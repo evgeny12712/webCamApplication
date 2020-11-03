@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Webcam Application</string>
+
+    <string-array name="howToStartOptions">
+        <item>By starting drive</item>
+        <item>By starting waze</item>
+    </string-array>
+</resources>

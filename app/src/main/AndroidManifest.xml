@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.webcamapplication">
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity android:name="Settings.NotificationsDialog"/>
+        <activity android:name="Settings.FragmentationDialog" />
+        <activity android:name="Settings.HowToStartDialog" />
+        <activity android:name="Gallery.FullScreenActivity" />
+        <activity android:name="Settings.SoundDialog"/>
+        <activity android:name=".SettingsActivity"/>
+        <activity android:name="Settings.ResetFrequencyDialog"/>
+        <activity android:name="Gallery.ImageAdapter"/>
+        <activity android:name="Gallery.GalleryActivity"/>
+        <activity android:name="Gallery.GallerySavedVideos"/>
+        <activity android:name="Gallery.GalleryPictures"/>
+        <activity android:name=".DrivingActivity"/>
+    </application>
+
+</manifest>
