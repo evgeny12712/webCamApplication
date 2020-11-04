@@ -32,8 +32,8 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-//import com.example.webcamapplication.DrivingActivity;
-//import com.example.webcamapplication.SettingsActivity;
+import com.example.webcamapplication.DrivingActivity;
+import Settings.SettingsActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
