@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
-import android.hardware.camera2.CameraDevice.StateCallback;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -21,7 +20,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -125,10 +123,6 @@ public class Camera extends AppCompatActivity {
     }
 
 
-    public String getCameraId()  {
-        return mCameraId;
-    }
-
     private static class CompareSizeByArea implements Comparator<Size> {
 
         @Override
@@ -147,9 +141,6 @@ public class Camera extends AppCompatActivity {
         }
     }
 
-<<<<<<< HEAD:app/src/main/java/com/example/webcamapplication/CameraClass.java
-    public void setupCamera(int width, int height, CameraManager cameraManager, WindowManager windowManager) {
-=======
     public void onWindowFocusChanged(boolean hasFocas) {
         super.onWindowFocusChanged(hasFocas);
         View decorView = getWindow().getDecorView();
@@ -164,7 +155,6 @@ public class Camera extends AppCompatActivity {
 
     private void setupCamera(int width, int height) {
         CameraManager cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
->>>>>>> parent of 5f020f4... cameraClass:app/src/main/java/com/example/webcamapplication/Camera.java
         try {
             for(String cameraId : cameraManager.getCameraIdList()){
                 CameraCharacteristics cameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId);
@@ -193,14 +183,6 @@ public class Camera extends AppCompatActivity {
         }
     }
 
-<<<<<<< HEAD:app/src/main/java/com/example/webcamapplication/CameraClass.java
-
-    public void connectCamera(CameraManager cameraManager, boolean isPermission, HandlerThread backgroundHandlerThread, String cameraId) {
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (isPermission) {
-                    cameraManager.openCamera(cameraId, cameraDeviceStateCallBack, backgroundHandlerThread);
-=======
     private void connectCamera() {
         CameraManager cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
 
@@ -210,7 +192,6 @@ public class Camera extends AppCompatActivity {
                         PackageManager.PERMISSION_GRANTED) {
                     cameraManager.openCamera(mCameraId, cameraDeviceStateCallBack, backgroundHandler);
 
->>>>>>> parent of 5f020f4... cameraClass:app/src/main/java/com/example/webcamapplication/Camera.java
                 } else {
                     if(shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
                         Toast.makeText(this, "video app required access to camera", Toast.LENGTH_SHORT).show();
@@ -220,54 +201,10 @@ public class Camera extends AppCompatActivity {
             } else {
                 cameraManager.openCamera(mCameraId, cameraDeviceStateCallBack, backgroundHandler);
             }
-<<<<<<< HEAD:app/src/main/java/com/example/webcamapplication/CameraClass.java
-            else
-                cameraManager.openCamera(cameraId, cameraDeviceStateCallBack, backgroundHandlerThread);
-=======
->>>>>>> parent of 5f020f4... cameraClass:app/src/main/java/com/example/webcamapplication/Camera.java
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
     }
-<<<<<<< HEAD:app/src/main/java/com/example/webcamapplication/CameraClass.java
-
-<<<<<<< HEAD:app/src/main/java/com/example/webcamapplication/CameraClass.java
-    public void closeCamera() {
-=======
-//    public void startPreview() {
-//        //first convert texture view into surface view that the camera can understand.
-//        SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
-//        //surfaceTexture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
-//        Surface previewSurface = new Surface(surfaceTexture);
-//
-//        try {
-//            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-//            mCaptureRequestBuilder.addTarget(previewSurface);
-//
-//            cameraDevice.createCaptureSession(Arrays.asList(previewSurface),
-//                    new CameraCaptureSession.StateCallback() {
-//                        public void onConfigured(CameraCaptureSession session) {
-//                            try {
-//                                session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, backgroundHandler);
-//                            } catch (CameraAccessException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onConfigureFailed(@NonNull CameraCaptureSession session) {
-//                            Toast.makeText(getApplicationContext(), "unable to setup camera preview", Toast.LENGTH_SHORT).show();
-//                        }
-//                    }, null);
-//
-//        } catch (CameraAccessException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-    private void closeCamera() {
->>>>>>> parent of 8cd77ea... Update Camera.java:app/src/main/java/com/example/webcamapplication/Camera.java
-=======
 
     public void startPreview() {
         //first convert texture view into surface view that the camera can understand.
@@ -301,7 +238,6 @@ public class Camera extends AppCompatActivity {
     }
 
     private void closeCamera() {
->>>>>>> parent of 5f020f4... cameraClass:app/src/main/java/com/example/webcamapplication/Camera.java
         if(cameraDevice != null) {
             cameraDevice.close();
             cameraDevice = null;
@@ -335,35 +271,6 @@ public class Camera extends AppCompatActivity {
         return (sensorOrientation + deviceOrientation + 360) %360;
     }
 
-<<<<<<< HEAD:app/src/main/java/com/example/webcamapplication/CameraClass.java
-<<<<<<< HEAD:app/src/main/java/com/example/webcamapplication/CameraClass.java
-=======
-//    private void transformImage(int width, int height){
-//        if(mPreviewSize == null || textureView == null) {
-//            return;
-//        }
-//
-//        Matrix matrix = new Matrix();
-//        int rotation = getWindowManager().getDefaultDisplay().getRotation();
-//        RectF textureRectF = new RectF(0,0,width,height);
-//        RectF previewRectF = new RectF(0,0,mPreviewSize.getHeight(), mPreviewSize.getWidth());
-//        float centerX = textureRectF.centerX();
-//        float centerY = textureRectF.centerY();
-//        if(rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
-//            previewRectF.offset(centerX - previewRectF.centerX(), centerY - previewRectF.centerY());
-//            matrix.setRectToRect(textureRectF, previewRectF, Matrix.ScaleToFit.FILL);
-//            float scale = Math.max((float)width / mPreviewSize.getWidth(),
-//                    (float)height / mPreviewSize.getHeight());
-//            matrix.postScale(scale, scale, centerX, centerY);
-//            matrix.postRotate(90 * (rotation - 2), centerX, centerY);
-//        }
-//        textureView.setTransform(matrix);
-//
-//    }
-
-
->>>>>>> parent of 8cd77ea... Update Camera.java:app/src/main/java/com/example/webcamapplication/Camera.java
-=======
     private void transformImage(int width, int height){
         if(mPreviewSize == null || textureView == null) {
             return;
@@ -388,7 +295,6 @@ public class Camera extends AppCompatActivity {
     }
 
 
->>>>>>> parent of 5f020f4... cameraClass:app/src/main/java/com/example/webcamapplication/Camera.java
     //give camera permission to preview and save files
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permission, int[] grantResults) {
@@ -446,39 +352,6 @@ public class Camera extends AppCompatActivity {
         }
     }
 
-    public void startPreview() {
-        //first convert texture view into surface view that the camera can understand.
-        SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
-        surfaceTexture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
-        Surface previewSurface = new Surface(surfaceTexture);
-
-        try {
-            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-            mCaptureRequestBuilder.addTarget(previewSurface);
-
-            cameraDevice.createCaptureSession(Arrays.asList(previewSurface),
-                    new CameraCaptureSession.StateCallback() {
-                        @RequiresApi(api = Build.VERSION_CODES.P)
-                        @Override
-                        public void onConfigured(@NonNull CameraCaptureSession session) {
-                            try {
-                                session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, backgroundHandler);
-                            } catch (CameraAccessException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        @Override
-                        public void onConfigureFailed(@NonNull CameraCaptureSession session) {
-                            Toast.makeText(getApplicationContext(), "unable to setup camera preview", Toast.LENGTH_SHORT).show();
-                        }
-                    }, null);
-
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
     private static Size chooseOptimalSize(Size[] choices, int width, int height) {
         List<Size> bigEnough = new ArrayList<Size>();
         for(Size option : choices) {
@@ -493,7 +366,6 @@ public class Camera extends AppCompatActivity {
             return choices[0];
         }
     }
-
 
     private void createVideoFolder() {
         //getting the directory in which we will create the folder for our files
