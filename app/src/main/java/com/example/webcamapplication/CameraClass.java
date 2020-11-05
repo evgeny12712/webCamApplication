@@ -9,6 +9,7 @@ import android.graphics.Camera;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
+import android.hardware.camera2.CameraDevice.StateCallback;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -22,6 +23,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -109,6 +111,10 @@ public class CameraClass extends AppCompatActivity {
         return mPreviewSize;
     }
 
+    public String getCameraId()  {
+        return mCameraId;
+    }
+
     private static class CompareSizeByArea implements Comparator<Size> {
 
         @Override
@@ -128,7 +134,6 @@ public class CameraClass extends AppCompatActivity {
     }
 
     public void setupCamera(int width, int height, CameraManager cameraManager, WindowManager windowManager) {
-
         try {
             for(String cameraId : cameraManager.getCameraIdList()){
                 CameraCharacteristics cameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId);
@@ -157,26 +162,24 @@ public class CameraClass extends AppCompatActivity {
         }
     }
 
-    @SuppressLint("MissingPermission")
-    public void connectCamera(CameraManager cameraManager, boolean isPermission, HandlerThread backgroundHandlerThread) {
-//        try {
+
+    public void connectCamera(CameraManager cameraManager, boolean isPermission, HandlerThread backgroundHandlerThread, String cameraId) {
+        try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (isPermission) {
-//                   cameraManager.openCamera(mCameraId, cameraDeviceStateCallBack, backgroundHandlerThread);
-                }
-                else {
+                    cameraManager.openCamera(cameraId, cameraDeviceStateCallBack, backgroundHandlerThread);
+                } else {
                     if(shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
                         Toast.makeText(this, "video app required access to camera", Toast.LENGTH_SHORT).show();
                     }
                     requestPermissions(new String[] {Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION_RESULT);
                 }
             }
-            else {
-//                cameraManager.openCamera(mCameraId, cameraDeviceStateCallBack, backgroundHandlerThread);
-            }
-//        } catch (CameraAccessException e) {
-//            e.printStackTrace();
-//        }
+            else
+                cameraManager.openCamera(cameraId, cameraDeviceStateCallBack, backgroundHandlerThread);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
     }
 
     public void closeCamera() {

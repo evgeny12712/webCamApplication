@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "IN SURFACETEXTUREAVAILABLE", Toast.LENGTH_SHORT).show();
             camera.setupCamera(width, height, cameraManager, getWindowManager());
             transformImage(textureView.getWidth(), textureView.getHeight());
-            camera.connectCamera(cameraManager, isPermission, backgroundHandlerThread);
+            camera.connectCamera(cameraManager, isPermission, backgroundHandlerThread, camera.getCameraId());
             Toast.makeText(getApplicationContext(), "CAMERA READY", Toast.LENGTH_SHORT).show();
         }
 
@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "AVAILABLE", Toast.LENGTH_SHORT).show();
             camera.setupCamera(textureView.getWidth(), textureView.getHeight(), cameraManager, getWindowManager());
             transformImage(textureView.getWidth(), textureView.getHeight());
-            camera.connectCamera(cameraManager, isPermission, backgroundHandlerThread);
+            camera.connectCamera(cameraManager, isPermission, backgroundHandlerThread, camera.getCameraId());
             startPreview();
         } else {
             Toast.makeText(getApplicationContext(), "textureViewIs-NOT-AVAILABLE", Toast.LENGTH_SHORT).show();
