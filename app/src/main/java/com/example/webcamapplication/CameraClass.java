@@ -182,7 +182,42 @@ public class CameraClass extends AppCompatActivity {
         }
     }
 
+<<<<<<< HEAD:app/src/main/java/com/example/webcamapplication/CameraClass.java
     public void closeCamera() {
+=======
+//    public void startPreview() {
+//        //first convert texture view into surface view that the camera can understand.
+//        SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
+//        //surfaceTexture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+//        Surface previewSurface = new Surface(surfaceTexture);
+//
+//        try {
+//            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+//            mCaptureRequestBuilder.addTarget(previewSurface);
+//
+//            cameraDevice.createCaptureSession(Arrays.asList(previewSurface),
+//                    new CameraCaptureSession.StateCallback() {
+//                        public void onConfigured(CameraCaptureSession session) {
+//                            try {
+//                                session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, backgroundHandler);
+//                            } catch (CameraAccessException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onConfigureFailed(@NonNull CameraCaptureSession session) {
+//                            Toast.makeText(getApplicationContext(), "unable to setup camera preview", Toast.LENGTH_SHORT).show();
+//                        }
+//                    }, null);
+//
+//        } catch (CameraAccessException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
+    private void closeCamera() {
+>>>>>>> parent of 8cd77ea... Update Camera.java:app/src/main/java/com/example/webcamapplication/Camera.java
         if(cameraDevice != null) {
             cameraDevice.close();
             cameraDevice = null;
@@ -216,6 +251,33 @@ public class CameraClass extends AppCompatActivity {
         return (sensorOrientation + deviceOrientation + 360) %360;
     }
 
+<<<<<<< HEAD:app/src/main/java/com/example/webcamapplication/CameraClass.java
+=======
+//    private void transformImage(int width, int height){
+//        if(mPreviewSize == null || textureView == null) {
+//            return;
+//        }
+//
+//        Matrix matrix = new Matrix();
+//        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+//        RectF textureRectF = new RectF(0,0,width,height);
+//        RectF previewRectF = new RectF(0,0,mPreviewSize.getHeight(), mPreviewSize.getWidth());
+//        float centerX = textureRectF.centerX();
+//        float centerY = textureRectF.centerY();
+//        if(rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
+//            previewRectF.offset(centerX - previewRectF.centerX(), centerY - previewRectF.centerY());
+//            matrix.setRectToRect(textureRectF, previewRectF, Matrix.ScaleToFit.FILL);
+//            float scale = Math.max((float)width / mPreviewSize.getWidth(),
+//                    (float)height / mPreviewSize.getHeight());
+//            matrix.postScale(scale, scale, centerX, centerY);
+//            matrix.postRotate(90 * (rotation - 2), centerX, centerY);
+//        }
+//        textureView.setTransform(matrix);
+//
+//    }
+
+
+>>>>>>> parent of 8cd77ea... Update Camera.java:app/src/main/java/com/example/webcamapplication/Camera.java
     //give camera permission to preview and save files
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permission, int[] grantResults) {
@@ -272,6 +334,39 @@ public class CameraClass extends AppCompatActivity {
 //        }
 //    }
 
+    public void startPreview() {
+        //first convert texture view into surface view that the camera can understand.
+        SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
+        surfaceTexture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+        Surface previewSurface = new Surface(surfaceTexture);
+
+        try {
+            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+            mCaptureRequestBuilder.addTarget(previewSurface);
+
+            cameraDevice.createCaptureSession(Arrays.asList(previewSurface),
+                    new CameraCaptureSession.StateCallback() {
+                        @RequiresApi(api = Build.VERSION_CODES.P)
+                        @Override
+                        public void onConfigured(@NonNull CameraCaptureSession session) {
+                            try {
+                                session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, backgroundHandler);
+                            } catch (CameraAccessException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onConfigureFailed(@NonNull CameraCaptureSession session) {
+                            Toast.makeText(getApplicationContext(), "unable to setup camera preview", Toast.LENGTH_SHORT).show();
+                        }
+                    }, null);
+
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
     private static Size chooseOptimalSize(Size[] choices, int width, int height) {
         List<Size> bigEnough = new ArrayList<Size>();
         for(Size option : choices) {
@@ -286,6 +381,7 @@ public class CameraClass extends AppCompatActivity {
             return choices[0];
         }
     }
+
 
     private void createVideoFolder() {
         //getting the directory in which we will create the folder for our files
