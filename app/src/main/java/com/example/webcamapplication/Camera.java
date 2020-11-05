@@ -1,11 +1,9 @@
 package com.example.webcamapplication;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Camera;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
@@ -30,7 +28,6 @@ import android.util.SparseIntArray;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -38,7 +35,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 //import com.example.webcamapplication.DrivingActivity;
@@ -58,15 +54,40 @@ import Gallery.GalleryActivity;
 
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-public class CameraClass extends AppCompatActivity {
+public class Camera extends AppCompatActivity {
     private static final int REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION_RESULT = 1;
     private static final int REQUEST_CAMERA_PERMISSION_RESULT = 0;
+    private TextureView textureView;
+    private TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
+        @Override
+        public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+            setupCamera(width, height); //setting up the camera that we gonna use (front or back)
+            connectCamera();
+        }
+
+        @Override
+        public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+
+        }
+
+        @Override
+        public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+            return false;
+        }
+
+        @Override
+        public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+
+        }
+    };
+
     private CameraDevice cameraDevice;
     private CameraDevice.StateCallback cameraDeviceStateCallBack = new CameraDevice.StateCallback() {
         @Override
         public void onOpened(@NonNull CameraDevice camera) {
             cameraDevice = camera;
-            //checkWriteStoragePermission();
+            Toast.makeText(getApplicationContext(), "CAMERA FILMING", Toast.LENGTH_SHORT).show();
+            checkWriteStoragePermission();
         }
 
 
@@ -82,8 +103,8 @@ public class CameraClass extends AppCompatActivity {
         }
     };
 
-//    private HandlerThread backgroundHandlerThread;
-//    private Handler backgroundHandler;
+    private HandlerThread backgroundHandlerThread;
+    private Handler backgroundHandler;
     private String mCameraId;
     private Size mPreviewSize;
     private Size mVideoSize;
@@ -103,13 +124,6 @@ public class CameraClass extends AppCompatActivity {
 
     }
 
-    public CameraDevice getCameraDevice() {
-        return cameraDevice;
-    }
-
-    public Size getmPreviewSize(){
-        return mPreviewSize;
-    }
 
     public String getCameraId()  {
         return mCameraId;
@@ -133,7 +147,24 @@ public class CameraClass extends AppCompatActivity {
         }
     }
 
+<<<<<<< HEAD:app/src/main/java/com/example/webcamapplication/CameraClass.java
     public void setupCamera(int width, int height, CameraManager cameraManager, WindowManager windowManager) {
+=======
+    public void onWindowFocusChanged(boolean hasFocas) {
+        super.onWindowFocusChanged(hasFocas);
+        View decorView = getWindow().getDecorView();
+        if(hasFocas) {
+            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+            );
+        }
+    }
+
+    private void setupCamera(int width, int height) {
+        CameraManager cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+>>>>>>> parent of 5f020f4... cameraClass:app/src/main/java/com/example/webcamapplication/Camera.java
         try {
             for(String cameraId : cameraManager.getCameraIdList()){
                 CameraCharacteristics cameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId);
@@ -142,7 +173,7 @@ public class CameraClass extends AppCompatActivity {
                     continue;
                 }
                 StreamConfigurationMap map = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-                int deviceOrientation = windowManager.getDefaultDisplay().getRotation(); //getting the rotation's of the device ( not sensor).
+                int deviceOrientation = getWindowManager().getDefaultDisplay().getRotation(); //getting the rotation's of the device ( not sensor).
 
                 mTotalRotation = sensorToDeviceRotation(cameraCharacteristics, deviceOrientation);
                 boolean swapRotation = mTotalRotation ==  90 || mTotalRotation == 270;
@@ -162,25 +193,43 @@ public class CameraClass extends AppCompatActivity {
         }
     }
 
+<<<<<<< HEAD:app/src/main/java/com/example/webcamapplication/CameraClass.java
 
     public void connectCamera(CameraManager cameraManager, boolean isPermission, HandlerThread backgroundHandlerThread, String cameraId) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (isPermission) {
                     cameraManager.openCamera(cameraId, cameraDeviceStateCallBack, backgroundHandlerThread);
+=======
+    private void connectCamera() {
+        CameraManager cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
+                        PackageManager.PERMISSION_GRANTED) {
+                    cameraManager.openCamera(mCameraId, cameraDeviceStateCallBack, backgroundHandler);
+
+>>>>>>> parent of 5f020f4... cameraClass:app/src/main/java/com/example/webcamapplication/Camera.java
                 } else {
                     if(shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
                         Toast.makeText(this, "video app required access to camera", Toast.LENGTH_SHORT).show();
                     }
                     requestPermissions(new String[] {Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION_RESULT);
                 }
+            } else {
+                cameraManager.openCamera(mCameraId, cameraDeviceStateCallBack, backgroundHandler);
             }
+<<<<<<< HEAD:app/src/main/java/com/example/webcamapplication/CameraClass.java
             else
                 cameraManager.openCamera(cameraId, cameraDeviceStateCallBack, backgroundHandlerThread);
+=======
+>>>>>>> parent of 5f020f4... cameraClass:app/src/main/java/com/example/webcamapplication/Camera.java
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
     }
+<<<<<<< HEAD:app/src/main/java/com/example/webcamapplication/CameraClass.java
 
 <<<<<<< HEAD:app/src/main/java/com/example/webcamapplication/CameraClass.java
     public void closeCamera() {
@@ -218,28 +267,63 @@ public class CameraClass extends AppCompatActivity {
 
     private void closeCamera() {
 >>>>>>> parent of 8cd77ea... Update Camera.java:app/src/main/java/com/example/webcamapplication/Camera.java
+=======
+
+    public void startPreview() {
+        //first convert texture view into surface view that the camera can understand.
+        SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
+        //surfaceTexture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+        Surface previewSurface = new Surface(surfaceTexture);
+
+        try {
+            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+            mCaptureRequestBuilder.addTarget(previewSurface);
+
+            cameraDevice.createCaptureSession(Arrays.asList(previewSurface),
+                    new CameraCaptureSession.StateCallback() {
+                        public void onConfigured(CameraCaptureSession session) {
+                            try {
+                                session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, backgroundHandler);
+                            } catch (CameraAccessException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onConfigureFailed(@NonNull CameraCaptureSession session) {
+                            Toast.makeText(getApplicationContext(), "unable to setup camera preview", Toast.LENGTH_SHORT).show();
+                        }
+                    }, null);
+
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void closeCamera() {
+>>>>>>> parent of 5f020f4... cameraClass:app/src/main/java/com/example/webcamapplication/Camera.java
         if(cameraDevice != null) {
             cameraDevice.close();
             cameraDevice = null;
         }
     }
 
-//    public void startBackgroundThread() {
-//        backgroundHandlerThread = new HandlerThread("MainActivity");
-//        backgroundHandlerThread.start();
-//        backgroundHandler = new Handler(backgroundHandlerThread.getLooper());
-//    }
+    public void startBackgroundThread() {
+        backgroundHandlerThread = new HandlerThread("MainActivity");
+        backgroundHandlerThread.start();
+        backgroundHandler = new Handler(backgroundHandlerThread.getLooper());
+    }
 
-//    private void stopBackGroundThread() {
-//        backgroundHandlerThread.quitSafely();
-//        try {
-//            backgroundHandlerThread.join();
-//            backgroundHandlerThread = null;
-//            backgroundHandler = null;
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//    }
+    private void stopBackGroundThread() {
+        backgroundHandlerThread.quitSafely();
+        try {
+            backgroundHandlerThread.join();
+            backgroundHandlerThread = null;
+            backgroundHandler = null;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
     //converting the camera sensor orientations to the device orientations
     private static int sensorToDeviceRotation(CameraCharacteristics cameraCharacteristics, int deviceOrientation) {
@@ -251,6 +335,7 @@ public class CameraClass extends AppCompatActivity {
         return (sensorOrientation + deviceOrientation + 360) %360;
     }
 
+<<<<<<< HEAD:app/src/main/java/com/example/webcamapplication/CameraClass.java
 <<<<<<< HEAD:app/src/main/java/com/example/webcamapplication/CameraClass.java
 =======
 //    private void transformImage(int width, int height){
@@ -278,6 +363,32 @@ public class CameraClass extends AppCompatActivity {
 
 
 >>>>>>> parent of 8cd77ea... Update Camera.java:app/src/main/java/com/example/webcamapplication/Camera.java
+=======
+    private void transformImage(int width, int height){
+        if(mPreviewSize == null || textureView == null) {
+            return;
+        }
+
+        Matrix matrix = new Matrix();
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        RectF textureRectF = new RectF(0,0,width,height);
+        RectF previewRectF = new RectF(0,0,mPreviewSize.getHeight(), mPreviewSize.getWidth());
+        float centerX = textureRectF.centerX();
+        float centerY = textureRectF.centerY();
+        if(rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
+            previewRectF.offset(centerX - previewRectF.centerX(), centerY - previewRectF.centerY());
+            matrix.setRectToRect(textureRectF, previewRectF, Matrix.ScaleToFit.FILL);
+            float scale = Math.max((float)width / mPreviewSize.getWidth(),
+                    (float)height / mPreviewSize.getHeight());
+            matrix.postScale(scale, scale, centerX, centerY);
+            matrix.postRotate(90 * (rotation - 2), centerX, centerY);
+        }
+        textureView.setTransform(matrix);
+
+    }
+
+
+>>>>>>> parent of 5f020f4... cameraClass:app/src/main/java/com/example/webcamapplication/Camera.java
     //give camera permission to preview and save files
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permission, int[] grantResults) {
@@ -301,38 +412,39 @@ public class CameraClass extends AppCompatActivity {
         }
     }
 
-//    public void startRecord() {
-//        try {
-//            setupMediaRecorder();
-//            //creating the surface on which we gonna display the preview while recording
-//            SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
-//            surfaceTexture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
-//            Surface previewSurface = new Surface(surfaceTexture);
-//            Surface recordSurface = mMediaRecorder.getSurface();
-//            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
-//            mCaptureRequestBuilder.addTarget(previewSurface);
-//            mCaptureRequestBuilder.addTarget(recordSurface);
-//
-//            cameraDevice.createCaptureSession(Arrays.asList(previewSurface, recordSurface),
-//                    new CameraCaptureSession.StateCallback() {
-//                        @Override
-//                        public void onConfigured(@NonNull CameraCaptureSession session) {
-//                            try {
-//                                session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, null);
-//                            } catch (CameraAccessException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onConfigureFailed(@NonNull CameraCaptureSession session) {
-//
-//                        }
-//                    }, null);
-//        } catch (IOException | CameraAccessException e) {
-//            e.printStackTrace();
-//        }
-//    }
+    public void startRecord() {
+        try {
+
+            setupMediaRecorder();
+            //creating the surface on which we gonna display the preview while recording
+            SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
+            surfaceTexture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+            Surface previewSurface = new Surface(surfaceTexture);
+            Surface recordSurface = mMediaRecorder.getSurface();
+            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+            mCaptureRequestBuilder.addTarget(previewSurface);
+            mCaptureRequestBuilder.addTarget(recordSurface);
+
+            cameraDevice.createCaptureSession(Arrays.asList(previewSurface, recordSurface),
+                    new CameraCaptureSession.StateCallback() {
+                        @Override
+                        public void onConfigured(@NonNull CameraCaptureSession session) {
+                            try {
+                                session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, null);
+                            } catch (CameraAccessException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onConfigureFailed(@NonNull CameraCaptureSession session) {
+
+                        }
+                    }, null);
+        } catch (IOException | CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void startPreview() {
         //first convert texture view into surface view that the camera can understand.
@@ -408,45 +520,45 @@ public class CameraClass extends AppCompatActivity {
         return videoFile;
     }
 
-//    private void checkWriteStoragePermission() {
-//        //checking if our version is greater then marshmallow
-//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            //checking if we already got permission
-//            if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//                    == PackageManager.PERMISSION_GRANTED) {
-//                try {
-//                    //create file to save video
-//                    createVideoFileName();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                // startPreview();
-//                startRecord();
-//                mMediaRecorder.start();
-////                mChronometer.setBase(SystemClock.elapsedRealtime());
-////                mChronometer.start();
-//            } else {
-//                //showing message to the user if he decided to refuse to give permission
-//                if(shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-//                    Toast.makeText(this, "app needs to be able to save videos", Toast.LENGTH_SHORT).show();
-//                }
-//                //requesting the permission
-//                requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
-//                        REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION_RESULT);
-//            }
-//        } else {
-//            try {
-//                createVideoFileName();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            startRecord();
-//            mMediaRecorder.start();
-////            mChronometer.setBase(SystemClock.elapsedRealtime());
-////            mChronometer.setVisibility(View.VISIBLE);
-////            mChronometer.start();
-//        }
-//    }
+    private void checkWriteStoragePermission() {
+        //checking if our version is greater then marshmallow
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            //checking if we already got permission
+            if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                try {
+                    //create file to save video
+                    createVideoFileName();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                // startPreview();
+                startRecord();
+                mMediaRecorder.start();
+//                mChronometer.setBase(SystemClock.elapsedRealtime());
+//                mChronometer.start();
+            } else {
+                //showing message to the user if he decided to refuse to give permission
+                if(shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+                    Toast.makeText(this, "app needs to be able to save videos", Toast.LENGTH_SHORT).show();
+                }
+                //requesting the permission
+                requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION_RESULT);
+            }
+        } else {
+            try {
+                createVideoFileName();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            startRecord();
+            mMediaRecorder.start();
+//            mChronometer.setBase(SystemClock.elapsedRealtime());
+//            mChronometer.setVisibility(View.VISIBLE);
+//            mChronometer.start();
+        }
+    }
 
     private void setupMediaRecorder() throws IOException {
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
