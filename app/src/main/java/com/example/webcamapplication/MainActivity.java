@@ -55,12 +55,8 @@ public class MainActivity extends AppCompatActivity {
             transformImage(textureView.getWidth(), textureView.getHeight());
 <<<<<<< HEAD
 <<<<<<< HEAD
-<<<<<<< HEAD
             camera.connectCamera(cameraManager, isPermission, backgroundHandlerThread, camera.getCameraId());
             Toast.makeText(getApplicationContext(), "CAMERA READY", Toast.LENGTH_SHORT).show();
-=======
-            connectCamera();
->>>>>>> parent of 5f020f4... cameraClass
 =======
             connectCamera();
 >>>>>>> parent of 5f020f4... cameraClass
@@ -188,12 +184,8 @@ public class MainActivity extends AppCompatActivity {
             transformImage(textureView.getWidth(), textureView.getHeight());
 <<<<<<< HEAD
 <<<<<<< HEAD
-<<<<<<< HEAD
             camera.connectCamera(cameraManager, isPermission, backgroundHandlerThread, camera.getCameraId());
             startPreview();
-=======
-            connectCamera();
->>>>>>> parent of 5f020f4... cameraClass
 =======
             connectCamera();
 >>>>>>> parent of 5f020f4... cameraClass
