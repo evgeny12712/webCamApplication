@@ -48,21 +48,16 @@ import Gallery.GalleryActivity;
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CAMERA_PERMISSION_RESULT = 0;
     private TextureView textureView;
+    CameraClass camera;
+    CameraManager cameraManager;
+    boolean isPermission;
     private TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
             setupCamera(width, height);
             transformImage(textureView.getWidth(), textureView.getHeight());
-<<<<<<< HEAD
-<<<<<<< HEAD
             camera.connectCamera(cameraManager, isPermission, backgroundHandlerThread, camera.getCameraId());
             Toast.makeText(getApplicationContext(), "CAMERA READY", Toast.LENGTH_SHORT).show();
-=======
-            connectCamera();
->>>>>>> parent of 5f020f4... cameraClass
-=======
-            connectCamera();
->>>>>>> parent of 5f020f4... cameraClass
         }
 
         @Override
@@ -87,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         public void onOpened(@NonNull CameraDevice camera) {
               cameraDevice = camera;
               startPreview();
-              Toast.makeText(MainActivity.this, "Camera connection done!", Toast.LENGTH_SHORT).show();
+              Toast.makeText(MainActivity.this, "CameraClass connection done!", Toast.LENGTH_SHORT).show();
         }
 
         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -139,8 +134,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        camera = new CameraClass();
         textureView = (TextureView)findViewById(R.id.textureView);
+        cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
 
         startBtn = (ImageButton) findViewById(R.id.btnStart);
         startBtn.setOnClickListener(new View.OnClickListener() {
@@ -182,16 +178,9 @@ public class MainActivity extends AppCompatActivity {
         if(textureView.isAvailable()) {
             setupCamera(textureView.getWidth(), textureView.getHeight());
             transformImage(textureView.getWidth(), textureView.getHeight());
-<<<<<<< HEAD
-<<<<<<< HEAD
             camera.connectCamera(cameraManager, isPermission, backgroundHandlerThread, camera.getCameraId());
             startPreview();
-=======
             connectCamera();
->>>>>>> parent of 5f020f4... cameraClass
-=======
-            connectCamera();
->>>>>>> parent of 5f020f4... cameraClass
         } else {
             textureView.setSurfaceTextureListener(surfaceTextureListener);
         }

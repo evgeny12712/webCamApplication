@@ -206,6 +206,7 @@ public class Camera extends AppCompatActivity {
         }
     }
 
+<<<<<<< HEAD:app/src/main/java/com/example/webcamapplication/Camera.java
     public void startPreview() {
         //first convert texture view into surface view that the camera can understand.
         SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
@@ -238,6 +239,9 @@ public class Camera extends AppCompatActivity {
     }
 
     private void closeCamera() {
+=======
+    public void closeCamera() {
+>>>>>>> parent of c45711e... com:app/src/main/java/com/example/webcamapplication/CameraClass.java
         if(cameraDevice != null) {
             cameraDevice.close();
             cameraDevice = null;
@@ -271,6 +275,7 @@ public class Camera extends AppCompatActivity {
         return (sensorOrientation + deviceOrientation + 360) %360;
     }
 
+<<<<<<< HEAD:app/src/main/java/com/example/webcamapplication/Camera.java
     private void transformImage(int width, int height){
         if(mPreviewSize == null || textureView == null) {
             return;
@@ -295,6 +300,8 @@ public class Camera extends AppCompatActivity {
     }
 
 
+=======
+>>>>>>> parent of c45711e... com:app/src/main/java/com/example/webcamapplication/CameraClass.java
     //give camera permission to preview and save files
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permission, int[] grantResults) {
@@ -318,6 +325,7 @@ public class Camera extends AppCompatActivity {
         }
     }
 
+<<<<<<< HEAD:app/src/main/java/com/example/webcamapplication/Camera.java
     public void startRecord() {
         try {
 
@@ -351,6 +359,40 @@ public class Camera extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+=======
+//    public void startRecord() {
+//        try {
+//            setupMediaRecorder();
+//            //creating the surface on which we gonna display the preview while recording
+//            SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
+//            surfaceTexture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+//            Surface previewSurface = new Surface(surfaceTexture);
+//            Surface recordSurface = mMediaRecorder.getSurface();
+//            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+//            mCaptureRequestBuilder.addTarget(previewSurface);
+//            mCaptureRequestBuilder.addTarget(recordSurface);
+//
+//            cameraDevice.createCaptureSession(Arrays.asList(previewSurface, recordSurface),
+//                    new CameraCaptureSession.StateCallback() {
+//                        @Override
+//                        public void onConfigured(@NonNull CameraCaptureSession session) {
+//                            try {
+//                                session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, null);
+//                            } catch (CameraAccessException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onConfigureFailed(@NonNull CameraCaptureSession session) {
+//
+//                        }
+//                    }, null);
+//        } catch (IOException | CameraAccessException e) {
+//            e.printStackTrace();
+//        }
+//    }
+>>>>>>> parent of c45711e... com:app/src/main/java/com/example/webcamapplication/CameraClass.java
 
     private static Size chooseOptimalSize(Size[] choices, int width, int height) {
         List<Size> bigEnough = new ArrayList<Size>();
