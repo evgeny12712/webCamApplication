@@ -1,9 +1,11 @@
 package com.example.webcamapplication;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Camera;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
@@ -56,28 +58,6 @@ import Gallery.GalleryActivity;
 public class CameraClass extends AppCompatActivity {
     private static final int REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION_RESULT = 1;
     private static final int REQUEST_CAMERA_PERMISSION_RESULT = 0;
-    private TextureView textureView;
-    private TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
-        @Override
-        public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-            setupCamera(width, height); //setting up the camera that we gonna use (front or back)
-        }
-
-        @Override
-        public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-
-        }
-
-        @Override
-        public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-            return false;
-        }
-
-        @Override
-        public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-
-        }
-    };
 
     private CameraDevice cameraDevice;
     private CameraDevice.StateCallback cameraDeviceStateCallBack = new CameraDevice.StateCallback() {
@@ -157,28 +137,29 @@ public class CameraClass extends AppCompatActivity {
         }
     }
 
-    private void setupCamera(int width, int height) {
-        CameraManager cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+    public void setupCamera(int width, int height,int deviceOrientation, CameraManager cameraManager) {
         try {
             for (String cameraId : cameraManager.getCameraIdList()) {
                 CameraCharacteristics cameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId);
+                //iterating through all the cameras and checking if its facing front, if it is so continue
                 if (cameraCharacteristics.get(CameraCharacteristics.LENS_FACING) ==
                         CameraCharacteristics.LENS_FACING_FRONT) {
                     continue;
                 }
+                //creating a list of all the all output formats (and sizes respectively for that format) that are supported by a camera device.
                 StreamConfigurationMap map = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-                int deviceOrientation = getWindowManager().getDefaultDisplay().getRotation(); //getting the rotation's of the device ( not sensor).
-
-                mTotalRotation = sensorToDeviceRotation(cameraCharacteristics, deviceOrientation);
-                boolean swapRotation = mTotalRotation == 90 || mTotalRotation == 270;
+                mTotalRotation = sensorToDeviceRotation(cameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION), deviceOrientation); //getting the rotation of the sensor
+                boolean swapRotation = mTotalRotation == 90 || mTotalRotation == 270; //check is the phone is landscape mode
                 int rotatedWidth = width;
                 int rotatedHeight = height;
+                //if the phone is landscape so switch between height and width
                 if (swapRotation) {
                     rotatedWidth = height;
                     rotatedHeight = width;
                 }
-
+                //setup the preview size
                 mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class), rotatedWidth, rotatedHeight);
+
                 mCameraId = cameraId;
                 return;
             }
@@ -187,26 +168,20 @@ public class CameraClass extends AppCompatActivity {
         }
     }
 
-    public void connectCamera(CameraManager cameraManager, boolean isPermission, HandlerThread backgroundHandlerThread, String cameraId) {
+    @SuppressLint("MissingPermission")
+    public void connectCamera(CameraManager cameraManager, boolean isPermission) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (isPermission) {
-                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
-                        return;
-                    }
                     cameraManager.openCamera(mCameraId, cameraDeviceStateCallBack, backgroundHandler);
 
-                } else {
+                }
+                else {
+                    //check if we should show a request for permission
                     if(shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
                         Toast.makeText(this, "video app required access to camera", Toast.LENGTH_SHORT).show();
                     }
+                    // asking for the permission
                     requestPermissions(new String[] {Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION_RESULT);
                 }
             } else {
@@ -217,92 +192,69 @@ public class CameraClass extends AppCompatActivity {
         }
     }
 
-    public void startPreview() {
-        //first convert texture view into surface view that the camera can understand.
-        SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
-        //surfaceTexture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
-        Surface previewSurface = new Surface(surfaceTexture);
+//    public void startPreview() {
+//        //first convert texture view into surface view that the camera can understand.
+//        SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
+//        //surfaceTexture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+//        Surface previewSurface = new Surface(surfaceTexture);
+//
+//        try {
+//            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+//            mCaptureRequestBuilder.addTarget(previewSurface);
+//
+//            cameraDevice.createCaptureSession(Arrays.asList(previewSurface),
+//                    new CameraCaptureSession.StateCallback() {
+//                        public void onConfigured(CameraCaptureSession session) {
+//                            try {
+//                                session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, backgroundHandler);
+//                            } catch (CameraAccessException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onConfigureFailed(@NonNull CameraCaptureSession session) {
+//                            Toast.makeText(getApplicationContext(), "unable to setup camera preview", Toast.LENGTH_SHORT).show();
+//                        }
+//                    }, null);
+//
+//        } catch (CameraAccessException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
-        try {
-            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-            mCaptureRequestBuilder.addTarget(previewSurface);
-
-            cameraDevice.createCaptureSession(Arrays.asList(previewSurface),
-                    new CameraCaptureSession.StateCallback() {
-                        public void onConfigured(CameraCaptureSession session) {
-                            try {
-                                session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, backgroundHandler);
-                            } catch (CameraAccessException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        @Override
-                        public void onConfigureFailed(@NonNull CameraCaptureSession session) {
-                            Toast.makeText(getApplicationContext(), "unable to setup camera preview", Toast.LENGTH_SHORT).show();
-                        }
-                    }, null);
-
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void closeCamera() {
+    public void closeCamera() {
         if(cameraDevice != null) {
             cameraDevice.close();
             cameraDevice = null;
         }
     }
 
-    public void startBackgroundThread() {
-        backgroundHandlerThread = new HandlerThread("MainActivity");
-        backgroundHandlerThread.start();
-        backgroundHandler = new Handler(backgroundHandlerThread.getLooper());
-    }
-
-    private void stopBackGroundThread() {
-        backgroundHandlerThread.quitSafely();
-        try {
-            backgroundHandlerThread.join();
-            backgroundHandlerThread = null;
-            backgroundHandler = null;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
+    // ABOUT TO REMOVE
+//    public void startBackgroundThread() {
+//        backgroundHandlerThread = new HandlerThread("MainActivity");
+//        backgroundHandlerThread.start();
+//        backgroundHandler = new Handler(backgroundHandlerThread.getLooper());
+//    }
+//
+//    private void stopBackGroundThread() {
+//        backgroundHandlerThread.quitSafely();
+//        try {
+//            backgroundHandlerThread.join();
+//            backgroundHandlerThread = null;
+//            backgroundHandler = null;
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     //converting the camera sensor orientations to the device orientations
-    private static int sensorToDeviceRotation(CameraCharacteristics cameraCharacteristics, int deviceOrientation) {
-        int sensorOrientation = cameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);  //getting the sensor orientation to a variable.
+    private static int sensorToDeviceRotation(int cameraSensorOrientation, int deviceOrientation) {
         deviceOrientation = ORIENTATIONS.get(deviceOrientation); // getting the device orientation and converting it to real number.
-        Log.i("orientations", "sensorOrientation " + sensorOrientation);
+        Log.i("orientations", "sensorOrientation " + cameraSensorOrientation);
         Log.i("device orientation", deviceOrientation + " deviceOrientation");
-        Log.i("Both", (sensorOrientation + deviceOrientation + 360) % 360 + " Both");
-        return (sensorOrientation + deviceOrientation + 360) %360;
-    }
-
-    private void transformImage(int width, int height){
-        if(mPreviewSize == null || textureView == null) {
-            return;
-        }
-
-        Matrix matrix = new Matrix();
-        int rotation = getWindowManager().getDefaultDisplay().getRotation();
-        RectF textureRectF = new RectF(0,0,width,height);
-        RectF previewRectF = new RectF(0,0,mPreviewSize.getHeight(), mPreviewSize.getWidth());
-        float centerX = textureRectF.centerX();
-        float centerY = textureRectF.centerY();
-        if(rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
-            previewRectF.offset(centerX - previewRectF.centerX(), centerY - previewRectF.centerY());
-            matrix.setRectToRect(textureRectF, previewRectF, Matrix.ScaleToFit.FILL);
-            float scale = Math.max((float)width / mPreviewSize.getWidth(),
-                    (float)height / mPreviewSize.getHeight());
-            matrix.postScale(scale, scale, centerX, centerY);
-            matrix.postRotate(90 * (rotation - 2), centerX, centerY);
-        }
-        textureView.setTransform(matrix);
-
+        Log.i("Both", (cameraSensorOrientation + deviceOrientation + 360) % 360 + " Both");
+        return (cameraSensorOrientation + deviceOrientation + 360) % 360;
     }
 
 
@@ -329,7 +281,7 @@ public class CameraClass extends AppCompatActivity {
         }
     }
 
-    public void startRecord() {
+    public void startRecord(TextureView textureView) {
         try {
 
             setupMediaRecorder();
@@ -416,7 +368,7 @@ public class CameraClass extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 // startPreview();
-                startRecord();
+//                startRecord();
                 mMediaRecorder.start();
 //                mChronometer.setBase(SystemClock.elapsedRealtime());
 //                mChronometer.start();
@@ -435,7 +387,7 @@ public class CameraClass extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            startRecord();
+//            startRecord();
             mMediaRecorder.start();
 //            mChronometer.setBase(SystemClock.elapsedRealtime());
 //            mChronometer.setVisibility(View.VISIBLE);
