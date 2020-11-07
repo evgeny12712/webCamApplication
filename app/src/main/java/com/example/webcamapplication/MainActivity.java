@@ -58,6 +58,15 @@ public class MainActivity extends AppCompatActivity {
 <<<<<<< HEAD
             camera.connectCamera(cameraManager, isPermission, backgroundHandlerThread, camera.getCameraId());
             Toast.makeText(getApplicationContext(), "CAMERA READY", Toast.LENGTH_SHORT).show();
+=======
+            connectCamera();
+>>>>>>> parent of 5f020f4... cameraClass
+=======
+            connectCamera();
+>>>>>>> parent of 5f020f4... cameraClass
+=======
+            connectCamera();
+>>>>>>> parent of 5f020f4... cameraClass
         }
 
         @Override
@@ -177,12 +186,20 @@ public class MainActivity extends AppCompatActivity {
         if(textureView.isAvailable()) {
             setupCamera(textureView.getWidth(), textureView.getHeight());
             transformImage(textureView.getWidth(), textureView.getHeight());
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
             camera.connectCamera(cameraManager, isPermission, backgroundHandlerThread, camera.getCameraId());
             startPreview();
+=======
             connectCamera();
-
+>>>>>>> parent of 5f020f4... cameraClass
+=======
             connectCamera();
+>>>>>>> parent of 5f020f4... cameraClass
+=======
             connectCamera();
+>>>>>>> parent of 5f020f4... cameraClass
         } else {
             textureView.setSurfaceTextureListener(surfaceTextureListener);
         }
