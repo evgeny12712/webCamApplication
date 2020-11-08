@@ -3,6 +3,7 @@ package com.example.webcamapplication;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Matrix;
 import android.graphics.RectF;
@@ -47,10 +48,10 @@ import Gallery.GalleryActivity;
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class MainActivity extends AppCompatActivity {
         private static final int REQUEST_CAMERA_PERMISSION_RESULT = 0;
-        private TextureView textureView;
         private CameraClass camera;
         private CameraManager cameraManager;
-        boolean isPermission;
+
+        private TextureView textureView;
         private TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
             @Override
             public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
@@ -127,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
             textureView = (TextureView)findViewById(R.id.textureView);
             cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
 
+
             startBtn = (ImageButton) findViewById(R.id.btnStart);
             startBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -198,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
         public void startPreview() {
             //first convert texture view into surface view that the camera can understand.
             SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
-            //surfaceTexture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+            surfaceTexture.setDefaultBufferSize(camera.getPreviewSize().getWidth(), camera.getPreviewSize().getHeight());
             Surface previewSurface = new Surface(surfaceTexture);
             try {
                 //setting up a request builder for preview
@@ -247,16 +249,18 @@ public class MainActivity extends AppCompatActivity {
         }
 
         private void transformImage(int width, int height){
+            mPreviewSize = camera.getPreviewSize();
             if(mPreviewSize == null || textureView == null) {
                 return;
             }
-
+            //creating a new matrix (maritsa)
             Matrix matrix = new Matrix();
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
             RectF textureRectF = new RectF(0,0,width,height);
-            RectF previewRectF = new RectF(0,0,mPreviewSize.getHeight(), mPreviewSize.getWidth());
+            RectF previewRectF = new RectF(0,0, mPreviewSize.getHeight(), mPreviewSize.getWidth());
             float centerX = textureRectF.centerX();
             float centerY = textureRectF.centerY();
+            //if switch to landscape mode
             if(rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
                 previewRectF.offset(centerX - previewRectF.centerX(), centerY - previewRectF.centerY());
                 matrix.setRectToRect(textureRectF, previewRectF, Matrix.ScaleToFit.FILL);

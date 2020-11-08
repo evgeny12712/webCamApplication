@@ -107,6 +107,10 @@ public class CameraClass extends AppCompatActivity {
         return mCameraId;
     }
 
+    public Size getPreviewSize() {
+        return mPreviewSize;
+    }
+
     private static class CompareSizeByArea implements Comparator<Size> {
 
         @Override
