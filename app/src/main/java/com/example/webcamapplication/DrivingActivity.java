@@ -100,20 +100,16 @@ public class DrivingActivity extends AppCompatActivity {
 
     private HandlerThread backgroundHandlerThread;
     private Handler backgroundHandler;
-    private String mCameraId;
-    private Size mPreviewSize;
-    private Size mVideoSize;
     private MediaRecorder mMediaRecorder;
-    private int mTotalRotation;
     private CaptureRequest.Builder mCaptureRequestBuilder;
-
+    private CameraManager cameraManager;
     private ImageButton btnMinimize;
     private ImageButton btnStop;
     private ImageButton btnPicture;
     private Chronometer mChronometer;
     private File mVideoFolder; //file path
     private String mVideoFileName; // file name
-
+    private CameraClass camera;
     private static SparseIntArray ORIENTATIONS = new SparseIntArray(); //converting surface orientation to real numbers
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 0);
@@ -124,24 +120,12 @@ public class DrivingActivity extends AppCompatActivity {
     }
 
 
-
-    //fitting the camera resolution to the device
-    private static class CompareSizeByArea implements Comparator<Size> {
-
-        @Override
-        public int compare(Size lhs, Size rhs) {
-            return Long.signum((long) lhs.getWidth() * lhs.getHeight() /
-                    (long) rhs.getWidth() * rhs.getHeight());
-        }
-    }
-
-
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driving);
 
         mMediaRecorder = new MediaRecorder();
-
+        cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         textureView = (TextureView)findViewById(R.id.textureView);
         mChronometer = (Chronometer) findViewById(R.id.videoTimer);
         btnMinimize = (ImageButton) findViewById(R.id.btnMinimize);
@@ -239,59 +223,32 @@ public class DrivingActivity extends AppCompatActivity {
         }
     }
 
-    //setting the camera id - choosing the camera that we wanna use (front of back)
-    private void setupCamera(int width, int height) {
-        CameraManager cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-        try {
-            for(String cameraId : cameraManager.getCameraIdList()){
-                CameraCharacteristics cameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId); //getting the camera characteristics of this id
-                if(cameraCharacteristics.get(CameraCharacteristics.LENS_FACING) ==  // checking if we are on the from camera, if we are so skip
-                        CameraCharacteristics.LENS_FACING_FRONT) {
-                    continue;
-                }
-                StreamConfigurationMap map = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-                int deviceOrientation = getWindowManager().getDefaultDisplay().getRotation(); //getting the rotation's of the device ( not sensor).
-                mTotalRotation = sensorToDeviceRotation(cameraCharacteristics, deviceOrientation);
-                boolean swapRotation = mTotalRotation == 90 || mTotalRotation == 270;
-                int rotatedWidth = width;
-                int rotatedHeight = height;
-                if(swapRotation) { // if out device is on poetrate mode so swap height and width
-                    rotatedWidth = height;
-                    rotatedHeight = width;
-                }
-                mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class), rotatedWidth, rotatedHeight);
-                mVideoSize = chooseOptimalSize(map.getOutputSizes(MediaRecorder.class), rotatedWidth, rotatedHeight);
 
-                mCameraId = cameraId; //getting the id of the back camera that we gonna use
-                return;
-            }
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
+    //connecting to the camera, getting the camera service, asking for permission
     private void connectCamera() {
-        CameraManager cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
                         PackageManager.PERMISSION_GRANTED) {
-                    cameraManager.openCamera(mCameraId, cameraDeviceStateCallBack, backgroundHandler);
-
-                } else {
+                    cameraManager.openCamera(camera.getCameraId(), cameraDeviceStateCallBack, backgroundHandler); //open the connection to the camera
+                }
+                else
+                {
+                    //check if we should show a request for permission
                     if(shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
                         Toast.makeText(this, "video app required access to camera", Toast.LENGTH_SHORT).show();
                     }
+                    // asking for the permission
                     requestPermissions(new String[] {Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION_RESULT);
                 }
             } else {
-                cameraManager.openCamera(mCameraId, cameraDeviceStateCallBack, backgroundHandler);
+                cameraManager.openCamera(camera.getCameraId(), cameraDeviceStateCallBack, backgroundHandler); //open the connection to the camera
             }
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
     }
+
 
     private static int sensorToDeviceRotation(CameraCharacteristics cameraCharacteristics, int deviceOrientation) {
         int sensorOrientation = cameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION); //getting the camera sensor orientations
@@ -302,11 +259,10 @@ public class DrivingActivity extends AppCompatActivity {
 
     public void startRecord() {
         try {
-
             setupMediaRecorder();
             //creating the surface on which we gonna display the preview while recording
             SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
-            surfaceTexture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+            surfaceTexture.setDefaultBufferSize(camera.getPreviewSize().getWidth(), camera.getPreviewSize().getHeight());
             Surface previewSurface = new Surface(surfaceTexture);
             Surface recordSurface = mMediaRecorder.getSurface();
             mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
@@ -334,39 +290,6 @@ public class DrivingActivity extends AppCompatActivity {
         }
     }
 
-    public void startPreview() {
-        //first convert texture view into surface view that the camera can understand.
-        SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
-        surfaceTexture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
-        Surface previewSurface = new Surface(surfaceTexture);
-
-        try {
-            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-            mCaptureRequestBuilder.addTarget(previewSurface);
-
-            cameraDevice.createCaptureSession(Arrays.asList(previewSurface),
-                    new CameraCaptureSession.StateCallback() {
-                        @RequiresApi(api = Build.VERSION_CODES.P)
-                        @Override
-                        public void onConfigured(@NonNull CameraCaptureSession session) {
-                            try {
-                                session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, backgroundHandler);
-                            } catch (CameraAccessException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        @Override
-                        public void onConfigureFailed(@NonNull CameraCaptureSession session) {
-                            Toast.makeText(DrivingActivity.this, "unable to setup camera preview", Toast.LENGTH_SHORT).show();
-                        }
-                    }, null);
-
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void closeCamera() {
         if(cameraDevice != null) {
             cameraDevice.close();
@@ -390,22 +313,6 @@ public class DrivingActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
-    private static Size chooseOptimalSize(Size[] choices, int width, int height) {
-        List<Size> bigEnough = new ArrayList<Size>();
-        for(Size option : choices) {
-            if(option.getHeight() == option.getWidth() * height / width &&
-                    option.getWidth() >= width && option.getHeight() >= height) {
-                bigEnough.add(option);
-            }
-        }
-        if(bigEnough.size() > 0) {
-            return Collections.min(bigEnough, new CompareSizeByArea());
-        } else {
-            return choices[0];
-        }
-    }
-
 
     private void createVideoFolder() {
         //getting the directory in which we will create the folder for our files
@@ -472,16 +379,58 @@ public class DrivingActivity extends AppCompatActivity {
         }
     }
 
-    private void setupMediaRecorder() throws IOException {
+    //fitting the camera resolution to the device
+    private static class CompareSizeByArea implements Comparator<Size> {
+        @Override
+        public int compare(Size lhs, Size rhs) {
+            return Long.signum((long) lhs.getWidth() * lhs.getHeight() /
+                    (long) rhs.getWidth() * rhs.getHeight());
+        }
+    }
+
+    private MediaRecorder setupMediaRecorder() throws IOException {
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         mMediaRecorder.setOutputFile(mVideoFileName);
         mMediaRecorder.setVideoEncodingBitRate(1000000);
         mMediaRecorder.setVideoFrameRate(30);
-        mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
+        mMediaRecorder.setVideoSize(camera.getVideoSize().getWidth(), camera.getVideoSize().getHeight());
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-        mMediaRecorder.setOrientationHint(mTotalRotation);
+        mMediaRecorder.setOrientationHint(camera.getTotaoRotation());
         mMediaRecorder.prepare();
+        return mMediaRecorder;
     }
+//    public void startPreview() {
+//        //first convert texture view into surface view that the camera can understand.
+//        SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
+//        surfaceTexture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+//        Surface previewSurface = new Surface(surfaceTexture);
+//
+//        try {
+//            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+//            mCaptureRequestBuilder.addTarget(previewSurface);
+//
+//            cameraDevice.createCaptureSession(Arrays.asList(previewSurface),
+//                    new CameraCaptureSession.StateCallback() {
+//                        @RequiresApi(api = Build.VERSION_CODES.P)
+//                        @Override
+//                        public void onConfigured(@NonNull CameraCaptureSession session) {
+//                            try {
+//                                session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, backgroundHandler);
+//                            } catch (CameraAccessException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onConfigureFailed(@NonNull CameraCaptureSession session) {
+//                            Toast.makeText(DrivingActivity.this, "unable to setup camera preview", Toast.LENGTH_SHORT).show();
+//                        }
+//                    }, null);
+//
+//        } catch (CameraAccessException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 }

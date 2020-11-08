@@ -111,6 +111,14 @@ public class CameraClass extends AppCompatActivity {
         return mPreviewSize;
     }
 
+    public Size getVideoSize() {
+        return mVideoSize;
+    }
+
+    public int getTotaoRotation() {
+        return mTotalRotation;
+    }
+
     private static class CompareSizeByArea implements Comparator<Size> {
 
         @Override
@@ -323,6 +331,10 @@ public class CameraClass extends AppCompatActivity {
         }
     }
 
+
+
+    /////------------RECORDING-FUNCTIONS------------/////
+
     private void createVideoFolder() {
         //getting the directory in which we will create the folder for our files
         File movieFile = getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_MOVIES);
@@ -388,15 +400,4 @@ public class CameraClass extends AppCompatActivity {
         }
     }
 
-    private void setupMediaRecorder() throws IOException {
-        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
-        mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        mMediaRecorder.setOutputFile(mVideoFileName);
-        mMediaRecorder.setVideoEncodingBitRate(1000000);
-        mMediaRecorder.setVideoFrameRate(30);
-        mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
-        mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-        mMediaRecorder.setOrientationHint(mTotalRotation);
-        mMediaRecorder.prepare();
-    }
 }
