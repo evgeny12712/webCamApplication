@@ -48,15 +48,16 @@ import Gallery.GalleryActivity;
 public class MainActivity extends AppCompatActivity {
         private static final int REQUEST_CAMERA_PERMISSION_RESULT = 0;
         private TextureView textureView;
-        CameraClass camera;
-        CameraManager cameraManager;
+        private CameraClass camera;
+        private CameraManager cameraManager;
         boolean isPermission;
         private TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
             @Override
             public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-                camera.setupCamera(width, height, getWindowManager().getDefaultDisplay().getRotation(), cameraManager); //getting the rotation position of the device ( not sensor )
-                transformImage(textureView.getWidth(), textureView.getHeight());
-                connectCamera();
+                //setting up the camera - camera id, preview size , rotation
+                camera.setupCamera(textureView.getWidth(), textureView.getHeight(), getWindowManager().getDefaultDisplay().getRotation(), cameraManager);
+                transformImage(textureView.getWidth(), textureView.getHeight()); //making sure that the camera does'nt reset when moving from landscape and portrait mode
+                connectCamera(); //connecting to the camera, getting the camera service, asking for permission
                 Toast.makeText(getApplicationContext(), "CAMERA READY", Toast.LENGTH_SHORT).show();
             }
 
@@ -81,8 +82,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onOpened(@NonNull CameraDevice camera) {
                   cameraDevice = camera;
-                  startPreview();
-                  Toast.makeText(MainActivity.this, "CameraClass connection done!", Toast.LENGTH_SHORT).show();
+                  startPreview(); //staring the preview
             }
 
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -102,10 +102,7 @@ public class MainActivity extends AppCompatActivity {
         };
         private HandlerThread backgroundHandlerThread;
         private Handler backgroundHandler;
-        private String mCameraId;
         private Size mPreviewSize;
-        private Size mVideoSize;
-        private int mTotalRotation;
         private CaptureRequest.Builder mCaptureRequestBuilder;
 
         private ImageButton startBtn;
@@ -167,10 +164,11 @@ public class MainActivity extends AppCompatActivity {
             startBackgroundThread();
 
             if(textureView.isAvailable()) {
-    //            camera.setupCamera(textureView.getWidth(), textureView.getHeight(), cameraManager);
-    //            transformImage(textureView.getWidth(), textureView.getHeight());
-                connectCamera();
-                startPreview();
+                //setting up the camera - camera id, preview size , rotation
+                camera.setupCamera(textureView.getWidth(), textureView.getHeight(), getWindowManager().getDefaultDisplay().getRotation(), cameraManager);
+                transformImage(textureView.getWidth(), textureView.getHeight()); //making sure that the camera does'nt reset when moving from landscape and portrait mode
+                connectCamera(); //connecting to the camera, getting the camera service, asking for permission
+                startPreview(); // starting the preview of the camera
             } else {
                 textureView.setSurfaceTextureListener(surfaceTextureListener);
             }
@@ -178,11 +176,11 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPause() {
-            closeCamera();
+            camera.closeCamera();
             stopBackGroundThread();
             super.onPause();
-
         }
+
 
         public void onWindowFocusChanged(boolean hasFocas) {
             super.onWindowFocusChanged(hasFocas);
@@ -192,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
-    );
+         );
             }
         }
 
@@ -202,16 +200,18 @@ public class MainActivity extends AppCompatActivity {
             SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
             //surfaceTexture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
             Surface previewSurface = new Surface(surfaceTexture);
-
             try {
+                //setting up a request builder for preview
                 mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+                // adding the preview surface to the capture builder
                 mCaptureRequestBuilder.addTarget(previewSurface);
-
+                // creating the session
                 cameraDevice.createCaptureSession(Arrays.asList(previewSurface),
                         new CameraCaptureSession.StateCallback() {
                             public void onConfigured(CameraCaptureSession session) {
                                try {
-                                        session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, backgroundHandler);
+                                   // creating the repeating capture request on the background thread
+                                   session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, backgroundHandler);
                                 } catch (CameraAccessException e) {
                                     e.printStackTrace();
                                 }
@@ -228,12 +228,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        private void closeCamera() {
-            if(cameraDevice != null) {
-                cameraDevice.close();
-                cameraDevice = null;
-            }
-        }
 
         public void startBackgroundThread() {
             backgroundHandlerThread = new HandlerThread("MainActivity");
@@ -249,31 +243,6 @@ public class MainActivity extends AppCompatActivity {
                 backgroundHandler = null;
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }
-        }
-
-        //converting the camera sensor orientations to the device orientations
-        private static int sensorToDeviceRotation(CameraCharacteristics cameraCharacteristics, int deviceOrientation) {
-            int sensorOrientation = cameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);  //getting the sensor orientation to a variable.
-            deviceOrientation = ORIENTATIONS.get(deviceOrientation); // getting the device orientation and converting it to real number.
-            Log.i("orientations", "sensorOrientation " + sensorOrientation);
-            Log.i("device orientation", deviceOrientation + " deviceOrientation");
-            Log.i("Both", (sensorOrientation + deviceOrientation + 360) % 360 + " Both");
-            return (sensorOrientation + deviceOrientation + 360) %360;
-        }
-
-        private static Size chooseOptimalSize(Size[] choices, int width, int height) {
-            List<Size> bigEnough = new ArrayList<Size>();
-            for(Size option : choices) {
-                if(option.getHeight() == option.getWidth() * height / width &&
-                    option.getWidth() >= width && option.getHeight() >= height) {
-                    bigEnough.add(option);
-                }
-            }
-            if(bigEnough.size() > 0) {// if the list is not empty
-                return Collections.min(bigEnough, new CompareSizeByArea());
-            } else {
-                return choices[0];
             }
         }
 
@@ -297,7 +266,6 @@ public class MainActivity extends AppCompatActivity {
                 matrix.postRotate(90 * (rotation - 2), centerX, centerY);
             }
             textureView.setTransform(matrix);
-
         }
 
         //connecting to the camera, getting the camera service, asking for permission
@@ -325,9 +293,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-
-    private static class CompareSizeByArea implements Comparator<Size> {
-
+        private static class CompareSizeByArea implements Comparator<Size> {
         @Override
         public int compare(Size lhs, Size rhs)  {
             return Long.signum((long) lhs.getWidth() * lhs.getHeight() /
@@ -335,17 +301,30 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+//        public void setRequestCameraPermissionResult(int requestCode, String[] permission, int[] grantResults) {
+//            super.onRequestPermissionsResult(requestCode, permission, grantResults);
+//            if(requestCode == REQUEST_CAMERA_PERMISSION_RESULT) {
+//                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    Toast.makeText(this, "Application will not run without camera permission", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        }
 
 
-
-    public void setRequestCameraPermissionResult(int requestCode, String[] permission, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permission, grantResults);
-        if(requestCode == REQUEST_CAMERA_PERMISSION_RESULT) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Application will not run without camera permission", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
+    //        private static Size chooseOptimalSize(Size[] choices, int width, int height) {
+//            List<Size> bigEnough = new ArrayList<Size>();
+//            for(Size option : choices) {
+//                if(option.getHeight() == option.getWidth() * height / width &&
+//                    option.getWidth() >= width && option.getHeight() >= height) {
+//                    bigEnough.add(option);
+//                }
+//            }
+//            if(bigEnough.size() > 0) {// if the list is not empty
+//                return Collections.min(bigEnough, new CompareSizeByArea());
+//            } else {
+//                return choices[0];
+//            }
+//        }
 
 
 }

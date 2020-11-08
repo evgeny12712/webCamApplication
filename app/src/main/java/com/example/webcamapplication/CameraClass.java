@@ -125,39 +125,28 @@ public class CameraClass extends AppCompatActivity {
         }
     }
 
-    public void onWindowFocusChanged(boolean hasFocas) {
-        super.onWindowFocusChanged(hasFocas);
-        View decorView = getWindow().getDecorView();
-        if (hasFocas) {
-            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-            );
-        }
-    }
-
     public void setupCamera(int width, int height,int deviceOrientation, CameraManager cameraManager) {
         try {
             for (String cameraId : cameraManager.getCameraIdList()) {
                 CameraCharacteristics cameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId);
-                //iterating through all the cameras and checking if its facing front, if it is so continue
+                // iterating through all the cameras and checking if its facing front, if it is so continue
                 if (cameraCharacteristics.get(CameraCharacteristics.LENS_FACING) ==
                         CameraCharacteristics.LENS_FACING_FRONT) {
                     continue;
                 }
-                //creating a list of all the all output formats (and sizes respectively for that format) that are supported by a camera device.
+                // creating a list of all the all output formats (and sizes respectively for that format) that are supported by a camera device.
                 StreamConfigurationMap map = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-                mTotalRotation = sensorToDeviceRotation(cameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION), deviceOrientation); //getting the rotation of the sensor
+                // getting the rotation of the sensor
+                mTotalRotation = sensorToDeviceRotation(cameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION), deviceOrientation);
                 boolean swapRotation = mTotalRotation == 90 || mTotalRotation == 270; //check is the phone is landscape mode
                 int rotatedWidth = width;
                 int rotatedHeight = height;
-                //if the phone is landscape so switch between height and width
+                // if the phone is landscape so switch between height and width
                 if (swapRotation) {
                     rotatedWidth = height;
                     rotatedHeight = width;
                 }
-                //setup the preview size
+                // setup the preview size
                 mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class), rotatedWidth, rotatedHeight);
 
                 mCameraId = cameraId;
