@@ -122,13 +122,19 @@ public class DrivingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driving);
-
         mMediaRecorder = new MediaRecorder();
         cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         camera = new CameraClass();
         textureView = (TextureView)findViewById(R.id.textureView);
         mChronometer = (Chronometer) findViewById(R.id.videoTimer);
         btnMinimize = (ImageButton) findViewById(R.id.btnMinimize);
+
+        try {
+            setupMediaRecorder();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         btnMinimize.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -291,7 +297,7 @@ public class DrivingActivity extends AppCompatActivity {
 
     public void startRecord() {
         try {
-            camera.setupMediaRecorder();
+            setupMediaRecorder();
             //creating the surface on which we gonna display the preview while recording
             SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
             surfaceTexture.setDefaultBufferSize(camera.getPreviewSize().getWidth(), camera.getPreviewSize().getHeight());
@@ -422,6 +428,18 @@ public class DrivingActivity extends AppCompatActivity {
         }
     }
 
+    public void setupMediaRecorder() throws IOException {
+        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+        mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+        mMediaRecorder.setOutputFile(mVideoFileName);
+        mMediaRecorder.setVideoEncodingBitRate(1000000);
+        mMediaRecorder.setVideoFrameRate(30);
+        Toast.makeText(getApplicationContext(), "" + camera.getVideoSize().getWidth() , Toast.LENGTH_SHORT).show();
+//        mMediaRecorder.setVideoSize(camera.getVideoSize().getWidth(), camera.getVideoSize().getHeight());
+        mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+//        mMediaRecorder.setOrientationHint(camera.getTotaoRotation());
+        mMediaRecorder.prepare();
+    }
     //    public void startPreview() {
 //        //first convert texture view into surface view that the camera can understand.
 //        SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
