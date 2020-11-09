@@ -119,6 +119,9 @@ public class CameraClass extends AppCompatActivity {
         return mTotalRotation;
     }
 
+    public int getNum() {
+        return 11231231;
+    }
     private static class CompareSizeByArea implements Comparator<Size> {
 
         @Override
@@ -285,7 +288,7 @@ public class CameraClass extends AppCompatActivity {
     public void startRecord(TextureView textureView) {
         try {
 
-            setupMediaRecorder();
+            setupMediaRecorder(mMediaRecorder);
             //creating the surface on which we gonna display the preview while recording
             SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
             surfaceTexture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
@@ -311,7 +314,7 @@ public class CameraClass extends AppCompatActivity {
 
                         }
                     }, null);
-        } catch (IOException | CameraAccessException e) {
+        } catch (CameraAccessException e) {
             e.printStackTrace();
         }
     }
@@ -400,16 +403,22 @@ public class CameraClass extends AppCompatActivity {
         }
     }
 
-    public void setupMediaRecorder() throws IOException {
+    public void setupMediaRecorder(MediaRecorder mMediaRecorder) {
+        mMediaRecorder = new MediaRecorder();
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         mMediaRecorder.setOutputFile(mVideoFileName);
         mMediaRecorder.setVideoEncodingBitRate(1000000);
         mMediaRecorder.setVideoFrameRate(30);
-        mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
+        mMediaRecorder.setVideoSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         mMediaRecorder.setOrientationHint(mTotalRotation);
-        mMediaRecorder.prepare();
+        try {
+            mMediaRecorder.prepare();
+        } catch (IOException e | IllegalStateException) {
+            e.printStackTrace();
+            Toast.makeText(getApplicationContext(), "EXCAPTION IN SETUPMEDIA", Toast.LENGTH_SHORT).show();
+        }
     }
 
 

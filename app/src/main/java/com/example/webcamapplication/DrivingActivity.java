@@ -20,6 +20,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.SystemClock;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -58,6 +59,7 @@ public class DrivingActivity extends AppCompatActivity {
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
             //setting up the camera - camera id, preview size , rotation
             camera.setupCamera(textureView.getWidth(), textureView.getHeight(), getWindowManager().getDefaultDisplay().getRotation(), cameraManager);
+            camera.setupMediaRecorder(mMediaRecorder);
             connectCamera();
         }
 
@@ -80,7 +82,6 @@ public class DrivingActivity extends AppCompatActivity {
         @Override
         public void onOpened(@NonNull CameraDevice camera) {
             cameraDevice = camera;
-            Toast.makeText(DrivingActivity.this, "CAMERA FILMING", Toast.LENGTH_SHORT).show();
             checkWriteStoragePermission();
         }
 
@@ -129,12 +130,6 @@ public class DrivingActivity extends AppCompatActivity {
         mChronometer = (Chronometer) findViewById(R.id.videoTimer);
         btnMinimize = (ImageButton) findViewById(R.id.btnMinimize);
 
-        try {
-            setupMediaRecorder();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         btnMinimize.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -146,8 +141,8 @@ public class DrivingActivity extends AppCompatActivity {
         btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mMediaRecorder.stop();
-                mMediaRecorder.reset();
+//                mMediaRecorder.stop();
+//                mMediaRecorder.reset();
 //                mChronometer.stop();
 //                mChronometer.setVisibility(View.INVISIBLE);
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -173,11 +168,12 @@ public class DrivingActivity extends AppCompatActivity {
         startBackgroundThread();
         //creating folder to save videos
         createVideoFolder();
+
         if(textureView.isAvailable()) {
             //setting up the camera - camera id, preview size , rotation
             camera.setupCamera(textureView.getWidth(), textureView.getHeight(), getWindowManager().getDefaultDisplay().getRotation(), cameraManager);
+//            mMediaRecorder = camera.setupMediaRecorder();
             connectCamera();
-
         } else {
             textureView.setSurfaceTextureListener(surfaceTextureListener);
         }
@@ -296,39 +292,40 @@ public class DrivingActivity extends AppCompatActivity {
     }
 
     public void startRecord() {
-        try {
-            setupMediaRecorder();
+ //       try {
             //creating the surface on which we gonna display the preview while recording
             SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
             surfaceTexture.setDefaultBufferSize(camera.getPreviewSize().getWidth(), camera.getPreviewSize().getHeight());
             Surface previewSurface = new Surface(surfaceTexture);
-            Surface recordSurface = mMediaRecorder.getSurface();
-            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
-            mCaptureRequestBuilder.addTarget(previewSurface);
-            mCaptureRequestBuilder.addTarget(recordSurface);
-
-            cameraDevice.createCaptureSession(Arrays.asList(previewSurface, recordSurface),
-                    new CameraCaptureSession.StateCallback() {
-                        @Override
-                        public void onConfigured(@NonNull CameraCaptureSession session) {
-                            try {
-                                session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, null);
-                            } catch (CameraAccessException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        @Override
-                        public void onConfigureFailed(@NonNull CameraCaptureSession session) {
-
-                        }
-                    }, null);
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            try {
+                Surface recordSurface = mMediaRecorder.getSurface();
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            }
+//            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+//            mCaptureRequestBuilder.addTarget(previewSurface);
+//            mCaptureRequestBuilder.addTarget(recordSurface);
+//
+//            cameraDevice.createCaptureSession(Arrays.asList(previewSurface, recordSurface),
+//                    new CameraCaptureSession.StateCallback() {
+//                        @Override
+//                        public void onConfigured(@NonNull CameraCaptureSession session) {
+//                            try {
+//                                session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, null);
+//                            } catch (CameraAccessException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onConfigureFailed(@NonNull CameraCaptureSession session) {
+//
+//                        }
+//                    }, null);
+//        } catch (CameraAccessException e) {
+//            e.printStackTrace();
+//       }
         }
-    }
 
     private void closeCamera() {
         if(cameraDevice != null) {
@@ -392,7 +389,7 @@ public class DrivingActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 startPreview();
-//                startRecord();
+                startRecord();
 //                mMediaRecorder.start();
 //                mChronometer.setBase(SystemClock.elapsedRealtime());
 //                mChronometer.start();
@@ -411,7 +408,7 @@ public class DrivingActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-//            startRecord();
+            startRecord();
 //            mMediaRecorder.start();
 //            mChronometer.setBase(SystemClock.elapsedRealtime());
 //            mChronometer.setVisibility(View.VISIBLE);
@@ -428,18 +425,10 @@ public class DrivingActivity extends AppCompatActivity {
         }
     }
 
-    public void setupMediaRecorder() throws IOException {
-        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
-        mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        mMediaRecorder.setOutputFile(mVideoFileName);
-        mMediaRecorder.setVideoEncodingBitRate(1000000);
-        mMediaRecorder.setVideoFrameRate(30);
-        Toast.makeText(getApplicationContext(), "" + camera.getVideoSize().getWidth() , Toast.LENGTH_SHORT).show();
-//        mMediaRecorder.setVideoSize(camera.getVideoSize().getWidth(), camera.getVideoSize().getHeight());
-        mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-//        mMediaRecorder.setOrientationHint(camera.getTotaoRotation());
-        mMediaRecorder.prepare();
-    }
+
+
+
+
     //    public void startPreview() {
 //        //first convert texture view into surface view that the camera can understand.
 //        SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
