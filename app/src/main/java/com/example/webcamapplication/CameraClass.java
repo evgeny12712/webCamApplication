@@ -61,29 +61,7 @@ public class CameraClass extends AppCompatActivity {
     private static final int REQUEST_CAMERA_PERMISSION_RESULT = 0;
 
     private CameraDevice cameraDevice;
-    private CameraDevice.StateCallback cameraDeviceStateCallBack = new CameraDevice.StateCallback() {
-        @Override
-        public void onOpened(@NonNull CameraDevice camera) {
-            cameraDevice = camera;
-            Toast.makeText(getApplicationContext(), "CAMERA FILMING", Toast.LENGTH_SHORT).show();
-            checkWriteStoragePermission();
-        }
 
-
-        public void onDisconnected(CameraDevice camera) {
-            camera.close();
-            cameraDevice = null;
-        }
-
-        public void onError(CameraDevice camera, int error) {
-            camera.close();
-            cameraDevice = null;
-
-        }
-    };
-
-    private HandlerThread backgroundHandlerThread;
-    private Handler backgroundHandler;
     private String mCameraId;
     private Size mPreviewSize;
     private Size mVideoSize;
@@ -112,40 +90,13 @@ public class CameraClass extends AppCompatActivity {
         return mPreviewSize;
     }
 
-    public Size getVideoSize() {
-        return mVideoSize;
-    }
 
-    public int getTotaoRotation() {
-        return mTotalRotation;
-    }
-
-    public File getmVideoFolder() {
-        return mVideoFolder;
-    }
-
-    public String getmVideoFileName() {
-        return mVideoFileName;
-    }
-
-    public int getNum() {
-        return 11231231;
-    }
     private static class CompareSizeByArea implements Comparator<Size> {
 
         @Override
         public int compare(Size lhs, Size rhs) {
             return Long.signum((long) lhs.getWidth() * lhs.getHeight() /
                     (long) rhs.getWidth() * rhs.getHeight()); //to get area we multiply the both sides width and height and then divide them
-        }
-    }
-
-    public void setRequestCameraPermissionResult(int requestCode, String[] permission, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permission, grantResults);
-        if (requestCode == REQUEST_CAMERA_PERMISSION_RESULT) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Application will not run without camera permission", Toast.LENGTH_SHORT).show();
-            }
         }
     }
 
@@ -180,85 +131,13 @@ public class CameraClass extends AppCompatActivity {
         }
     }
 
-    @SuppressLint("MissingPermission")
-    public void connectCamera(CameraManager cameraManager, boolean isPermission) {
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (isPermission) {
-                    cameraManager.openCamera(mCameraId, cameraDeviceStateCallBack, backgroundHandler);
 
-                }
-                else {
-                    //check if we should show a request for permission
-                    if(shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
-                        Toast.makeText(this, "video app required access to camera", Toast.LENGTH_SHORT).show();
-                    }
-                    // asking for the permission
-                    requestPermissions(new String[] {Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION_RESULT);
-                }
-            } else {
-                cameraManager.openCamera(mCameraId, cameraDeviceStateCallBack, backgroundHandler);
-            }
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
-//    public void startPreview() {
-//        //first convert texture view into surface view that the camera can understand.
-//        SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
-//        //surfaceTexture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
-//        Surface previewSurface = new Surface(surfaceTexture);
-//
-//        try {
-//            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-//            mCaptureRequestBuilder.addTarget(previewSurface);
-//
-//            cameraDevice.createCaptureSession(Arrays.asList(previewSurface),
-//                    new CameraCaptureSession.StateCallback() {
-//                        public void onConfigured(CameraCaptureSession session) {
-//                            try {
-//                                session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, backgroundHandler);
-//                            } catch (CameraAccessException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onConfigureFailed(@NonNull CameraCaptureSession session) {
-//                            Toast.makeText(getApplicationContext(), "unable to setup camera preview", Toast.LENGTH_SHORT).show();
-//                        }
-//                    }, null);
-//
-//        } catch (CameraAccessException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-    public void closeCamera() {
+    public void closeCamera(CameraDevice cameraDevice) {
         if(cameraDevice != null) {
             cameraDevice.close();
             cameraDevice = null;
         }
     }
-
-    // ABOUT TO REMOVE
-//    public void startBackgroundThread() {
-//        backgroundHandlerThread = new HandlerThread("MainActivity");
-//        backgroundHandlerThread.start();
-//        backgroundHandler = new Handler(backgroundHandlerThread.getLooper());
-//    }
-//
-//    private void stopBackGroundThread() {
-//        backgroundHandlerThread.quitSafely();
-//        try {
-//            backgroundHandlerThread.join();
-//            backgroundHandlerThread = null;
-//            backgroundHandler = null;
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     //converting the camera sensor orientations to the device orientations
     private static int sensorToDeviceRotation(int cameraSensorOrientation, int deviceOrientation) {
@@ -269,63 +148,6 @@ public class CameraClass extends AppCompatActivity {
         return (cameraSensorOrientation + deviceOrientation + 360) % 360;
     }
 
-
-    //give camera permission to preview and save files
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permission, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permission, grantResults);
-        if(requestCode == REQUEST_CAMERA_PERMISSION_RESULT) {
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Application will not run without camera permission", Toast.LENGTH_SHORT).show();
-            }
-        }
-        if(requestCode == REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION_RESULT) {
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                try {
-                    createVideoFileName();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                Toast.makeText(this, "Permission successfully granted", Toast.LENGTH_SHORT).show();
-            }  else {
-                Toast.makeText(this, "App needs to save video to run", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-//    public void startRecord(TextureView textureView) {
-//        try {
-//
-//            mMediaRecorder = setupMediaRecorder();
-//            //creating the surface on which we gonna display the preview while recording
-//            SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
-//            surfaceTexture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
-//            Surface previewSurface = new Surface(surfaceTexture);
-//            Surface recordSurface = mMediaRecorder.getSurface();
-//            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
-//            mCaptureRequestBuilder.addTarget(previewSurface);
-//            mCaptureRequestBuilder.addTarget(recordSurface);
-//
-//            cameraDevice.createCaptureSession(Arrays.asList(previewSurface, recordSurface),
-//                    new CameraCaptureSession.StateCallback() {
-//                        @Override
-//                        public void onConfigured(@NonNull CameraCaptureSession session) {
-//                            try {
-//                                session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, null);
-//                            } catch (CameraAccessException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onConfigureFailed(@NonNull CameraCaptureSession session) {
-//
-//                        }
-//                    }, null);
-//        } catch (CameraAccessException e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     private static Size chooseOptimalSize(Size[] choices, int width, int height) {
         List<Size> bigEnough = new ArrayList<Size>();
@@ -410,14 +232,29 @@ public class CameraClass extends AppCompatActivity {
         }
     }
 
-    public void createFolderAndFile() {
-//        createVideoFolder();
-//        try {
-//            createVideoFileName();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+    //give camera permission to preview and save files
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permission, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permission, grantResults);
+        if(requestCode == REQUEST_CAMERA_PERMISSION_RESULT) {
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Application will not run without camera permission", Toast.LENGTH_SHORT).show();
+            }
+        }
+        if(requestCode == REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION_RESULT) {
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                try {
+                    createVideoFileName();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Toast.makeText(this, "Permission successfully granted", Toast.LENGTH_SHORT).show();
+            }  else {
+                Toast.makeText(this, "App needs to save video to run", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
+
     public MediaRecorder setupMediaRecorder() {
         mMediaRecorder = new MediaRecorder();
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);

@@ -3,45 +3,27 @@ package com.example.webcamapplication;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Matrix;
-import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
-import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
-import android.hardware.camera2.params.StreamConfigurationMap;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.util.Log;
-import android.util.Size;
-import android.util.SparseIntArray;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-
-import com.example.webcamapplication.DrivingActivity;
-import Settings.SettingsActivity;
-
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import Gallery.GalleryActivity;
 
 
@@ -57,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
             public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
                 //setting up the camera - camera id, preview size , rotation
                 camera.setupCamera(textureView.getWidth(), textureView.getHeight(), getWindowManager().getDefaultDisplay().getRotation(), cameraManager);
-                transformImage(textureView.getWidth(), textureView.getHeight()); //making sure that the camera does'nt reset when moving from landscape and portrait mode
+                textureView = Functions.transformImage(textureView.getWidth(), textureView.getHeight(), getWindowManager().getDefaultDisplay().getRotation(), camera.getPreviewSize(), textureView); //making sure that the camera does'nt reset when moving from landscape and portrait mode
                 connectCamera(); //connecting to the camera, getting the camera service, asking for permission
                 Toast.makeText(getApplicationContext(), "CAMERA READY", Toast.LENGTH_SHORT).show();
             }
@@ -101,23 +83,15 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
+
         private HandlerThread backgroundHandlerThread;
         private Handler backgroundHandler;
-        private Size mPreviewSize;
+
         private CaptureRequest.Builder mCaptureRequestBuilder;
 
         private ImageButton startBtn;
         private ImageButton galleryBtn;
         private ImageButton settingsBtn;
-
-        private static SparseIntArray ORIENTATIONS = new SparseIntArray(); //all possible orientations on the surface
-        static { //converting from 0/1/2/3 to read dagrees
-            ORIENTATIONS.append(Surface.ROTATION_0, 0);
-            ORIENTATIONS.append(Surface.ROTATION_90, 90);
-            ORIENTATIONS.append(Surface.ROTATION_180, 180);
-            ORIENTATIONS.append(Surface.ROTATION_270, 270);
-
-        }
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -168,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
             if(textureView.isAvailable()) {
                 //setting up the camera - camera id, preview size , rotation
                 camera.setupCamera(textureView.getWidth(), textureView.getHeight(), getWindowManager().getDefaultDisplay().getRotation(), cameraManager);
-                transformImage(textureView.getWidth(), textureView.getHeight()); //making sure that the camera does'nt reset when moving from landscape and portrait mode
+                textureView = Functions.transformImage(textureView.getWidth(), textureView.getHeight(), getWindowManager().getDefaultDisplay().getRotation(), camera.getPreviewSize(), textureView); //making sure that the camera does'nt reset when moving from landscape and portrait mode
                 connectCamera(); //connecting to the camera, getting the camera service, asking for permission
                 startPreview(); // starting the preview of the camera
             } else {
@@ -178,11 +152,10 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPause() {
-            camera.closeCamera();
+            camera.closeCamera(cameraDevice);
             stopBackGroundThread();
             super.onPause();
         }
-
 
         public void onWindowFocusChanged(boolean hasFocas) {
             super.onWindowFocusChanged(hasFocas);
@@ -195,7 +168,6 @@ public class MainActivity extends AppCompatActivity {
          );
             }
         }
-
 
         public void startPreview() {
             //first convert texture view into surface view that the camera can understand.
@@ -230,7 +202,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-
         public void startBackgroundThread() {
             backgroundHandlerThread = new HandlerThread("MainActivity");
             backgroundHandlerThread.start();
@@ -246,30 +217,6 @@ public class MainActivity extends AppCompatActivity {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }
-
-        private void transformImage(int width, int height){
-            mPreviewSize = camera.getPreviewSize();
-            if(mPreviewSize == null || textureView == null) {
-                return;
-            }
-            //creating a new matrix (maritsa)
-            Matrix matrix = new Matrix();
-            int rotation = getWindowManager().getDefaultDisplay().getRotation();
-            RectF textureRectF = new RectF(0,0,width,height);
-            RectF previewRectF = new RectF(0,0, mPreviewSize.getHeight(), mPreviewSize.getWidth());
-            float centerX = textureRectF.centerX();
-            float centerY = textureRectF.centerY();
-            //if switch to landscape mode
-            if(rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
-                previewRectF.offset(centerX - previewRectF.centerX(), centerY - previewRectF.centerY());
-                matrix.setRectToRect(textureRectF, previewRectF, Matrix.ScaleToFit.FILL);
-                float scale = Math.max((float)width / mPreviewSize.getWidth(),
-                        (float)height / mPreviewSize.getHeight());
-                matrix.postScale(scale, scale, centerX, centerY);
-                matrix.postRotate(90 * (rotation - 2), centerX, centerY);
-            }
-            textureView.setTransform(matrix);
         }
 
         //connecting to the camera, getting the camera service, asking for permission
@@ -297,38 +244,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        private static class CompareSizeByArea implements Comparator<Size> {
-        @Override
-        public int compare(Size lhs, Size rhs)  {
-            return Long.signum((long) lhs.getWidth() * lhs.getHeight() /
-                    (long) rhs.getWidth() * rhs.getHeight()); //to get area we multiply the both sides width and height and then divide them
-        }
     }
-
-//        public void setRequestCameraPermissionResult(int requestCode, String[] permission, int[] grantResults) {
-//            super.onRequestPermissionsResult(requestCode, permission, grantResults);
-//            if(requestCode == REQUEST_CAMERA_PERMISSION_RESULT) {
-//                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    Toast.makeText(this, "Application will not run without camera permission", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        }
-
-
-    //        private static Size chooseOptimalSize(Size[] choices, int width, int height) {
-//            List<Size> bigEnough = new ArrayList<Size>();
-//            for(Size option : choices) {
-//                if(option.getHeight() == option.getWidth() * height / width &&
-//                    option.getWidth() >= width && option.getHeight() >= height) {
-//                    bigEnough.add(option);
-//                }
-//            }
-//            if(bigEnough.size() > 0) {// if the list is not empty
-//                return Collections.min(bigEnough, new CompareSizeByArea());
-//            } else {
-//                return choices[0];
-//            }
-//        }
-
-
-}
