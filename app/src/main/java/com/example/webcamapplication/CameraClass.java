@@ -17,6 +17,7 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.MediaRecorder;
+import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -119,6 +120,14 @@ public class CameraClass extends AppCompatActivity {
         return mTotalRotation;
     }
 
+    public File getmVideoFolder() {
+        return mVideoFolder;
+    }
+
+    public String getmVideoFileName() {
+        return mVideoFileName;
+    }
+
     public int getNum() {
         return 11231231;
     }
@@ -163,7 +172,6 @@ public class CameraClass extends AppCompatActivity {
                 }
                 // setup the preview size
                 mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class), rotatedWidth, rotatedHeight);
-
                 mCameraId = cameraId;
                 return;
             }
@@ -285,39 +293,39 @@ public class CameraClass extends AppCompatActivity {
         }
     }
 
-    public void startRecord(TextureView textureView) {
-        try {
-
-            setupMediaRecorder(mMediaRecorder);
-            //creating the surface on which we gonna display the preview while recording
-            SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
-            surfaceTexture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
-            Surface previewSurface = new Surface(surfaceTexture);
-            Surface recordSurface = mMediaRecorder.getSurface();
-            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
-            mCaptureRequestBuilder.addTarget(previewSurface);
-            mCaptureRequestBuilder.addTarget(recordSurface);
-
-            cameraDevice.createCaptureSession(Arrays.asList(previewSurface, recordSurface),
-                    new CameraCaptureSession.StateCallback() {
-                        @Override
-                        public void onConfigured(@NonNull CameraCaptureSession session) {
-                            try {
-                                session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, null);
-                            } catch (CameraAccessException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        @Override
-                        public void onConfigureFailed(@NonNull CameraCaptureSession session) {
-
-                        }
-                    }, null);
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
-        }
-    }
+//    public void startRecord(TextureView textureView) {
+//        try {
+//
+//            mMediaRecorder = setupMediaRecorder();
+//            //creating the surface on which we gonna display the preview while recording
+//            SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
+//            surfaceTexture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+//            Surface previewSurface = new Surface(surfaceTexture);
+//            Surface recordSurface = mMediaRecorder.getSurface();
+//            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+//            mCaptureRequestBuilder.addTarget(previewSurface);
+//            mCaptureRequestBuilder.addTarget(recordSurface);
+//
+//            cameraDevice.createCaptureSession(Arrays.asList(previewSurface, recordSurface),
+//                    new CameraCaptureSession.StateCallback() {
+//                        @Override
+//                        public void onConfigured(@NonNull CameraCaptureSession session) {
+//                            try {
+//                                session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, null);
+//                            } catch (CameraAccessException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onConfigureFailed(@NonNull CameraCaptureSession session) {
+//
+//                        }
+//                    }, null);
+//        } catch (CameraAccessException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     private static Size chooseOptimalSize(Size[] choices, int width, int height) {
         List<Size> bigEnough = new ArrayList<Size>();
@@ -338,20 +346,19 @@ public class CameraClass extends AppCompatActivity {
 
     /////------------RECORDING-FUNCTIONS------------/////
 
-    private void createVideoFolder() {
-        //getting the directory in which we will create the folder for our files
-        File movieFile = getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_MOVIES);
-        //creating the folder that we want to save into
+    public void createVideoFolder(File movieFile) {
+        // creating the folder that we want to save into
         Log.d("ASD", "createVideoFolder: " + movieFile);
+        // inside movieFile (path) create new folder called webCamVideos
         mVideoFolder = new File(movieFile, "webCamVideos");
-        //checking if we don't have the folder yet
+        // checking if we don't have the folder yet
         if(!mVideoFolder.exists()) {
-            //creating the folder
+            // creating the folder
             mVideoFolder.mkdirs();
         }
     }
 
-    private File createVideoFileName() throws IOException {
+    public File createVideoFileName() throws IOException {
         //creating the time string
         String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         //creating the file name
@@ -403,7 +410,15 @@ public class CameraClass extends AppCompatActivity {
         }
     }
 
-    public void setupMediaRecorder(MediaRecorder mMediaRecorder) {
+    public void createFolderAndFile() {
+//        createVideoFolder();
+//        try {
+//            createVideoFileName();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+    }
+    public MediaRecorder setupMediaRecorder() {
         mMediaRecorder = new MediaRecorder();
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
@@ -415,11 +430,11 @@ public class CameraClass extends AppCompatActivity {
         mMediaRecorder.setOrientationHint(mTotalRotation);
         try {
             mMediaRecorder.prepare();
-        } catch (IOException e | IllegalStateException) {
+        } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(getApplicationContext(), "EXCAPTION IN SETUPMEDIA", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "EXCEPT-PREPARE", Toast.LENGTH_SHORT).show();
         }
+        return mMediaRecorder;
     }
-
 
 }

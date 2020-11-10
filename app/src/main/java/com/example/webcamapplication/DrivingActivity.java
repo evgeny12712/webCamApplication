@@ -59,7 +59,7 @@ public class DrivingActivity extends AppCompatActivity {
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
             //setting up the camera - camera id, preview size , rotation
             camera.setupCamera(textureView.getWidth(), textureView.getHeight(), getWindowManager().getDefaultDisplay().getRotation(), cameraManager);
-            camera.setupMediaRecorder(mMediaRecorder);
+            mMediaRecorder = camera.setupMediaRecorder();
             connectCamera();
         }
 
@@ -97,7 +97,7 @@ public class DrivingActivity extends AppCompatActivity {
 
         }
     };
-
+    private File movieFile;
     private HandlerThread backgroundHandlerThread;
     private Handler backgroundHandler;
     private MediaRecorder mMediaRecorder;
@@ -129,7 +129,7 @@ public class DrivingActivity extends AppCompatActivity {
         textureView = (TextureView)findViewById(R.id.textureView);
         mChronometer = (Chronometer) findViewById(R.id.videoTimer);
         btnMinimize = (ImageButton) findViewById(R.id.btnMinimize);
-
+        movieFile = getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_MOVIES);
         btnMinimize.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -167,12 +167,16 @@ public class DrivingActivity extends AppCompatActivity {
 
         startBackgroundThread();
         //creating folder to save videos
-        createVideoFolder();
-
+        camera.createVideoFolder(movieFile);
+        try {
+            camera.createVideoFileName();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if(textureView.isAvailable()) {
             //setting up the camera - camera id, preview size , rotation
             camera.setupCamera(textureView.getWidth(), textureView.getHeight(), getWindowManager().getDefaultDisplay().getRotation(), cameraManager);
-//            mMediaRecorder = camera.setupMediaRecorder();
+            mMediaRecorder = camera.setupMediaRecorder();
             connectCamera();
         } else {
             textureView.setSurfaceTextureListener(surfaceTextureListener);
@@ -213,11 +217,7 @@ public class DrivingActivity extends AppCompatActivity {
         }
         if(requestCode == REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION_RESULT) {
             if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                try {
-                    createVideoFileName();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                camera.createFolderAndFile();
                 Toast.makeText(this, "Permission successfully granted", Toast.LENGTH_SHORT).show();
             }  else {
                 Toast.makeText(this, "App needs to save video to run", Toast.LENGTH_SHORT).show();
@@ -292,20 +292,17 @@ public class DrivingActivity extends AppCompatActivity {
     }
 
     public void startRecord() {
- //       try {
+        try {
             //creating the surface on which we gonna display the preview while recording
             SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
             surfaceTexture.setDefaultBufferSize(camera.getPreviewSize().getWidth(), camera.getPreviewSize().getHeight());
             Surface previewSurface = new Surface(surfaceTexture);
-            try {
-                Surface recordSurface = mMediaRecorder.getSurface();
-            } catch (IllegalStateException e) {
-                e.printStackTrace();
-            }
-//            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
-//            mCaptureRequestBuilder.addTarget(previewSurface);
-//            mCaptureRequestBuilder.addTarget(recordSurface);
-//
+            Surface recordSurface = mMediaRecorder.getSurface();
+
+            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+            mCaptureRequestBuilder.addTarget(previewSurface);
+            mCaptureRequestBuilder.addTarget(recordSurface);
+
 //            cameraDevice.createCaptureSession(Arrays.asList(previewSurface, recordSurface),
 //                    new CameraCaptureSession.StateCallback() {
 //                        @Override
@@ -322,9 +319,9 @@ public class DrivingActivity extends AppCompatActivity {
 //
 //                        }
 //                    }, null);
-//        } catch (CameraAccessException e) {
-//            e.printStackTrace();
-//       }
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+       }
         }
 
     private void closeCamera() {
@@ -351,30 +348,30 @@ public class DrivingActivity extends AppCompatActivity {
         }
     }
 
-    private void createVideoFolder() {
-        //getting the directory in which we will create the folder for our files
-        File movieFile = getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_MOVIES);
-        //creating the folder that we want to save into
-        Log.d("ASD", "createVideoFolder: " + movieFile);
-        mVideoFolder = new File(movieFile, "webCamVideos");
-        //checking if we don't have the folder yet
-        if(!mVideoFolder.exists()) {
-            //creating the folder
-            mVideoFolder.mkdirs();
-        }
-    }
+//    private void createVideoFolder() {
+//        //getting the directory in which we will create the folder for our files
+//        File movieFile = getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_MOVIES);
+//        //creating the folder that we want to save into
+//        Log.d("ASD", "createVideoFolder: " + movieFile);
+//        mVideoFolder = new File(movieFile, "webCamVideos");
+//        //checking if we don't have the folder yet
+//        if(!mVideoFolder.exists()) {
+//            //creating the folder
+//            mVideoFolder.mkdirs();
+//        }
+//    }
 
-    private File createVideoFileName() throws IOException {
-        //creating the time string
-        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        //creating the file name
-        String prepend = "VIDEO_" + timestamp + "_";
-        //creating the actual file
-        File videoFile = File.createTempFile(prepend, ".mp4", mVideoFolder);
-        //setting the file inside the folder that we created on "createVideoFolder" func
-        mVideoFileName = videoFile.getAbsolutePath();
-        return videoFile;
-    }
+//    private File createVideoFileName() throws IOException {
+//        //creating the time string
+//        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+//        //creating the file name
+//        String prepend = "VIDEO_" + timestamp + "_";
+//        //creating the actual file
+//        File videoFile = File.createTempFile(prepend, ".mp4", mVideoFolder);
+//        //setting the file inside the folder that we created on "createVideoFolder" func
+//        mVideoFileName = videoFile.getAbsolutePath();
+//        return videoFile;
+//    }
 
     private void checkWriteStoragePermission() {
         //checking if our version is greater then marshmallow
@@ -382,15 +379,11 @@ public class DrivingActivity extends AppCompatActivity {
             //checking if we already got permission
             if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED) {
-                try {
                     //create file to save video
-                    createVideoFileName();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                startPreview();
-                startRecord();
-//                mMediaRecorder.start();
+                    camera.createFolderAndFile();
+                    startPreview();
+                    startRecord();
+                    mMediaRecorder.start();
 //                mChronometer.setBase(SystemClock.elapsedRealtime());
 //                mChronometer.start();
             } else {
@@ -403,18 +396,31 @@ public class DrivingActivity extends AppCompatActivity {
                         REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION_RESULT);
             }
         } else {
-            try {
-                createVideoFileName();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            startRecord();
-//            mMediaRecorder.start();
+                startRecord();
+                mMediaRecorder.start();
 //            mChronometer.setBase(SystemClock.elapsedRealtime());
 //            mChronometer.setVisibility(View.VISIBLE);
 //            mChronometer.start();
         }
     }
+
+//    public void setupMediaRecorder() {
+//        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+//        mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+//        mMediaRecorder.setOutputFile(mVideoFileName);
+//        mMediaRecorder.setVideoEncodingBitRate(1000000);
+//        mMediaRecorder.setVideoFrameRate(30);
+//        mMediaRecorder.setVideoSize(camera.getPreviewSize().getWidth(), camera.getPreviewSize().getHeight());
+//        mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+//        mMediaRecorder.setOrientationHint(camera.getTotaoRotation());
+//        try {
+//            mMediaRecorder.prepare();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            Toast.makeText(this, "EXCEPT-PREPARE", Toast.LENGTH_SHORT).show();
+//        }
+//    }
+
 
     //fitting the camera resolution to the device
     private static class CompareSizeByArea implements Comparator<Size> {
