@@ -38,8 +38,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
                 //setting up the camera - camera id, preview size , rotation
-                camera.setupCamera(textureView.getWidth(), textureView.getHeight(), getWindowManager().getDefaultDisplay().getRotation(), cameraManager);
-                textureView = Functions.transformImage(textureView.getWidth(), textureView.getHeight(), getWindowManager().getDefaultDisplay().getRotation(), camera.getPreviewSize(), textureView); //making sure that the camera does'nt reset when moving from landscape and portrait mode
+                camera.setupCamera(textureView.getWidth(), textureView.getHeight(), deviceOrientation, cameraManager);
+                textureView = Functions.transformImage(textureView.getWidth(), textureView.getHeight(), deviceOrientation, camera.getPreviewSize(), textureView); //making sure that the camera does'nt reset when moving from landscape and portrait mode
                 connectCamera(); //connecting to the camera, getting the camera service, asking for permission
                 Toast.makeText(getApplicationContext(), "CAMERA READY", Toast.LENGTH_SHORT).show();
             }
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         private Handler backgroundHandler;
 
         private CaptureRequest.Builder mCaptureRequestBuilder;
-
+        private int deviceOrientation;
         private ImageButton startBtn;
         private ImageButton galleryBtn;
         private ImageButton settingsBtn;
@@ -136,13 +136,12 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onResume() {
             super.onResume();
-
             startBackgroundThread();
-
+            deviceOrientation = getWindowManager().getDefaultDisplay().getRotation();
             if(textureView.isAvailable()) {
                 //setting up the camera - camera id, preview size , rotation
-                camera.setupCamera(textureView.getWidth(), textureView.getHeight(), getWindowManager().getDefaultDisplay().getRotation(), cameraManager);
-                textureView = Functions.transformImage(textureView.getWidth(), textureView.getHeight(), getWindowManager().getDefaultDisplay().getRotation(), camera.getPreviewSize(), textureView); //making sure that the camera does'nt reset when moving from landscape and portrait mode
+                camera.setupCamera(textureView.getWidth(), textureView.getHeight(), deviceOrientation, cameraManager);
+                textureView = Functions.transformImage(textureView.getWidth(), textureView.getHeight(), deviceOrientation, camera.getPreviewSize(), textureView); //making sure that the camera does'nt reset when moving from landscape and portrait mode
                 connectCamera(); //connecting to the camera, getting the camera service, asking for permission
                 startPreview(); // starting the preview of the camera
             } else {

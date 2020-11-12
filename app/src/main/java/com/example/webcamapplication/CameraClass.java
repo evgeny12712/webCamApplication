@@ -72,8 +72,8 @@ public class CameraClass extends AppCompatActivity {
     private File mVideoFolder; //file path
     private String mVideoFileName; // file name
 
+    //surface orientations to real world numbers
     private static SparseIntArray ORIENTATIONS = new SparseIntArray(); //converting surface orientation to real numbers
-
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 0);
         ORIENTATIONS.append(Surface.ROTATION_90, 90);

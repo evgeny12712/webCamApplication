@@ -40,9 +40,9 @@ public class DrivingActivity extends AppCompatActivity {
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
             //setting up the camera - camera id, preview size , rotation
-            camera.setupCamera(textureView.getWidth(), textureView.getHeight(), getWindowManager().getDefaultDisplay().getRotation(), cameraManager);
+            camera.setupCamera(textureView.getWidth(), textureView.getHeight(), deviceOrientation, cameraManager);
             //making sure that the camera does'nt reset when moving from landscape and portrait mode
-            textureView = Functions.transformImage(textureView.getWidth(), textureView.getHeight(), getWindowManager().getDefaultDisplay().getRotation(), camera.getPreviewSize(), textureView);
+            textureView = Functions.transformImage(textureView.getWidth(), textureView.getHeight(), deviceOrientation, camera.getPreviewSize(), textureView);
             mMediaRecorder = camera.setupMediaRecorder();
             connectCamera();
         }
@@ -90,6 +90,7 @@ public class DrivingActivity extends AppCompatActivity {
     private MediaRecorder mMediaRecorder;
     private CaptureRequest.Builder mCaptureRequestBuilder;
     private CameraManager cameraManager;
+    private int deviceOrientation;
 
     private ImageButton btnMinimize;
     private ImageButton btnStop;
@@ -151,18 +152,19 @@ public class DrivingActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        deviceOrientation = getWindowManager().getDefaultDisplay().getRotation();
         if(textureView.isAvailable()) {
             //setting up the camera - camera id, preview size , rotation
-            camera.setupCamera(textureView.getWidth(), textureView.getHeight(), getWindowManager().getDefaultDisplay().getRotation(), cameraManager);
+
+            camera.setupCamera(textureView.getWidth(), textureView.getHeight(), deviceOrientation, cameraManager);
             //making sure that the camera does'nt reset when moving from landscape and portrait mode
-            textureView = Functions.transformImage(textureView.getWidth(), textureView.getHeight(), getWindowManager().getDefaultDisplay().getRotation(), camera.getPreviewSize(), textureView);
+            textureView = Functions.transformImage(textureView.getWidth(), textureView.getHeight(), deviceOrientation, camera.getPreviewSize(), textureView);
             mMediaRecorder = camera.setupMediaRecorder();
             connectCamera();
         } else {
             textureView.setSurfaceTextureListener(surfaceTextureListener);
         }
     }
-
 
     protected void onPause() {
         camera.closeCamera(cameraDevice);
