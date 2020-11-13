@@ -92,9 +92,10 @@ public class CameraClass extends AppCompatActivity {
 
 
     private static class CompareSizeByArea implements Comparator<Size> {
-
+        //class to compare different resolutions by the preview
         @Override
         public int compare(Size lhs, Size rhs) {
+            //return -1 if the result is negative, 0 if the result is 0, 1 is the result is positive
             return Long.signum((long) lhs.getWidth() * lhs.getHeight() /
                     (long) rhs.getWidth() * rhs.getHeight()); //to get area we multiply the both sides width and height and then divide them
         }
@@ -150,13 +151,23 @@ public class CameraClass extends AppCompatActivity {
 
 
     private static Size chooseOptimalSize(Size[] choices, int width, int height) {
+        /***
+         * choices - all the resolutions from the camera sensor
+         * width \ height - the width and height of our surface
+         *
+         * the function will match the width \ height to the surface resolution to get a preview size
+         */
         List<Size> bigEnough = new ArrayList<Size>();
         for(Size option : choices) {
+            //checking if the the optional surface size is big enough to show the resolution of the
+            // camera sensor.
             if(option.getHeight() == option.getWidth() * height / width &&
-                    option.getWidth() >= width && option.getHeight() >= height) {
+                    option.getWidth() >= width &&
+                    option.getHeight() >= height) {
                 bigEnough.add(option);
             }
         }
+        //return the minimum size that matches to the options
         if(bigEnough.size() > 0) {
             return Collections.min(bigEnough, new CompareSizeByArea());
         } else {
