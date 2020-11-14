@@ -44,12 +44,13 @@
     </LinearLayout>
 
     <Chronometer
-        android:id="@+id/videoTimer"
+        android:id="@+id/chronometer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="30dp"
-        android:textColor="@color/red"
-        android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:layout_marginRight="20dp"/>
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="0dp"
+        android:layout_marginRight="17dp"
+        android:textColor="@color/red"
+        android:textSize="30dp" />
 </RelativeLayout>

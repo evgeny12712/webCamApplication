@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Camera;
+import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
@@ -16,6 +17,7 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.ImageReader;
 import android.media.MediaRecorder;
 import android.nfc.Tag;
 import android.os.Build;
@@ -65,6 +67,8 @@ public class CameraClass extends AppCompatActivity {
     private String mCameraId;
     private Size mPreviewSize;
     private Size mVideoSize;
+    private Size mImageSize;
+    private ImageReader mImageReader;
     private MediaRecorder mMediaRecorder;
     private int mTotalRotation;
     private CaptureRequest.Builder mCaptureRequestBuilder;
@@ -72,6 +76,7 @@ public class CameraClass extends AppCompatActivity {
     private File mVideoFolder; //file path
     private String mVideoFileName; // file name
 
+    private CameraCharacteristics cameraCharacteristics;
     //surface orientations to real world numbers
     private static SparseIntArray ORIENTATIONS = new SparseIntArray(); //converting surface orientation to real numbers
     static {
@@ -90,6 +95,11 @@ public class CameraClass extends AppCompatActivity {
         return mPreviewSize;
     }
 
+    public CameraCharacteristics getCameraCharacteristics() { return cameraCharacteristics;}
+
+    public ImageReader getmImageReader() {
+        return mImageReader;
+    }
 
     private static class CompareSizeByArea implements Comparator<Size> {
         //class to compare different resolutions by the preview
@@ -104,7 +114,7 @@ public class CameraClass extends AppCompatActivity {
     public void setupCamera(int width, int height,int deviceOrientation, CameraManager cameraManager) {
         try {
             for (String cameraId : cameraManager.getCameraIdList()) {
-                CameraCharacteristics cameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId);
+                cameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId);
                 // iterating through all the cameras and checking if its facing front, if it is so continue
                 if (cameraCharacteristics.get(CameraCharacteristics.LENS_FACING) ==
                         CameraCharacteristics.LENS_FACING_FRONT) {
@@ -124,6 +134,9 @@ public class CameraClass extends AppCompatActivity {
                 }
                 // setup the preview size
                 mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class), rotatedWidth, rotatedHeight);
+                mImageSize = chooseOptimalSize(map.getOutputSizes(ImageFormat.JPEG), rotatedWidth, rotatedHeight);
+                mImageReader = ImageReader.newInstance(mImageReader.getWidth(), mImageReader.getHeight(), ImageFormat.JPEG, 1);
+                //mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, HandlerThread);
                 mCameraId = cameraId;
                 return;
             }
@@ -271,11 +284,11 @@ public class CameraClass extends AppCompatActivity {
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         mMediaRecorder.setOutputFile(mVideoFileName);
-        mMediaRecorder.setVideoEncodingBitRate(1000000);
-        mMediaRecorder.setVideoFrameRate(30);
+        mMediaRecorder.setVideoEncodingBitRate(3000000);
+        mMediaRecorder.setVideoFrameRate(16);
         mMediaRecorder.setVideoSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-        mMediaRecorder.setOrientationHint(mTotalRotation);
+        mMediaRecorder.setOrientationHint(cameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION));
         try {
             mMediaRecorder.prepare();
         } catch (IOException e) {

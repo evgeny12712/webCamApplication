@@ -1,0 +1,7 @@
+full screen on main activity landscape - DONE
+continue recording when changing between landscape and portrait - DONE
+fix quality - CHECK WITH OTHER PHONE
+chronometer - DONE
+
+
+finish activityDRIVING (BUTTONS)

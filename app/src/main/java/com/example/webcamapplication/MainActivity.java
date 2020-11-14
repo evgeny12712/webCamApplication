@@ -102,7 +102,6 @@ public class MainActivity extends AppCompatActivity {
             textureView = (TextureView)findViewById(R.id.textureView);
             cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
 
-
             startBtn = (ImageButton) findViewById(R.id.btnStart);
             startBtn.setOnClickListener(new View.OnClickListener() {
                 @Override

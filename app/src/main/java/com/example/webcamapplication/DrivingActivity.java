@@ -10,12 +10,16 @@ import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.CaptureResult;
+import android.hardware.camera2.TotalCaptureResult;
+import android.media.ImageReader;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.SystemClock;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
@@ -35,6 +39,9 @@ import java.util.Arrays;
 public class DrivingActivity extends AppCompatActivity {
     private static final int REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION_RESULT = 1;
     private static final int REQUEST_CAMERA_PERMISSION_RESULT = 0;
+    private static final int STATE_PREVIEW = 0;
+    private static final int STATE_WAIT_LOCK = 1;
+    private int mCaptureState = STATE_PREVIEW;
     private TextureView textureView;
     private TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
         @Override
@@ -88,7 +95,38 @@ public class DrivingActivity extends AppCompatActivity {
     private Handler backgroundHandler;
 
     private MediaRecorder mMediaRecorder;
+    private ImageReader mImageReader;
+    private final ImageReader.OnImageAvailableListener mOnImageAvailableListener = new
+            ImageReader.OnImageAvailableListener() {
+                @Override
+                public void onImageAvailable(ImageReader reader) {
+
+                }
+            };
+
     private CaptureRequest.Builder mCaptureRequestBuilder;
+    private CameraCaptureSession mPreviewCaptureSession;
+    private CameraCaptureSession.CaptureCallback mPreviewCaptureCallback = new
+            CameraCaptureSession.CaptureCallback() {
+                private void process(CaptureResult) {
+                    switch(mCaptureState){
+                        case STATE_PREVIEW:
+                            // Do nothing
+                            break;
+                        case STATE_WAIT_LOCK:
+
+                            break;
+                    }
+                }
+                @Override
+                public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
+                    super.onCaptureCompleted(session, request, result);
+
+                    process(result);
+                }
+            };
+
+
     private CameraManager cameraManager;
     private int deviceOrientation;
 
@@ -103,12 +141,15 @@ public class DrivingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driving);
         mMediaRecorder = new MediaRecorder();
+        mChronometer = (Chronometer) findViewById(R.id.chronometer);
         cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         camera = new CameraClass();
-        textureView = (TextureView)findViewById(R.id.textureView);
-        mChronometer = (Chronometer) findViewById(R.id.videoTimer);
+        textureView = (TextureView) findViewById(R.id.textureView);
         btnMinimize = (ImageButton) findViewById(R.id.btnMinimize);
         movieFile = getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_MOVIES);
+
+
+
         btnMinimize.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -122,8 +163,7 @@ public class DrivingActivity extends AppCompatActivity {
             public void onClick(View v) {
                 mMediaRecorder.stop();
                 mMediaRecorder.reset();
-//                mChronometer.stop();
-//                mChronometer.setVisibility(View.INVISIBLE);
+                mChronometer.stop();
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
             }
@@ -160,10 +200,16 @@ public class DrivingActivity extends AppCompatActivity {
             //making sure that the camera does'nt reset when moving from landscape and portrait mode
             textureView = Functions.transformImage(textureView.getWidth(), textureView.getHeight(), deviceOrientation, camera.getPreviewSize(), textureView);
             mMediaRecorder = camera.setupMediaRecorder();
+            mImageReader = camera.getmImageReader();
+            mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, backgroundHandler);
             connectCamera();
         } else {
             textureView.setSurfaceTextureListener(surfaceTextureListener);
         }
+        mChronometer.setBase(SystemClock.elapsedRealtime());
+        mChronometer.start();
+
+
     }
 
     protected void onPause() {
@@ -295,8 +341,7 @@ public class DrivingActivity extends AppCompatActivity {
                     //create file to save video
                     startRecord();
                     mMediaRecorder.start();
-//                mChronometer.setBase(SystemClock.elapsedRealtime());
-//                mChronometer.start();
+                Toast.makeText(getApplicationContext(), "" + SystemClock.elapsedRealtime(), Toast.LENGTH_SHORT).show();
             } else {
                 //showing message to the user if he decided to refuse to give permission
                 if(shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
@@ -309,9 +354,6 @@ public class DrivingActivity extends AppCompatActivity {
         } else {
                 startRecord();
                 mMediaRecorder.start();
-//            mChronometer.setBase(SystemClock.elapsedRealtime());
-//            mChronometer.setVisibility(View.VISIBLE);
-//            mChronometer.start();
         }
     }
 
