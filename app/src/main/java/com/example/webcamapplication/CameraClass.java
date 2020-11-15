@@ -135,8 +135,7 @@ public class CameraClass extends AppCompatActivity {
                 // setup the preview size
                 mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class), rotatedWidth, rotatedHeight);
                 mImageSize = chooseOptimalSize(map.getOutputSizes(ImageFormat.JPEG), rotatedWidth, rotatedHeight);
-                mImageReader = ImageReader.newInstance(mImageReader.getWidth(), mImageReader.getHeight(), ImageFormat.JPEG, 1);
-                //mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, HandlerThread);
+                mImageReader = ImageReader.newInstance(mImageSize.getWidth(), mImageSize.getHeight(), ImageFormat.JPEG, 1);
                 mCameraId = cameraId;
                 return;
             }

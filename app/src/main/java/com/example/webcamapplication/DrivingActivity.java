@@ -20,6 +20,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.SystemClock;
+import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
@@ -48,6 +49,9 @@ public class DrivingActivity extends AppCompatActivity {
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
             //setting up the camera - camera id, preview size , rotation
             camera.setupCamera(textureView.getWidth(), textureView.getHeight(), deviceOrientation, cameraManager);
+            mImageReader = camera.getmImageReader();
+            mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, backgroundHandler);
+
             //making sure that the camera does'nt reset when moving from landscape and portrait mode
             textureView = Functions.transformImage(textureView.getWidth(), textureView.getHeight(), deviceOrientation, camera.getPreviewSize(), textureView);
             mMediaRecorder = camera.setupMediaRecorder();
@@ -95,6 +99,7 @@ public class DrivingActivity extends AppCompatActivity {
     private Handler backgroundHandler;
 
     private MediaRecorder mMediaRecorder;
+    private Size mImageSize;
     private ImageReader mImageReader;
     private final ImageReader.OnImageAvailableListener mOnImageAvailableListener = new
             ImageReader.OnImageAvailableListener() {
@@ -108,13 +113,18 @@ public class DrivingActivity extends AppCompatActivity {
     private CameraCaptureSession mPreviewCaptureSession;
     private CameraCaptureSession.CaptureCallback mPreviewCaptureCallback = new
             CameraCaptureSession.CaptureCallback() {
-                private void process(CaptureResult) {
+                private void process(CaptureResult captureResult) {
                     switch(mCaptureState){
                         case STATE_PREVIEW:
                             // Do nothing
                             break;
                         case STATE_WAIT_LOCK:
-
+                            mCaptureState = STATE_PREVIEW;
+                            Integer afState = captureResult.get(CaptureResult.CONTROL_AF_STATE);
+                            if(afState == CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED ||
+                                    afState == CaptureRequest.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED) {
+                                Toast.makeText(getApplicationContext(), "AUTO FOCUS LOCKED!", Toast.LENGTH_SHORT).show();
+                            }
                             break;
                     }
                 }
@@ -173,8 +183,7 @@ public class DrivingActivity extends AppCompatActivity {
         btnPicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), DrivingActivity.class);
-                startActivity(intent);
+                lockFocus();
             }
         });
 
@@ -292,7 +301,10 @@ public class DrivingActivity extends AppCompatActivity {
                     new CameraCaptureSession.StateCallback() {
                         @Override
                         public void onConfigured(@NonNull CameraCaptureSession session) {
+                            mPreviewCaptureSession = session;
                             try {
+                                mPreviewCaptureSession.setRepeatingRequest(mCaptureRequestBuilder.build(),
+                                    null, backgroundHandler);
                                 session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, null);
                             } catch (CameraAccessException e) {
                                 e.printStackTrace();
@@ -357,4 +369,13 @@ public class DrivingActivity extends AppCompatActivity {
         }
     }
 
+    private void lockFocus() {
+        mCaptureState = STATE_WAIT_LOCK;
+        mCaptureRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_START);
+        try {
+            mPreviewCaptureSession.capture(mCaptureRequestBuilder.build(), mPreviewCaptureCallback, backgroundHandler);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
 }
