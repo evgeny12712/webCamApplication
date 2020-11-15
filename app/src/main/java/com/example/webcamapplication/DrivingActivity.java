@@ -12,6 +12,7 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
+import android.media.Image;
 import android.media.ImageReader;
 import android.media.MediaRecorder;
 import android.os.Build;
@@ -32,7 +33,10 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 
@@ -94,6 +98,7 @@ public class DrivingActivity extends AppCompatActivity {
     };
 
     private File movieFile;
+    private File imageFile;
 
     private HandlerThread backgroundHandlerThread;
     private Handler backgroundHandler;
@@ -105,10 +110,43 @@ public class DrivingActivity extends AppCompatActivity {
             ImageReader.OnImageAvailableListener() {
                 @Override
                 public void onImageAvailable(ImageReader reader) {
-
+                    backgroundHandler.post(new ImageSaver(reader.acquireLatestImage()));
                 }
             };
 
+    private class ImageSaver implements Runnable {
+        private final Image mImage;
+
+        public ImageSaver(Image image) {
+            mImage =  image;
+        }
+        @Override
+        public void run() {
+            ByteBuffer byteBuffer = mImage.getPlanes()[0].getBuffer();
+            byte[] bytes = new byte[byteBuffer.remaining()];
+            byteBuffer.get(bytes);
+
+            FileOutputStream fileOutputStream = null;
+            try {
+                fileOutputStream = new FileOutputStream(camera.getmImageFileName());
+                fileOutputStream.write(bytes);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                mImage.close();
+                if(fileOutputStream != null) {
+                    try {
+                        fileOutputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+    }
     private CaptureRequest.Builder mCaptureRequestBuilder;
     private CameraCaptureSession mPreviewCaptureSession;
     private CameraCaptureSession.CaptureCallback mPreviewCaptureCallback = new
@@ -124,6 +162,7 @@ public class DrivingActivity extends AppCompatActivity {
                             if(afState == CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED ||
                                     afState == CaptureRequest.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED) {
                                 Toast.makeText(getApplicationContext(), "AUTO FOCUS LOCKED!", Toast.LENGTH_SHORT).show();
+                                startStillCaptureRequest();
                             }
                             break;
                     }
@@ -157,7 +196,7 @@ public class DrivingActivity extends AppCompatActivity {
         textureView = (TextureView) findViewById(R.id.textureView);
         btnMinimize = (ImageButton) findViewById(R.id.btnMinimize);
         movieFile = getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_MOVIES);
-
+        imageFile = getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
 
         btnMinimize.setOnClickListener(new View.OnClickListener() {
@@ -196,6 +235,7 @@ public class DrivingActivity extends AppCompatActivity {
         startBackgroundThread();
         //creating folder to save videos
         camera.createVideoFolder(movieFile);
+        camera.createImageFolder(imageFile);
         try {
             camera.createVideoFileName();
         } catch (IOException e) {
@@ -325,6 +365,30 @@ public class DrivingActivity extends AppCompatActivity {
             Toast.makeText(this, "ILLEGAL ARGUMENT", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
+    }
+
+    public void startStillCaptureRequest() {
+        try {
+            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+            mCaptureRequestBuilder.addTarget(mImageReader.getSurface());
+            mCaptureRequestBuilder.set(CaptureRequest.JPEG_ORIENTATION, camera.getmTotalRotation());
+            CameraCaptureSession.CaptureCallback stillCaptureCallback = new
+                    CameraCaptureSession.CaptureCallback() {
+                        @Override
+                        public void onCaptureStarted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, long timestamp, long frameNumber) {
+                            super.onCaptureStarted(session, request, timestamp, frameNumber);
+                            try {
+                                camera.createImageFileName();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+            mPreviewCaptureSession.capture(mCaptureRequestBuilder.build(), stillCaptureCallback, null);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void startBackgroundThread() {

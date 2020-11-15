@@ -75,6 +75,9 @@ public class CameraClass extends AppCompatActivity {
 
     private File mVideoFolder; //file path
     private String mVideoFileName; // file name
+    private File mImageFolder; //file path
+    private String mImageFileName; // file name
+
 
     private CameraCharacteristics cameraCharacteristics;
     //surface orientations to real world numbers
@@ -95,6 +98,8 @@ public class CameraClass extends AppCompatActivity {
         return mPreviewSize;
     }
 
+    public String getmImageFileName() { return mImageFileName; }
+    public int getmTotalRotation() {return mTotalRotation;}
     public CameraCharacteristics getCameraCharacteristics() { return cameraCharacteristics;}
 
     public ImageReader getmImageReader() {
@@ -214,6 +219,31 @@ public class CameraClass extends AppCompatActivity {
         mVideoFileName = videoFile.getAbsolutePath();
         return videoFile;
     }
+
+    public void createImageFolder(File imageFile) {
+        // creating the folder that we want to save into
+
+        // inside movieFile (path) create new folder called webCamVideos
+        mImageFolder = new File(imageFile, "webCamVideos");
+        // checking if we don't have the folder yet
+        if(!mImageFolder.exists()) {
+            // creating the folder
+            mImageFolder.mkdirs();
+        }
+    }
+
+    public File createImageFileName() throws IOException {
+        //creating the time string
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        //creating the file name
+        String prepend = "IMAGE_" + timestamp + "_";
+        //creating the actual file
+        File imageFile = File.createTempFile(prepend, ".jpg", mImageFolder);
+        //setting the file inside the folder that we created on "createVideoFolder" func
+        mImageFileName = imageFile.getAbsolutePath();
+        return imageFile;
+    }
+
 
     private void checkWriteStoragePermission() {
         //checking if our version is greater then marshmallow
