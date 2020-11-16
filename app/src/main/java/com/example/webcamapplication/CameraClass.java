@@ -17,6 +17,7 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.Image;
 import android.media.ImageReader;
 import android.media.MediaRecorder;
 import android.nfc.Tag;
@@ -29,10 +30,6 @@ import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.Surface;
-import android.view.TextureView;
-import android.view.View;
-import android.widget.Chronometer;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -45,7 +42,10 @@ import androidx.core.content.ContextCompat;
 //import com.example.webcamapplication.SettingsActivity;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -224,7 +224,7 @@ public class CameraClass extends AppCompatActivity {
         // creating the folder that we want to save into
 
         // inside movieFile (path) create new folder called webCamVideos
-        mImageFolder = new File(imageFile, "webCamVideos");
+        mImageFolder = new File(imageFile, "webCamImages");
         // checking if we don't have the folder yet
         if(!mImageFolder.exists()) {
             // creating the folder
@@ -257,11 +257,7 @@ public class CameraClass extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                // startPreview();
-//                startRecord();
                 mMediaRecorder.start();
-//                mChronometer.setBase(SystemClock.elapsedRealtime());
-//                mChronometer.start();
             } else {
                 //showing message to the user if he decided to refuse to give permission
                 if(shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
@@ -277,11 +273,7 @@ public class CameraClass extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-//            startRecord();
             mMediaRecorder.start();
-//            mChronometer.setBase(SystemClock.elapsedRealtime());
-//            mChronometer.setVisibility(View.VISIBLE);
-//            mChronometer.start();
         }
     }
 
@@ -326,5 +318,43 @@ public class CameraClass extends AppCompatActivity {
         }
         return mMediaRecorder;
     }
+
+    public static class ImageSaver implements Runnable {
+        private final Image mImage;
+        private CameraClass camera;
+
+        public ImageSaver(Image image, CameraClass camera) {
+            mImage =  image;
+            this.camera = camera;
+        }
+
+        @Override
+        public void run() {
+            ByteBuffer byteBuffer = mImage.getPlanes()[0].getBuffer();
+            byte[] bytes = new byte[byteBuffer.remaining()];
+            byteBuffer.get(bytes);
+
+            FileOutputStream fileOutputStream = null;
+            try {
+                fileOutputStream = new FileOutputStream(camera.getmImageFileName());
+                fileOutputStream.write(bytes);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                mImage.close();
+                if(fileOutputStream != null) {
+                    try {
+                        fileOutputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+    }
+
 
 }

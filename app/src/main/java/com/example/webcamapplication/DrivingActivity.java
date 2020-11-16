@@ -110,46 +110,15 @@ public class DrivingActivity extends AppCompatActivity {
             ImageReader.OnImageAvailableListener() {
                 @Override
                 public void onImageAvailable(ImageReader reader) {
-                    backgroundHandler.post(new ImageSaver(reader.acquireLatestImage()));
+                    backgroundHandler.post(new CameraClass.ImageSaver(reader.acquireLatestImage(), camera));
                 }
             };
 
-    private class ImageSaver implements Runnable {
-        private final Image mImage;
-
-        public ImageSaver(Image image) {
-            mImage =  image;
-        }
-        @Override
-        public void run() {
-            ByteBuffer byteBuffer = mImage.getPlanes()[0].getBuffer();
-            byte[] bytes = new byte[byteBuffer.remaining()];
-            byteBuffer.get(bytes);
-
-            FileOutputStream fileOutputStream = null;
-            try {
-                fileOutputStream = new FileOutputStream(camera.getmImageFileName());
-                fileOutputStream.write(bytes);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                mImage.close();
-                if(fileOutputStream != null) {
-                    try {
-                        fileOutputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-
-    }
     private CaptureRequest.Builder mCaptureRequestBuilder;
-    private CameraCaptureSession mPreviewCaptureSession;
-    private CameraCaptureSession.CaptureCallback mPreviewCaptureCallback = new
+
+
+    private CameraCaptureSession mRecordCaptureSession;
+    private CameraCaptureSession.CaptureCallback mRecordCaptureCallback = new
             CameraCaptureSession.CaptureCallback() {
                 private void process(CaptureResult captureResult) {
                     switch(mCaptureState){
@@ -174,6 +143,7 @@ public class DrivingActivity extends AppCompatActivity {
                     process(result);
                 }
             };
+
 
 
     private CameraManager cameraManager;
@@ -202,7 +172,7 @@ public class DrivingActivity extends AppCompatActivity {
         btnMinimize.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(DrivingActivity.this, "Minimize", Toast.LENGTH_SHORT).show();
+                onBackPressed();
             }
         });
 
@@ -213,6 +183,8 @@ public class DrivingActivity extends AppCompatActivity {
                 mMediaRecorder.stop();
                 mMediaRecorder.reset();
                 mChronometer.stop();
+                camera.closeCamera(cameraDevice);
+                stopBackGroundThread();
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
             }
@@ -226,6 +198,8 @@ public class DrivingActivity extends AppCompatActivity {
             }
         });
 
+        mChronometer.setBase(SystemClock.elapsedRealtime());
+        mChronometer.start();
     }
 
     @Override
@@ -255,17 +229,12 @@ public class DrivingActivity extends AppCompatActivity {
         } else {
             textureView.setSurfaceTextureListener(surfaceTextureListener);
         }
-        mChronometer.setBase(SystemClock.elapsedRealtime());
-        mChronometer.start();
-
-
     }
 
     protected void onPause() {
-        camera.closeCamera(cameraDevice);
-        stopBackGroundThread();
+        //camera.closeCamera(cameraDevice);
+        //stopBackGroundThread();
         super.onPause();
-
     }
 
 
@@ -337,13 +306,13 @@ public class DrivingActivity extends AppCompatActivity {
             mCaptureRequestBuilder.addTarget(previewSurface);
             mCaptureRequestBuilder.addTarget(recordSurface);
 
-            cameraDevice.createCaptureSession(Arrays.asList(previewSurface, recordSurface),
+            cameraDevice.createCaptureSession(Arrays.asList(previewSurface, recordSurface, mImageReader.getSurface()),
                     new CameraCaptureSession.StateCallback() {
                         @Override
                         public void onConfigured(@NonNull CameraCaptureSession session) {
-                            mPreviewCaptureSession = session;
+                            mRecordCaptureSession = session;
                             try {
-                                mPreviewCaptureSession.setRepeatingRequest(mCaptureRequestBuilder.build(),
+                                mRecordCaptureSession.setRepeatingRequest(mCaptureRequestBuilder.build(),
                                     null, backgroundHandler);
                                 session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, null);
                             } catch (CameraAccessException e) {
@@ -369,9 +338,10 @@ public class DrivingActivity extends AppCompatActivity {
 
     public void startStillCaptureRequest() {
         try {
-            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_VIDEO_SNAPSHOT);
             mCaptureRequestBuilder.addTarget(mImageReader.getSurface());
             mCaptureRequestBuilder.set(CaptureRequest.JPEG_ORIENTATION, camera.getmTotalRotation());
+
             CameraCaptureSession.CaptureCallback stillCaptureCallback = new
                     CameraCaptureSession.CaptureCallback() {
                         @Override
@@ -384,7 +354,7 @@ public class DrivingActivity extends AppCompatActivity {
                             }
                         }
                     };
-            mPreviewCaptureSession.capture(mCaptureRequestBuilder.build(), stillCaptureCallback, null);
+            mRecordCaptureSession.capture(mCaptureRequestBuilder.build(), stillCaptureCallback, null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -437,9 +407,16 @@ public class DrivingActivity extends AppCompatActivity {
         mCaptureState = STATE_WAIT_LOCK;
         mCaptureRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_START);
         try {
-            mPreviewCaptureSession.capture(mCaptureRequestBuilder.build(), mPreviewCaptureCallback, backgroundHandler);
+
+            mRecordCaptureSession.capture(mCaptureRequestBuilder.build(), mRecordCaptureCallback, backgroundHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        this.moveTaskToBack(true);
+    }
+
 }
