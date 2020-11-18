@@ -6,12 +6,12 @@
     android:layout_height="match_parent"
     android:background="#242424"
     tools:context=".DrivingActivity">
-    `
-    <TextureView
-        android:id="@+id/textureView"
+
+    <fragment
+        android:name="com.example.webcamapplication.PreviewFragment"
+        android:id="@+id/previewFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true" />/>
+        android:layout_height="match_parent"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -40,6 +40,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@drawable/picture_button" />
+
+
 
     </LinearLayout>
 
