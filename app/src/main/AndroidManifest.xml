@@ -31,7 +31,8 @@
         <activity android:name="Gallery.GalleryActivity"/>
         <activity android:name="Gallery.GallerySavedVideos"/>
         <activity android:name="Gallery.GalleryPictures"/>
-        <activity android:name=".DrivingActivity"/>
+        <activity android:name=".DrivingActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"/>
     </application>
 
 </manifest>

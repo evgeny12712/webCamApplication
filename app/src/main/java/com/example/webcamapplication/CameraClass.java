@@ -93,17 +93,17 @@ public class CameraClass extends AppCompatActivity {
     public String getCameraId() {
         return mCameraId;
     }
-
     public Size getPreviewSize() {
         return mPreviewSize;
     }
-
     public String getmImageFileName() { return mImageFileName; }
     public int getmTotalRotation() {return mTotalRotation;}
-    public CameraCharacteristics getCameraCharacteristics() { return cameraCharacteristics;}
-
     public ImageReader getmImageReader() {
         return mImageReader;
+    }
+
+    public void setmPreviewSize(int width, int height) {
+        mPreviewSize = new Size(width, height);
     }
 
     private static class CompareSizeByArea implements Comparator<Size> {
@@ -355,6 +355,4 @@ public class CameraClass extends AppCompatActivity {
         }
 
     }
-
-
 }

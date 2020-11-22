@@ -8,8 +8,8 @@
     tools:context=".DrivingActivity">
 
     <fragment
-        android:name="com.example.webcamapplication.PreviewFragment"
-        android:id="@+id/previewFragment"
+        android:name="com.example.webcamapplication.CameraRecordingFragment"
+        android:id="@+id/cameraRecordingFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

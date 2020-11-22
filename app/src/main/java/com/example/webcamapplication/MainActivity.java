@@ -31,64 +31,64 @@ import Gallery.GalleryActivity;
 public class MainActivity extends AppCompatActivity {
         private static final int REQUEST_CAMERA_PERMISSION_RESULT = 0;
         private CameraClass camera;
-        private CameraManager cameraManager;
-
-        private TextureView textureView;
-        private TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
-            @Override
-            public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-                //setting up the camera - camera id, preview size , rotation
-                camera.setupCamera(textureView.getWidth(), textureView.getHeight(), deviceOrientation, cameraManager);
-                textureView = Functions.transformImage(textureView.getWidth(), textureView.getHeight(), deviceOrientation, camera.getPreviewSize(), textureView); //making sure that the camera does'nt reset when moving from landscape and portrait mode
-                connectCamera(); //connecting to the camera, getting the camera service, asking for permission
-                Toast.makeText(getApplicationContext(), "CAMERA READY", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-
-            }
-
-            @Override
-            public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                return false;
-            }
-
-            @Override
-            public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-
-            }
-        };
-
-        private CameraDevice cameraDevice;
-        private CameraDevice.StateCallback cameraDeviceStateCallBack = new CameraDevice.StateCallback() {
-            @Override
-            public void onOpened(@NonNull CameraDevice camera) {
-                  cameraDevice = camera;
-                  startPreview(); //staring the preview
-            }
-
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-            @Override
-            public void onDisconnected(@NonNull CameraDevice camera) {
-                camera.close();
-                cameraDevice = null;
-            }
-
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-            @Override
-            public void onError(@NonNull CameraDevice camera, int error) {
-                camera.close();
-                cameraDevice = null;
-
-            }
-        };
-
-        private HandlerThread backgroundHandlerThread;
-        private Handler backgroundHandler;
-
-        private CaptureRequest.Builder mCaptureRequestBuilder;
-        private int deviceOrientation;
+//        private CameraManager cameraManager;
+//
+//        private TextureView textureView;
+//        private TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
+//            @Override
+//            public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+//                //setting up the camera - camera id, preview size , rotation
+//                camera.setupCamera(textureView.getWidth(), textureView.getHeight(), deviceOrientation, cameraManager);
+//                textureView = Functions.transformImage(textureView.getWidth(), textureView.getHeight(), deviceOrientation, camera.getPreviewSize(), textureView); //making sure that the camera does'nt reset when moving from landscape and portrait mode
+//                connectCamera(); //connecting to the camera, getting the camera service, asking for permission
+//                Toast.makeText(getApplicationContext(), "CAMERA READY", Toast.LENGTH_SHORT).show();
+//            }
+//
+//            @Override
+//            public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+//
+//            }
+//
+//            @Override
+//            public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+//                return false;
+//            }
+//
+//            @Override
+//            public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+//
+//            }
+//        };
+//
+//        private CameraDevice cameraDevice;
+//        private CameraDevice.StateCallback cameraDeviceStateCallBack = new CameraDevice.StateCallback() {
+//            @Override
+//            public void onOpened(@NonNull CameraDevice camera) {
+//                  cameraDevice = camera;
+//                  startPreview(); //staring the preview
+//            }
+//
+//            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+//            @Override
+//            public void onDisconnected(@NonNull CameraDevice camera) {
+//                camera.close();
+//                cameraDevice = null;
+//            }
+//
+//            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+//            @Override
+//            public void onError(@NonNull CameraDevice camera, int error) {
+//                camera.close();
+//                cameraDevice = null;
+//
+//            }
+//        };
+//
+//        private HandlerThread backgroundHandlerThread;
+//        private Handler backgroundHandler;
+//
+//        private CaptureRequest.Builder mCaptureRequestBuilder;
+//        private int deviceOrientation;
         private ImageButton startBtn;
         private ImageButton galleryBtn;
         private ImageButton settingsBtn;
@@ -99,36 +99,36 @@ public class MainActivity extends AppCompatActivity {
             setContentView(R.layout.activity_main);
 
             camera = new CameraClass();
-            textureView = (TextureView)findViewById(R.id.textureView);
-            cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-
-            startBtn = (ImageButton) findViewById(R.id.btnStart);
-            startBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(getApplicationContext(), DrivingActivity.class);
-                    startActivity(intent);
-                }
-            });
-
-            galleryBtn = (ImageButton)findViewById(R.id.btnGallery);
-            galleryBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(getApplicationContext(), GalleryActivity.class);
-                    startActivity(intent);
-                }
-            });
-
-            settingsBtn = (ImageButton)findViewById(R.id.btnSettings);
-            settingsBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(MainActivity.this, "HEY", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(getApplicationContext(), Settings.SettingsActivity.class);
-                    startActivity(intent);
-                }
-            });
+//            textureView = (TextureView)findViewById(R.id.textureView);
+//            cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+//
+//            startBtn = (ImageButton) findViewById(R.id.btnStart);
+//            startBtn.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Intent intent = new Intent(getApplicationContext(), DrivingActivity.class);
+//                    startActivity(intent);
+//                }
+//            });
+//
+//            galleryBtn = (ImageButton)findViewById(R.id.btnGallery);
+//            galleryBtn.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Intent intent = new Intent(getApplicationContext(), GalleryActivity.class);
+//                    startActivity(intent);
+//                }
+//            });
+//
+//            settingsBtn = (ImageButton)findViewById(R.id.btnSettings);
+//            settingsBtn.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Toast.makeText(MainActivity.this, "HEY", Toast.LENGTH_SHORT).show();
+//                    Intent intent = new Intent(getApplicationContext(), Settings.SettingsActivity.class);
+//                    startActivity(intent);
+//                }
+//            });
 
         }
 
