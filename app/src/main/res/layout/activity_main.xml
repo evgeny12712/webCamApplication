@@ -4,14 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.webcamapplication.MainActivity">
-    `
+    tools:context=".MainActivity">
 
-    <TextureView
-        android:id="@+id/textureView"
+
+    <fragment
+        android:name="com.example.webcamapplication.CameraMainFragment"
+        android:id="@+id/CameraMainFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true" />
+        android:layout_height="match_parent"/>
+
 
     <ImageButton
         android:id="@+id/btnSettings"

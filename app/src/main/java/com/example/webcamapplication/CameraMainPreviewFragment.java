@@ -2,36 +2,39 @@ package com.example.webcamapplication;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.CaptureResult;
+import android.hardware.camera2.TotalCaptureResult;
+import android.media.ImageReader;
+import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.SystemClock;
+import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-
-import Gallery.GalleryActivity;
 
 class CameraMainPreviewFragment extends Fragment {
         private static final int REQUEST_CAMERA_PERMISSION_RESULT = 0;
@@ -107,10 +110,10 @@ class CameraMainPreviewFragment extends Fragment {
             isFirstTime = true;
         }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        v = inflater.inflate(R.layout.fragment_camera, container, false);
+        v = inflater.inflate(R.layout.fragment_camera_main, container, false);
         if (isFirstTime == true) {
             startBackgroundThread();
             textureView = (TextureView) v.findViewById(R.id.textureView);
@@ -137,6 +140,10 @@ class CameraMainPreviewFragment extends Fragment {
             camera.closeCamera(cameraDevice);
             stopBackGroundThread();
             super.onPause();
+        }
+
+        public CameraDevice getCameraDevice() {
+            return cameraDevice;
         }
 
 

@@ -164,7 +164,7 @@ public class CameraRecordingFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        v = inflater.inflate(R.layout.fragment_camera, container, false);
+        v = inflater.inflate(R.layout.fragment_recording_camera, container, false);
         if (isFirstTime == true) {
             startBackgroundThread();
             textureView = (TextureView) v.findViewById(R.id.textureView);
