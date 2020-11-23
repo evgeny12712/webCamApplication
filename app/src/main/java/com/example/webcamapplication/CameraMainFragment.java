@@ -15,6 +15,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -30,7 +31,7 @@ import android.widget.Toast;
 import java.util.Arrays;
 
 public class CameraMainFragment extends Fragment {
-
+    private static final int REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION_RESULT = 1;
     private static final int REQUEST_CAMERA_PERMISSION_RESULT = 0;
     private CameraClass camera;
     private CameraManager cameraManager;
@@ -112,7 +113,7 @@ public class CameraMainFragment extends Fragment {
             startBackgroundThread();
             textureView = (TextureView) v.findViewById(R.id.textureView);
             deviceOrientation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
-            if(textureView.isAvailable()) {
+            if (textureView.isAvailable()) {
                 //setting up the camera - camera id, preview size , rotation
                 camera.setupCamera(textureView.getWidth(), textureView.getHeight(), deviceOrientation, cameraManager);
                 textureView = Functions.transformImage(textureView.getWidth(), textureView.getHeight(), deviceOrientation, camera.getPreviewSize(), textureView); //making sure that the camera does'nt reset when moving from landscape and portrait mode
@@ -127,7 +128,6 @@ public class CameraMainFragment extends Fragment {
         // Inflate the layout for this fragment
         return v;
     }
-
 
 
     @Override
@@ -193,23 +193,28 @@ public class CameraMainFragment extends Fragment {
     }
 
     //connecting to the camera, getting the camera service, asking for permission
-    private void connectCamera() {
+    protected void connectCamera() {
         try {
             //if our version of android is later version of android then marshmallow so we have to ask for permission
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 // check if we already got permission (for earlier activations)
-                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) ==
-                        PackageManager.PERMISSION_GRANTED) {
+                if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+                        && ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                            && ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED ) {
                     cameraManager.openCamera(camera.getCameraId(), cameraDeviceStateCallBack, backgroundHandler); //open the connection to the camera
-                }
-                else
-                {
+                } else {
                     //check if the user denied permission earlier, if he did so send him a toast
-                    if(shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
+                    if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
                         Toast.makeText(getActivity().getApplicationContext(), "video app required access to camera", Toast.LENGTH_SHORT).show();
                     }
-                    // asking for the permission
-                    requestPermissions(new String[] {Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION_RESULT);
+                    if (shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)) {
+                        Toast.makeText(getActivity().getApplicationContext(), "app needs to be able to record audio", Toast.LENGTH_SHORT).show();
+                    }
+                    if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                        Toast.makeText(getActivity().getApplicationContext(), "app needs to be able to save videos", Toast.LENGTH_SHORT).show();
+                    }
+
+                    requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.RECORD_AUDIO}, REQUEST_CAMERA_PERMISSION_RESULT);
                 }
             } //if our version of android is earlier version of android then marshmallow so we can just open camera
             else {
@@ -219,29 +224,36 @@ public class CameraMainFragment extends Fragment {
             e.printStackTrace();
         }
     }
-    @SuppressLint("MissingPermission")
+
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode == REQUEST_CAMERA_PERMISSION_RESULT) {
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    try {
-                        cameraManager.openCamera(camera.getCameraId(), cameraDeviceStateCallBack, backgroundHandler); //open the connection to the camera
-                    } catch (CameraAccessException e) {
-                        e.printStackTrace();
-                    }
-                }
-                 else if(grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(getActivity().getApplicationContext(), "Application will not run without camera services", Toast.LENGTH_SHORT).show();
-                }
-//                else if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
-//                    try {
-//                    } catch (CameraAccessException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
+        boolean shouldOpen = true;
+        if (requestCode == REQUEST_CAMERA_PERMISSION_RESULT) {
+           if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getActivity().getApplicationContext(), "Application will not run without camera services", Toast.LENGTH_SHORT).show();
+                shouldOpen = false;
             }
+            if (grantResults[1] != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getContext(), "Application need to be able to save data", Toast.LENGTH_SHORT).show();
+                shouldOpen = false;
+            }
+            if (grantResults[2] != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getContext(), "Application need to be able to record audio", Toast.LENGTH_SHORT).show();
+                shouldOpen = false;
+            }
+            if(shouldOpen) {
+                try {
+                    if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                        return;
+                    }
+                    cameraManager.openCamera(camera.getCameraId(), cameraDeviceStateCallBack, backgroundHandler); //open the connection to the camera
+                } catch (CameraAccessException e) {
+                    e.printStackTrace();
+                }
         }
+        }
+
     }
 }

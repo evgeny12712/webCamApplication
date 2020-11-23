@@ -81,7 +81,9 @@ public class CameraRecordingFragment extends Fragment {
         @Override
         public void onOpened(@NonNull CameraDevice camera) {
             cameraDevice = camera;
-            checkWriteStoragePermission();
+            Toast.makeText(getActivity().getApplicationContext(), "cameraOPENED!!!", Toast.LENGTH_SHORT).show();
+            startRecord();
+            mMediaRecorder.start();
         }
 
 
@@ -226,6 +228,43 @@ public class CameraRecordingFragment extends Fragment {
     }
 
 
+    //connecting to the camera, getting the camera service, asking for permission
+    protected void connectCamera() {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) ==
+                        PackageManager.PERMISSION_GRANTED &&
+                        ContextCompat.checkSelfPermission(getContext(), Manifest.permission.RECORD_AUDIO) ==
+                        PackageManager.PERMISSION_GRANTED &&
+                        ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+                        PackageManager.PERMISSION_GRANTED) {
+                    cameraManager.openCamera(camera.getCameraId(), cameraDeviceStateCallBack, backgroundHandler); //open the connection to the camera
+                }
+                else
+                {
+                    //check if we should show a request for permission
+                    if(shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
+                        Toast.makeText(getContext(), "video app required access to camera", Toast.LENGTH_SHORT).show();
+                    }
+                    if(shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)) {
+                        Toast.makeText(getContext(), "video app required access to record audio", Toast.LENGTH_SHORT).show();
+                    }
+                    if(shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                        Toast.makeText(getContext(), "video app needs to be able to write to storage", Toast.LENGTH_SHORT).show();
+                    }
+                    // asking for the permission
+                    requestPermissions(new String[] {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            Manifest.permission.RECORD_AUDIO,
+                    }, REQUEST_CAMERA_PERMISSION_RESULT);
+                }
+            } else {
+                cameraManager.openCamera(camera.getCameraId(), cameraDeviceStateCallBack, backgroundHandler); //open the connection to the camera
+            }
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
     //give camera permission to preview and save files
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permission, int[] grantResults) {
@@ -237,43 +276,10 @@ public class CameraRecordingFragment extends Fragment {
             if(grantResults[1] != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(getContext(), "Application will not have audio on record", Toast.LENGTH_SHORT).show();
             }
-        }
-        if(requestCode == REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION_RESULT) {
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(getContext(), "Permission successfully granted", Toast.LENGTH_SHORT).show();
-            }  else {
-                Toast.makeText(getContext(), "App needs to save video to run", Toast.LENGTH_SHORT).show();
+            if(grantResults[2] != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getActivity().getApplicationContext(),
+                        "Application will not run without being able to save to storage", Toast.LENGTH_SHORT).show();
             }
-        }
-    }
-
-    //connecting to the camera, getting the camera service, asking for permission
-    protected void connectCamera() {
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) ==
-                        PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(getContext(), Manifest.permission.RECORD_AUDIO) ==
-                        PackageManager.PERMISSION_GRANTED) {
-                    cameraManager.openCamera(camera.getCameraId(), cameraDeviceStateCallBack, backgroundHandler); //open the connection to the camera
-                }
-                else
-                {
-                    //check if we should show a request for permission
-                    if(shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
-                        Toast.makeText(getContext(), "video app required access to camera", Toast.LENGTH_SHORT).show();
-                    }
-                    if(shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)) {
-                        Toast.makeText(getContext(), "video app required access to camera", Toast.LENGTH_SHORT).show();
-                    }
-                    // asking for the permission
-                    requestPermissions(new String[] {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO
-                    }, REQUEST_CAMERA_PERMISSION_RESULT);
-                }
-            } else {
-                cameraManager.openCamera(camera.getCameraId(), cameraDeviceStateCallBack, backgroundHandler); //open the connection to the camera
-            }
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
         }
     }
 
@@ -323,7 +329,7 @@ public class CameraRecordingFragment extends Fragment {
         //checking if our version is greater then marshmallow
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             //checking if we already got permission
-            if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            if(ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED) {
                 //create file to save video
                 startRecord();
