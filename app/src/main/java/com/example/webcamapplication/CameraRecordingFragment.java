@@ -231,8 +231,11 @@ public class CameraRecordingFragment extends Fragment {
     public void onRequestPermissionsResult(int requestCode, String[] permission, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permission, grantResults);
         if(requestCode == REQUEST_CAMERA_PERMISSION_RESULT) {
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if(grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(getContext(), "Application will not run without camera permission", Toast.LENGTH_SHORT).show();
+            }
+            if(grantResults[1] != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getContext(), "Application will not have audio on record", Toast.LENGTH_SHORT).show();
             }
         }
         if(requestCode == REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION_RESULT) {
@@ -249,6 +252,7 @@ public class CameraRecordingFragment extends Fragment {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) ==
+                        PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(getContext(), Manifest.permission.RECORD_AUDIO) ==
                         PackageManager.PERMISSION_GRANTED) {
                     cameraManager.openCamera(camera.getCameraId(), cameraDeviceStateCallBack, backgroundHandler); //open the connection to the camera
                 }
@@ -258,8 +262,12 @@ public class CameraRecordingFragment extends Fragment {
                     if(shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
                         Toast.makeText(getContext(), "video app required access to camera", Toast.LENGTH_SHORT).show();
                     }
+                    if(shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)) {
+                        Toast.makeText(getContext(), "video app required access to camera", Toast.LENGTH_SHORT).show();
+                    }
                     // asking for the permission
-                    requestPermissions(new String[] {Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION_RESULT);
+                    requestPermissions(new String[] {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO
+                    }, REQUEST_CAMERA_PERMISSION_RESULT);
                 }
             } else {
                 cameraManager.openCamera(camera.getCameraId(), cameraDeviceStateCallBack, backgroundHandler); //open the connection to the camera

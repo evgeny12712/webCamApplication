@@ -1,6 +1,7 @@
 package com.example.webcamapplication;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
@@ -42,7 +43,6 @@ public class CameraMainFragment extends Fragment {
             camera.setupCamera(textureView.getWidth(), textureView.getHeight(), deviceOrientation, cameraManager);
             textureView = Functions.transformImage(textureView.getWidth(), textureView.getHeight(), deviceOrientation, camera.getPreviewSize(), textureView); //making sure that the camera does'nt reset when moving from landscape and portrait mode
             connectCamera(); //connecting to the camera, getting the camera service, asking for permission
-            Toast.makeText(getContext(), "CAMERA READY", Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -66,6 +66,7 @@ public class CameraMainFragment extends Fragment {
         @Override
         public void onOpened(@NonNull CameraDevice camera) {
             cameraDevice = camera;
+            Toast.makeText(getContext(), "CameraConnectionDONE!", Toast.LENGTH_LONG).show();
             startPreview(); //staring the preview
         }
 
@@ -194,25 +195,53 @@ public class CameraMainFragment extends Fragment {
     //connecting to the camera, getting the camera service, asking for permission
     private void connectCamera() {
         try {
+            //if our version of android is later version of android then marshmallow so we have to ask for permission
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                // check if we already got permission (for earlier activations)
                 if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) ==
                         PackageManager.PERMISSION_GRANTED) {
                     cameraManager.openCamera(camera.getCameraId(), cameraDeviceStateCallBack, backgroundHandler); //open the connection to the camera
                 }
                 else
                 {
-                    //check if we should show a request for permission
+                    //check if the user denied permission earlier, if he did so send him a toast
                     if(shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
-                        Toast.makeText(getContext(), "video app required access to camera", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity().getApplicationContext(), "video app required access to camera", Toast.LENGTH_SHORT).show();
                     }
                     // asking for the permission
                     requestPermissions(new String[] {Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION_RESULT);
                 }
-            } else {
+            } //if our version of android is earlier version of android then marshmallow so we can just open camera
+            else {
                 cameraManager.openCamera(camera.getCameraId(), cameraDeviceStateCallBack, backgroundHandler); //open the connection to the camera
             }
         } catch (CameraAccessException e) {
             e.printStackTrace();
+        }
+    }
+    @SuppressLint("MissingPermission")
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == REQUEST_CAMERA_PERMISSION_RESULT) {
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    try {
+                        cameraManager.openCamera(camera.getCameraId(), cameraDeviceStateCallBack, backgroundHandler); //open the connection to the camera
+                    } catch (CameraAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+                 else if(grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(getActivity().getApplicationContext(), "Application will not run without camera services", Toast.LENGTH_SHORT).show();
+                }
+//                else if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+//                    try {
+//                    } catch (CameraAccessException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+            }
         }
     }
 }
