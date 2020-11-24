@@ -14,6 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import Gallery.GalleryActivity;
+import Gallery.GalleryPictures;
+import Gallery.GalleryPicturesFragment;
+import Gallery.GalleryTemporaryFilesFragment;
 
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -23,10 +26,13 @@ public class MainActivity extends AppCompatActivity {
         private ImageButton galleryBtn;
         private ImageButton settingsBtn;
 
-        @Override
+
+    @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_main);
+
+
 //            cameraMainPreviewFragment = (CameraMainPreviewFragment) getSupportFragmentManager().findFragmentById(R.id.cameraPreviewFragment);
             startBtn = (ImageButton) findViewById(R.id.btnStart);
             startBtn.setOnClickListener(new View.OnClickListener() {

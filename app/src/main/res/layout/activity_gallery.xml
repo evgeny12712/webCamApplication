@@ -17,7 +17,7 @@
                 android:layout_weight="1"
                 android:text="Home"
                 android:autoSizePresetSizes="80dp"
-                android:background="@drawable/gallery_button_border"
+                android:background="@color/grey"
                 ></Button>
             <Button
                 android:id="@+id/btnVideos"
@@ -26,7 +26,7 @@
                 android:layout_weight="1"
                 android:text="Videos"
                 android:autoSizePresetSizes="80dp"
-                android:background="@drawable/gallery_bold_button_border"
+                android:background="@color/darkGrey"
                 ></Button>
             <Button
                 android:id="@+id/btnSavedVideos"
@@ -35,7 +35,7 @@
                 android:layout_weight="1"
                 android:text="Saved Videos"
                 android:autoSizePresetSizes="80dp"
-                android:background="@drawable/gallery_button_border"
+                android:background="@color/grey"
                 ></Button>
             <Button
                 android:id="@+id/btnPictures"
@@ -44,20 +44,14 @@
                 android:layout_weight="1"
                 android:text="Pictures"
                 android:autoSizePresetSizes="80dp"
-                android:background="@drawable/gallery_button_border"
+                android:background="@color/grey"
                 ></Button>
     </LinearLayout>
 
-    <GridView
-        android:id="@+id/grid_view"
+    <FrameLayout
+        android:id="@+id/gridFLayoutFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:numColumns="3"
-        android:columnWidth="90dp"
-        android:horizontalSpacing="10dp"
-        android:verticalSpacing="10dp"
-        android:layout_gravity="center"
-        android:stretchMode="columnWidth">
-    </GridView>
+        android:layout_height="match_parent">
+    </FrameLayout>
 
 </LinearLayout>

@@ -1,6 +1,9 @@
 package Gallery;
 
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -53,6 +56,8 @@ public class GalleryPictures extends AppCompatActivity {
                 overridePendingTransition(0, 0);
             }
         });
+    }
+
 
     }
 }
