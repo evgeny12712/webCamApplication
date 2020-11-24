@@ -20,6 +20,7 @@ import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
@@ -101,9 +102,8 @@ public class CameraClass extends AppCompatActivity {
     public ImageReader getmImageReader() {
         return mImageReader;
     }
-
-    public void setmPreviewSize(int width, int height) {
-        mPreviewSize = new Size(width, height);
+    public String getmVideoFileName() {
+        return mVideoFileName;
     }
 
     private static class CompareSizeByArea implements Comparator<Size> {
@@ -323,11 +323,15 @@ public class CameraClass extends AppCompatActivity {
 
     public static class ImageSaver implements Runnable {
         private final Image mImage;
-        private CameraClass camera;
+        private static CameraClass camera;
 
         public ImageSaver(Image image, CameraClass camera) {
             mImage =  image;
             this.camera = camera;
+        }
+
+        public static CameraClass getCamera() {
+            return camera;
         }
 
         @Override
@@ -346,6 +350,7 @@ public class CameraClass extends AppCompatActivity {
                 e.printStackTrace();
             } finally {
                 mImage.close();
+
                 if(fileOutputStream != null) {
                     try {
                         fileOutputStream.close();

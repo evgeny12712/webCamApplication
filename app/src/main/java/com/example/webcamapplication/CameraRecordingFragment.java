@@ -36,7 +36,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-public class CameraRecordingFragment extends Fragment {
+public class  CameraRecordingFragment extends Fragment {
     private static final int REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION_RESULT = 1;
     private static final int REQUEST_CAMERA_PERMISSION_RESULT = 0;
 
@@ -59,6 +59,7 @@ public class CameraRecordingFragment extends Fragment {
             //making sure that the camera does'nt reset when moving from landscape and portrait mode
             textureView = Functions.transformImage(textureView.getWidth(), textureView.getHeight(), deviceOrientation, camera.getPreviewSize(), textureView);
             mMediaRecorder = camera.setupMediaRecorder();
+            Toast.makeText(getContext(), "IN SURFACE LISTENER!!!", Toast.LENGTH_SHORT).show();
             connectCamera();
         }
 
@@ -199,7 +200,6 @@ public class CameraRecordingFragment extends Fragment {
         return v;
     }
 
-
     @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
@@ -214,6 +214,10 @@ public class CameraRecordingFragment extends Fragment {
             deviceOrientation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
             textureView = Functions.transformImage(textureView.getHeight(), textureView.getWidth(), deviceOrientation, camera.getPreviewSize(), textureView);
         }
+    }
+
+    public void setIsFirstTime(boolean isFirstTime) {
+        this.isFirstTime = isFirstTime;
     }
 
     //----GETTERS----//

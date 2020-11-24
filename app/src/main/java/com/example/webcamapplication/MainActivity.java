@@ -1,6 +1,8 @@
 package com.example.webcamapplication;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -9,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import Gallery.GalleryActivity;
 
@@ -29,8 +32,15 @@ public class MainActivity extends AppCompatActivity {
             startBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(getApplicationContext(), DrivingActivity.class);
-                    startActivity(intent);
+                    if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+                            && ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                            && ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED ) {
+                        Intent intent = new Intent(getApplicationContext(), DrivingActivity.class);
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(MainActivity.this, "You can't start recording without giving permission to use camera!",
+                                Toast.LENGTH_LONG).show();
+                    }
                 }
             });
 

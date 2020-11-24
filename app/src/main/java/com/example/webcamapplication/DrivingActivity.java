@@ -2,6 +2,7 @@ package com.example.webcamapplication;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -13,6 +14,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.io.File;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class DrivingActivity extends AppCompatActivity {
@@ -38,9 +41,15 @@ public class DrivingActivity extends AppCompatActivity {
         btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                cameraFragment.setIsFirstTime(true);
                 cameraFragment.getMediaRecorder().stop();
                 cameraFragment.getMediaRecorder().reset();
                 mChronometer.stop();
+
+                Intent mediaStoreUpdateIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                mediaStoreUpdateIntent.setData(Uri.fromFile(new File(cameraFragment.getCamera().getmVideoFileName())));
+                sendBroadcast(mediaStoreUpdateIntent);
+
                 cameraFragment.getCamera().closeCamera(cameraFragment.getCameraDevice());
                 cameraFragment.stopBackGroundThread();
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -53,6 +62,10 @@ public class DrivingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 cameraFragment.lockFocus();
+//                Intent mediaStoreUpdateIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+//                mediaStoreUpdateIntent.setData(Uri.fromFile(new File(cameraFragment.getCamera().getmImageFileName())));
+                //sendBroadcast(mediaStoreUpdateIntent);
+
                 Toast.makeText(DrivingActivity.this, "PICTURE TAKEN!", Toast.LENGTH_SHORT).show();
             }
         });
