@@ -4,14 +4,13 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.Toast;
-
+import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.webcamapplication.MainActivity;
+import MainWindow.MainActivity;
 import com.example.webcamapplication.R;
 
 public class GalleryActivity extends AppCompatActivity {
@@ -24,11 +23,16 @@ public class GalleryActivity extends AppCompatActivity {
     private GalleryTemporaryFilesFragment savedFiles;
     private GalleryPicturesFragment pictures;
     private Resources res;
+    private Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
+
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+
         res = getResources();
 
         temporaryFiles = new GalleryTemporaryFilesFragment();
@@ -38,10 +42,12 @@ public class GalleryActivity extends AppCompatActivity {
                 .replace(R.id.gridFLayoutFragment, temporaryFiles)
                 .commit();
 
-        btnVideos = (Button)findViewById(R.id.btnVideos);
 
-//        gridView = (GridView) findViewById(R.id.grid_view);
-//        gridView.setAdapter(new ImageAdapter(this));
+        btnHome = (Button)findViewById(R.id.btnHome);
+        btnVideos = (Button)findViewById(R.id.btnVideos);
+        btnSavedVideos = (Button) findViewById(R.id.btnSavedVideos);
+        btnPictures = (Button) findViewById(R.id.btnPictures);
+
 
         btnHome = (Button)findViewById(R.id.btnHome);
         btnHome.setOnClickListener(new View.OnClickListener() {
@@ -52,21 +58,27 @@ public class GalleryActivity extends AppCompatActivity {
             }
         });
 
+        btnVideos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.gridFLayoutFragment, temporaryFiles)
+                        .commit();
+                setButtonPressed("videos");
+            }
+        });
 
-        btnSavedVideos = (Button) findViewById(R.id.btnSavedVideos);
         btnSavedVideos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(GalleryActivity.this, "savedVides", Toast.LENGTH_SHORT).show();
+                Toast.makeText(GalleryActivity.this, "savedVideos", Toast.LENGTH_SHORT).show();
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.gridFLayoutFragment, savedFiles)
                         .commit();
                 setButtonPressed("savedVideos");
-                overridePendingTransition(0, 0);
             }
         });
 
-        btnPictures = (Button) findViewById(R.id.btnPictures);
         btnPictures.setOnClickListener(new View.OnClickListener(){
 
             @Override
@@ -76,7 +88,6 @@ public class GalleryActivity extends AppCompatActivity {
                         .replace(R.id.gridFLayoutFragment, pictures)
                         .commit();
                 setButtonPressed("pictures");
-                overridePendingTransition(0, 0);
 
             }
         });
@@ -98,26 +109,17 @@ public class GalleryActivity extends AppCompatActivity {
         int grey = res.getColor(R.color.grey);
         int darkGrey = res.getColor(R.color.darkGrey);
         switch (buttonName) {
-            case "home":
-                btnHome.setBackgroundColor(darkGrey);
-                btnVideos.setBackgroundColor(grey);
-                btnSavedVideos.setBackgroundColor(grey);
-                btnPictures.setBackgroundColor(grey);
-                break;
             case "videos":
-                btnHome.setBackgroundColor(grey);
                 btnVideos.setBackgroundColor(darkGrey);
                 btnSavedVideos.setBackgroundColor(grey);
                 btnPictures.setBackgroundColor(grey);
                 break;
             case "savedVideos":
-                btnHome.setBackgroundColor(darkGrey);
                 btnVideos.setBackgroundColor(grey);
                 btnSavedVideos.setBackgroundColor(darkGrey);
                 btnPictures.setBackgroundColor(grey);
                 break;
             case "pictures":
-                btnHome.setBackgroundColor(darkGrey);
                 btnVideos.setBackgroundColor(grey);
                 btnSavedVideos.setBackgroundColor(grey);
                 btnPictures.setBackgroundColor(darkGrey);

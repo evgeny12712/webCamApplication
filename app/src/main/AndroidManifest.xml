@@ -5,7 +5,6 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher_round"
@@ -13,8 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:screenOrientation="sensorPortrait"
-        android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        <activity android:name="MainWindow.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -29,9 +29,7 @@
         <activity android:name="Settings.ResetFrequencyDialog"/>
         <activity android:name="Gallery.ImageAdapter"/>
         <activity android:name="Gallery.GalleryActivity"/>
-        <activity android:name="Gallery.GallerySavedVideos"/>
-        <activity android:name="Gallery.GalleryPictures"/>
-        <activity android:name=".DrivingActivity"
+        <activity android:name="Driving.DrivingActivity"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"/>
     </application>
 

@@ -1,4 +1,4 @@
-package com.example.webcamapplication;
+package CameraAndSupport;
 
 import android.graphics.Matrix;
 import android.graphics.RectF;

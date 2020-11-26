@@ -35,7 +35,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-//import com.example.webcamapplication.DrivingActivity;
+//import Driving.DrivingActivity;
 //import com.example.webcamapplication.SettingsActivity;
 
 import java.io.File;

@@ -6,5 +6,7 @@
     <color name="red">#FF0000</color>
     <color name="grey">#DCDCDC</color>
     <color name="darkGrey">#A9A9A9</color>
-    <color name="darkgrey">#A9A9A9</color>
+    <color name="themePrimaryColor">#2B2D2F</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFfF</color>
 </resources>

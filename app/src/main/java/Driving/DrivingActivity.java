@@ -1,7 +1,6 @@
-package com.example.webcamapplication;
+package Driving;
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,9 +10,11 @@ import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+
+import MainWindow.MainActivity;
+import com.example.webcamapplication.R;
 
 import java.io.File;
 
@@ -62,22 +63,13 @@ public class DrivingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 cameraFragment.lockFocus();
-//                Intent mediaStoreUpdateIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-//                mediaStoreUpdateIntent.setData(Uri.fromFile(new File(cameraFragment.getCamera().getmImageFileName())));
-                //sendBroadcast(mediaStoreUpdateIntent);
-
+                cameraFragment.galleryAddPic();
                 Toast.makeText(DrivingActivity.this, "PICTURE TAKEN!", Toast.LENGTH_SHORT).show();
             }
         });
 
         mChronometer.setBase(SystemClock.elapsedRealtime());
         mChronometer.start();
-    }
-
-    protected void onPause() {
-//        cameraFragment.getCamera().closeCamera(cameraFragment.getCameraDevice());
-//        cameraFragment.stopBackGroundThread();
-        super.onPause();
     }
 
     //setting the application fullscreen

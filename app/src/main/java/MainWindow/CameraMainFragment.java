@@ -1,7 +1,6 @@
-package com.example.webcamapplication;
+package MainWindow;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
@@ -27,6 +26,10 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import CameraAndSupport.CameraClass;
+import CameraAndSupport.Functions;
+import com.example.webcamapplication.R;
 
 import java.util.Arrays;
 
@@ -127,14 +130,6 @@ public class CameraMainFragment extends Fragment {
 
         // Inflate the layout for this fragment
         return v;
-    }
-
-
-    @Override
-    public void onPause() {
-        camera.closeCamera(cameraDevice);
-        stopBackGroundThread();
-        super.onPause();
     }
 
     public CameraDevice getCameraDevice() {

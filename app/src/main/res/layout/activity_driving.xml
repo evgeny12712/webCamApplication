@@ -5,10 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#242424"
-    tools:context=".DrivingActivity">
+    tools:context="Driving.DrivingActivity">
 
     <fragment
-        android:name="com.example.webcamapplication.CameraRecordingFragment"
+        android:name="Driving.CameraRecordingFragment"
         android:id="@+id/cameraRecordingFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
