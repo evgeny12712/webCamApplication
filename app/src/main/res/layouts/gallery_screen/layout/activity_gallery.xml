@@ -61,10 +61,8 @@
                 ></Button>
     </LinearLayout>
 
-    <FrameLayout
-        android:id="@+id/gridFLayoutFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </FrameLayout>
+    <include layout="@layout/content_scrolling"
+        android:id="@+id/content_scrolling">
+    </include>
 
 </LinearLayout>

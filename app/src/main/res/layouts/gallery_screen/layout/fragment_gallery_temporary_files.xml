@@ -1,25 +1,13 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/list"
+    android:name="com.example.newfile.GalleryTemporaryFilesFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="Gallery.GalleryTemporaryFilesFragment">
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/recyclerView">
-    </androidx.recyclerview.widget.RecyclerView>
-
-<!--    <GridView-->
-<!--        android:id="@+id/grid_view"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:numColumns="3"-->
-<!--        android:columnWidth="90dp"-->
-<!--        android:horizontalSpacing="10dp"-->
-<!--        android:verticalSpacing="10dp"-->
-<!--        android:layout_gravity="center"-->
-<!--        android:stretchMode="columnWidth">-->
-<!--    </GridView>-->
-
-</RelativeLayout>
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+    app:layoutManager="GridLayoutManager"
+    tools:context=".GalleryTemporaryFilesFragment"
+    tools:listitem="@layout/fragment_item_picture" />

@@ -58,7 +58,7 @@ public class CameraClass extends AppCompatActivity {
 
     private File mVideoFolder; //file path
     private String mVideoFileName; // file name
-    private File mImageFolder; //file path
+    private static File mImageFolder; //file path
     private String mImageFileName; // file name
 
 
@@ -87,7 +87,7 @@ public class CameraClass extends AppCompatActivity {
     public String getmVideoFileName() {
         return mVideoFileName;
     }
-
+    public static File getmImageFolder() { return mImageFolder; }
     private static class CompareSizeByArea implements Comparator<Size> {
         //class to compare different resolutions by the preview
         @Override
@@ -227,37 +227,37 @@ public class CameraClass extends AppCompatActivity {
     }
 
 
-    private void checkWriteStoragePermission() {
-        //checking if our version is greater then marshmallow
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            //checking if we already got permission
-            if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED) {
-                try {
-                    //create file to save video
-                    createVideoFileName();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                mMediaRecorder.start();
-            } else {
-                //showing message to the user if he decided to refuse to give permission
-                if(shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    Toast.makeText(this, "app needs to be able to save videos", Toast.LENGTH_SHORT).show();
-                }
-                //requesting the permission
-                requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION_RESULT);
-            }
-        } else {
-            try {
-                createVideoFileName();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            mMediaRecorder.start();
-        }
-    }
+//    private void checkWriteStoragePermission() {
+//        //checking if our version is greater then marshmallow
+//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            //checking if we already got permission
+//            if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                    == PackageManager.PERMISSION_GRANTED) {
+//                try {
+//                    //create file to save video
+//                    createVideoFileName();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                mMediaRecorder.start();
+//            } else {
+//                //showing message to the user if he decided to refuse to give permission
+//                if(shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+//                    Toast.makeText(this, "app needs to be able to save videos", Toast.LENGTH_SHORT).show();
+//                }
+//                //requesting the permission
+//                requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
+//                        REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION_RESULT);
+//            }
+//        } else {
+//            try {
+//                createVideoFileName();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            mMediaRecorder.start();
+//        }
+//    }
 
     //give camera permission to preview and save files
     @Override
@@ -318,8 +318,11 @@ public class CameraClass extends AppCompatActivity {
 
         @Override
         public void run() {
+            // getting our image into a ByteBuffer
             ByteBuffer byteBuffer = mImage.getPlanes()[0].getBuffer();
+            // making a bytes array at the size of the byteBuffer.
             byte[] bytes = new byte[byteBuffer.remaining()];
+            // initializing the bytes array with the bytes of the image
             byteBuffer.get(bytes);
 
             FileOutputStream fileOutputStream = null;

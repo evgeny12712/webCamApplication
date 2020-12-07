@@ -5,51 +5,46 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.GridView;
-import android.widget.Toast;
+
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
+import Gallery.Gallery.TemporaryFiles.GalleryTemporaryFilesFragment;
 import MainWindow.MainActivity;
 import com.example.webcamapplication.R;
 
-public class GalleryActivity extends AppCompatActivity {
-    private GridView gridView;
+public class GalleryActivity extends AppCompatActivity implements GalleryTemporaryFilesFragment.OnListFragmentInteractionListener,
+        GalleryPicturesFragment.OnListFragmentInteractionListener,
+        GallerySavedFilesFragment.OnListFragmentInteractionListener {
     private Button btnSavedVideos;
     private Button btnPictures;
     private Button btnHome;
     private Button btnVideos;
-    private GalleryTemporaryFilesFragment temporaryFiles;
-    private GalleryTemporaryFilesFragment savedFiles;
-    private GalleryPicturesFragment pictures;
     private Resources res;
-    private Toolbar mToolbar;
+    private Toolbar toolbar;
+    private Fragment temporaryFiles;
+    private Fragment savedFiles;
+    private Fragment pictures;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
 
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
-
-        res = getResources();
-
-        temporaryFiles = new GalleryTemporaryFilesFragment();
-        savedFiles = new GalleryTemporaryFilesFragment();
-        pictures = new GalleryPicturesFragment();
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.gridFLayoutFragment, temporaryFiles)
-                .commit();
-
-
         btnHome = (Button)findViewById(R.id.btnHome);
         btnVideos = (Button)findViewById(R.id.btnVideos);
         btnSavedVideos = (Button) findViewById(R.id.btnSavedVideos);
         btnPictures = (Button) findViewById(R.id.btnPictures);
 
+        temporaryFiles = new GalleryTemporaryFilesFragment();
+        savedFiles = new GallerySavedFilesFragment();
+        pictures = new GallerySavedFilesFragment();
 
-        btnHome = (Button)findViewById(R.id.btnHome);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        res = getResources();
+        setSupportActionBar(toolbar);
+
         btnHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -62,18 +57,18 @@ public class GalleryActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.gridFLayoutFragment, temporaryFiles)
+                        .replace(R.id.frameLayout, temporaryFiles)
                         .commit();
-                setButtonPressed("videos");
+            setButtonPressed("videos");
+
             }
         });
 
         btnSavedVideos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(GalleryActivity.this, "savedVideos", Toast.LENGTH_SHORT).show();
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.gridFLayoutFragment, savedFiles)
+                        .replace(R.id.frameLayout, savedFiles)
                         .commit();
                 setButtonPressed("savedVideos");
             }
@@ -83,27 +78,15 @@ public class GalleryActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                Toast.makeText(GalleryActivity.this, "Pictures", Toast.LENGTH_SHORT).show();
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.gridFLayoutFragment, pictures)
+                        .replace(R.id.frameLayout, pictures)
                         .commit();
                 setButtonPressed("pictures");
-
             }
         });
 
-
-
-//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Toast.makeText(GalleryActivity.this, "id" + position, Toast.LENGTH_SHORT).show();
-//                Intent intent = new Intent(getApplicationContext(), FullScreenActivity.class);
-//                intent.putExtra("id", position);
-//                startActivity(intent);
-//            }
-//        });
     }
+
 
     public void setButtonPressed(String buttonName) {
         int grey = res.getColor(R.color.grey);
@@ -125,5 +108,11 @@ public class GalleryActivity extends AppCompatActivity {
                 btnPictures.setBackgroundColor(darkGrey);
                 break;
         }
+    }
+
+
+    @Override
+    public void onListFragmentInteraction(PictureItem item) {
+
     }
 }

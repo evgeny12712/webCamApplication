@@ -63,7 +63,7 @@ public class DrivingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 cameraFragment.lockFocus();
-                cameraFragment.galleryAddPic();
+//                cameraFragment.galleryAddPic();
                 Toast.makeText(DrivingActivity.this, "PICTURE TAKEN!", Toast.LENGTH_SHORT).show();
             }
         });

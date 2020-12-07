@@ -302,7 +302,9 @@ public class  CameraRecordingFragment extends Fragment {
             Surface recordSurface = mMediaRecorder.getSurface();
 
             mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+            //making preview
             mCaptureRequestBuilder.addTarget(previewSurface);
+            //recording
             mCaptureRequestBuilder.addTarget(recordSurface);
 
             cameraDevice.createCaptureSession(Arrays.asList(previewSurface, recordSurface, mImageReader.getSurface()),
@@ -400,6 +402,7 @@ public class  CameraRecordingFragment extends Fragment {
                         }
                     };
             mRecordCaptureSession.capture(mCaptureRequestBuilder.build(), stillCaptureCallback, null);
+            Toast.makeText(this.getActivity().getApplicationContext(), "CAPTURED", Toast.LENGTH_SHORT).show();
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -415,11 +418,11 @@ public class  CameraRecordingFragment extends Fragment {
         }
     }
 
-    protected void galleryAddPic() {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        Uri contentUri = Uri.fromFile(imageFile);
-        Toast.makeText(getActivity().getApplicationContext(), "" + imageFile.toString(), Toast.LENGTH_SHORT).show();
-        mediaScanIntent.setData(contentUri);
-        getActivity().sendBroadcast(mediaScanIntent);
-    }
+//    protected void galleryAddPic() {
+//        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+//        Uri contentUri = Uri.fromFile(imageFile);
+//        Toast.makeText(getActivity().getApplicationContext(), "" + imageFile.toString(), Toast.LENGTH_SHORT).show();
+//        mediaScanIntent.setData(contentUri);
+//        getActivity().sendBroadcast(mediaScanIntent);
+//    }
 }
