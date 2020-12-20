@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -44,6 +45,10 @@ public class GalleryActivity extends AppCompatActivity implements GalleryTempora
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         res = getResources();
         setSupportActionBar(toolbar);
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frameLayout, temporaryFiles)
+                .commit();
 
         btnHome.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,6 +118,11 @@ public class GalleryActivity extends AppCompatActivity implements GalleryTempora
 
     @Override
     public void onListFragmentInteraction(PictureItem item) {
+
+    }
+
+    @Override
+    public void onListFragmentInteraction(ImageView imageView) {
 
     }
 }

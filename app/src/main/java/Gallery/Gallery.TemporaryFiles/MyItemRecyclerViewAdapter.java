@@ -3,80 +3,109 @@ package Gallery.Gallery.TemporaryFiles;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
+import android.net.Uri;
+import android.os.CancellationSignal;
+import android.os.Environment;
+import android.service.autofill.Dataset;
+import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.webcamapplication.R;
 
 import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 import Gallery.GalleryPicturesFragment;
+import Gallery.PictureItem;
 
 public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecyclerViewAdapter.ViewHolder> {
 
-    private final List<File> mFiles;
-    private final GalleryTemporaryFilesFragment.OnListFragmentInteractionListener mListener;
-    private ImageView mImageView;
-    public MyItemRecyclerViewAdapter(List<File> mFiles, GalleryTemporaryFilesFragment.OnListFragmentInteractionListener mListener) {
-        this.mFiles = mFiles;
-        this.mListener = mListener;
+    private static final String TAG = "CustomAdapter";
+    private ArrayList<File> mDataset;
+    private ArrayList<ImageView> imageViews;
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public ImageView mImageView;
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            mImageView = (ImageView) itemView.findViewById(R.id.imageView);
+        }
+
+    }
+
+
+    public MyItemRecyclerViewAdapter(File dir) {
+        mDataset = new ArrayList<File>();
+        loadSavedImages(dir);
     }
 
 
     @NonNull
     @Override
-    public MyItemRecyclerViewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_gallery_temporary_files, parent, false);
+                .inflate(R.layout.fragment_image, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        holder.mImageView = convertFileToImageView(mFiles.get(position));
-
-        holder.mItemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mImageView);
-                }
-            }
-        });
+        convertFilesToImages(mDataset, holder);
+        //holder.mImageView = imageViews.get(0);
 
     }
 
     @Override
     public int getItemCount() {
-        return mFiles.size();
+        return mDataset.size();
     }
 
-    public ImageView convertFileToImageView(File file) {
-        ImageView imageView = null;
-        String filePath = file.getPath();
-        Bitmap bitmap = BitmapFactory.decodeFile(filePath);
-        imageView.setImageBitmap(bitmap);
-        return imageView;
+    public ArrayList<File> getmDataset() {
+        return mDataset;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public View mItemView;
-        public ImageView mImageView;
-
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            this.mItemView = itemView;
-            mImageView = (ImageView) itemView.findViewById(R.id.imageView);
-
+    public void convertFilesToImages(ArrayList<File> files, ViewHolder holder) {
+        for(File file : files) {
+            try {
+                imageViews.add(convertFileToImageView(file, holder));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
+    public ImageView convertFileToImageView(File file, ViewHolder holder) throws IOException {
+        ImageView imageView = holder.mImageView;
+//        Size mSize = new Size(96,96);
+//        CancellationSignal ca = new CancellationSignal();
+//        Bitmap bitmapThumbnail = ThumbnailUtils.createVideoThumbnail(file, mSize, ca);
+//        imageView.setImageBitmap(bitmapThumbnail);
+        return holder.mImageView;
+    }
+
+    public void loadSavedImages(File dir) {
+        if (dir.exists()) {
+            File[] files = dir.listFiles();
+            for (File file : files) {
+                String absolutePath = file.getAbsolutePath();
+                String extension = absolutePath.substring(absolutePath.lastIndexOf("."));
+                if (extension.equals(".mp4")) {
+                    mDataset.add(file);
+                }
+            }
+        }
+    }
 
 }

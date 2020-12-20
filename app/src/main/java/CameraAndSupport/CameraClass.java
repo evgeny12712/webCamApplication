@@ -179,15 +179,7 @@ public class CameraClass extends AppCompatActivity {
     /////------------RECORDING-FUNCTIONS------------/////
 
     public void createVideoFolder(File movieFile) {
-        // creating the folder that we want to save into
-        Log.d("ASD", "createVideoFolder: " + movieFile);
-        // inside movieFile (path) create new folder called webCamVideos
-        mVideoFolder = new File(movieFile, "webCamVideos");
-        // checking if we don't have the folder yet
-        if(!mVideoFolder.exists()) {
-            // creating the folder
-            mVideoFolder.mkdirs();
-        }
+        mVideoFolder = movieFile;
     }
 
     public File createVideoFileName() throws IOException {

@@ -1,49 +1,43 @@
 package Gallery.Gallery.TemporaryFiles;
 
 import android.content.Context;
+import android.graphics.Camera;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.webcamapplication.R;
 
+import java.io.File;
+import java.util.ArrayList;
+
+import Driving.CameraRecordingFragment;
 import Gallery.FilesContent;
 import Gallery.GalleryPicturesFragment;
 import Gallery.PictureItem;
 
 public class GalleryTemporaryFilesFragment extends Fragment  {
 
-    // TODO: Customize parameter argument names
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
-    private int mColumnCount = 3;
-    public OnListFragmentInteractionListener mListener;
+    private static final String TAG = "RecyclerViewTemporaryFragment";
+    private static final int DATASET_COUNT = 60;
 
-
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static GalleryTemporaryFilesFragment newInstance(int columnCount) {
-        GalleryTemporaryFilesFragment fragment = new GalleryTemporaryFilesFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    protected RecyclerView mRecyclerView;
+    protected MyItemRecyclerViewAdapter mAdapter;
+    protected RecyclerView.LayoutManager mLayoutManager;
+    protected ArrayList<File> mDataset;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-        }
     }
 
     @Override
@@ -51,13 +45,12 @@ public class GalleryTemporaryFilesFragment extends Fragment  {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_gallery_temporary_files, container, false);
 
-        // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            recyclerView.setAdapter(new MyItemRecyclerViewAdapter(FilesContent.getTemporaryItems(), (GalleryTemporaryFilesFragment.OnListFragmentInteractionListener) mListener));
-        }
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.list);
+        mLayoutManager = new GridLayoutManager(getActivity(), 3);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mAdapter = new MyItemRecyclerViewAdapter(getActivity().getExternalFilesDir(Environment.DIRECTORY_MOVIES));
+        mRecyclerView.setAdapter(mAdapter);
+        Toast.makeText(this.getContext() , "" + mAdapter.getmDataset().size(), Toast.LENGTH_SHORT).show();
         return view;
     }
 

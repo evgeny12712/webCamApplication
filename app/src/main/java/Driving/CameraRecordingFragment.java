@@ -106,7 +106,7 @@ public class  CameraRecordingFragment extends Fragment {
         }
     };
 
-    private File movieFile;
+    private static File movieFile;
     private File imageFile;
 
     private HandlerThread backgroundHandlerThread;
@@ -206,6 +206,13 @@ public class  CameraRecordingFragment extends Fragment {
         return v;
     }
 
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //moviewFile = getContext().getExternal
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
@@ -236,7 +243,9 @@ public class  CameraRecordingFragment extends Fragment {
     protected CameraDevice getCameraDevice() {
         return cameraDevice;
     }
-
+    public static File getMovieFile() {
+        return movieFile;
+    }
 
     //connecting to the camera, getting the camera service, asking for permission
     protected void connectCamera() {
