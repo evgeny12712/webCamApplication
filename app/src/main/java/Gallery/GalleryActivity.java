@@ -11,11 +11,13 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import Gallery.Gallery.TemporaryFiles.GalleryTemporaryFilesFragment;
+import Gallery.Pictures.GalleryPicturesFragment;
+import Gallery.SavedFiles.GallerySavedFilesFragment;
 import MainWindow.MainActivity;
 import com.example.webcamapplication.R;
 
 public class GalleryActivity extends AppCompatActivity implements GalleryTemporaryFilesFragment.OnListFragmentInteractionListener,
-        GalleryPicturesFragment.OnListFragmentInteractionListener,
         GallerySavedFilesFragment.OnListFragmentInteractionListener {
     private Button btnSavedVideos;
     private Button btnPictures;
@@ -39,7 +41,7 @@ public class GalleryActivity extends AppCompatActivity implements GalleryTempora
 
         temporaryFiles = new GalleryTemporaryFilesFragment();
         savedFiles = new GallerySavedFilesFragment();
-        pictures = new GallerySavedFilesFragment();
+        pictures = new GalleryPicturesFragment();
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         res = getResources();
@@ -114,11 +116,6 @@ public class GalleryActivity extends AppCompatActivity implements GalleryTempora
         }
     }
 
-
-    @Override
-    public void onListFragmentInteraction(PictureItem item) {
-
-    }
 
     @Override
     public void onListFragmentInteraction(ImageView imageView) {

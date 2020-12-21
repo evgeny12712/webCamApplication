@@ -1,36 +1,24 @@
-package Gallery.Gallery.TemporaryFiles;
+package Gallery.SavedFiles;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
-import android.net.Uri;
 import android.os.CancellationSignal;
-import android.os.Environment;
-import android.service.autofill.Dataset;
 import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.webcamapplication.R;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.List;
 
-import Gallery.GalleryPicturesFragment;
-import Gallery.PictureItem;
-
-public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecyclerViewAdapter.ViewHolder> {
+public class MySavedFilesRecyclerViewAdapter extends RecyclerView.Adapter<MySavedFilesRecyclerViewAdapter.ViewHolder> {
 
     private static final String TAG = "CustomAdapter";
     private ArrayList<File> mDataset;
@@ -45,7 +33,7 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
     }
 
 
-    public MyItemRecyclerViewAdapter(File dir) {
+    public MySavedFilesRecyclerViewAdapter(File dir) {
         mDataset = new ArrayList<File>();
         loadSavedImages(dir);
     }
@@ -55,7 +43,7 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_image, parent, false);
+                .inflate(R.layout.fragment_gallery_pictures, parent, false);
         return new ViewHolder(view);
     }
 

@@ -195,15 +195,7 @@ public class CameraClass extends AppCompatActivity {
     }
 
     public void createImageFolder(File imageFile) {
-        // creating the folder that we want to save into
-
-        // inside movieFile (path) create new folder called webCamVideos
-        mImageFolder = new File(imageFile, "webCamImages");
-        // checking if we don't have the folder yet
-        if(!mImageFolder.exists()) {
-            // creating the folder
-            mImageFolder.mkdirs();
-        }
+        mImageFolder = imageFile;
     }
 
     public File createImageFileName() throws IOException {

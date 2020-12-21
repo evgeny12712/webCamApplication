@@ -7,5 +7,5 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-    tools:context="Gallery.Gallery.TemporaryFiles.GalleryTemporaryFilesFragment"
-    tools:listitem="@layout/fragment_image" />
+    tools:context="Gallery.SavedFiles.GallerySavedFilesFragment"
+    tools:listitem="@layout/imageview_saved_files" />
