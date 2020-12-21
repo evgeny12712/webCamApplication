@@ -1,4 +1,4 @@
-package Gallery.Gallery.TemporaryFiles;
+package Gallery;
 
 import android.content.Context;
 import android.graphics.Camera;
@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import Driving.CameraRecordingFragment;
 import Gallery.FilesContent;
+import Gallery.Gallery.TemporaryFiles.MyItemRecyclerViewAdapter;
 import Gallery.GalleryPicturesFragment;
 import Gallery.PictureItem;
 

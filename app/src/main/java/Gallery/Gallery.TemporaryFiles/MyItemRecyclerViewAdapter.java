@@ -34,7 +34,6 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
 
     private static final String TAG = "CustomAdapter";
     private ArrayList<File> mDataset;
-    private ArrayList<ImageView> imageViews;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView mImageView;
@@ -62,8 +61,11 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        convertFilesToImages(mDataset, holder);
-        //holder.mImageView = imageViews.get(0);
+        try {
+                holder.mImageView.setImageBitmap(convertFileToThumbnailBitmap(mDataset.get(position)));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -76,25 +78,15 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
         return mDataset;
     }
 
-    public void convertFilesToImages(ArrayList<File> files, ViewHolder holder) {
-        for(File file : files) {
-            try {
-                imageViews.add(convertFileToImageView(file, holder));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+    //convert files to thumbnails and return bitmap
+    public Bitmap convertFileToThumbnailBitmap(File file) throws IOException {
+        Size mSize = new Size(10000000,10000000);
+        CancellationSignal ca = new CancellationSignal();
+        Bitmap bitmapThumbnail = ThumbnailUtils.createVideoThumbnail(file, mSize, ca);
+        return bitmapThumbnail;
     }
 
-    public ImageView convertFileToImageView(File file, ViewHolder holder) throws IOException {
-        ImageView imageView = holder.mImageView;
-//        Size mSize = new Size(96,96);
-//        CancellationSignal ca = new CancellationSignal();
-//        Bitmap bitmapThumbnail = ThumbnailUtils.createVideoThumbnail(file, mSize, ca);
-//        imageView.setImageBitmap(bitmapThumbnail);
-        return holder.mImageView;
-    }
-
+    // load Files from folder
     public void loadSavedImages(File dir) {
         if (dir.exists()) {
             File[] files = dir.listFiles();

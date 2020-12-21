@@ -11,7 +11,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
-import Gallery.Gallery.TemporaryFiles.GalleryTemporaryFilesFragment;
 import MainWindow.MainActivity;
 import com.example.webcamapplication.R;
 
