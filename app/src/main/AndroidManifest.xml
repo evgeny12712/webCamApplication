@@ -25,7 +25,7 @@
         <activity android:name="Settings.NotificationsDialog" />
         <activity android:name="Settings.FragmentationDialog" />
         <activity android:name="Settings.HowToStartDialog" />
-        <activity android:name="Gallery.FullScreenActivity" />
+        <activity android:name="Gallery.VideoPreviewActivity" />
         <activity android:name="Settings.SoundDialog" />
         <activity android:name="Settings.SettingsActivity" />
         <activity android:name="Settings.ResetFrequencyDialog" />

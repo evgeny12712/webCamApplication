@@ -3,14 +3,18 @@ package Gallery.Gallery.TemporaryFiles;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.os.CancellationSignal;
 import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.webcamapplication.R;
 
@@ -18,10 +22,20 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import Gallery.VideoPreviewActivity;
+
 public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<MyTemporaryFilesRecyclerViewAdapter.ViewHolder> {
 
     private static final String TAG = "CustomAdapter";
     private ArrayList<File> mDataset;
+    private Context mContext;
+
+    public MyTemporaryFilesRecyclerViewAdapter(Context context, File dir) {
+        mDataset = new ArrayList<File>();
+        mContext = context;
+        loadSavedImages(dir);
+    }
+
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView mImageView;
@@ -31,13 +45,6 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
         }
 
     }
-
-
-    public MyTemporaryFilesRecyclerViewAdapter(File dir) {
-        mDataset = new ArrayList<File>();
-        loadSavedImages(dir);
-    }
-
 
     @NonNull
     @Override
@@ -54,6 +61,15 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        holder.mImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, VideoPreviewActivity.class);
+                intent.putExtra("video", mDataset.get(position).getPath());
+                mContext.startActivity(intent);
+            }
+        });
 
     }
 
