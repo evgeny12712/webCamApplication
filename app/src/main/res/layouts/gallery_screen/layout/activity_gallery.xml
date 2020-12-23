@@ -5,15 +5,6 @@
     android:orientation="vertical"
     android:background="#F0F3F3">
 
-<!--    <androidx.appcompat.widget.Toolbar-->
-<!--        android:id="@+id/toolbar"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="?attr/actionBarSize"-->
-<!--        android:background="?attr/colorPrimary"-->
-<!--        android:elevation="3dp"-->
-<!--        android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />-->
-
-
     <include
         android:id="@+id/toolbar"
         layout = "@layout/tool_bar" />
@@ -23,42 +14,38 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/btnHome"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Home"
-                android:autoSizePresetSizes="80dp"
-                android:background="@color/grey"
-                ></Button>
-            <Button
-                android:id="@+id/btnVideos"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Videos"
-                android:autoSizePresetSizes="80dp"
-                android:background="@color/darkGrey"
-                ></Button>
-            <Button
-                android:id="@+id/btnSavedVideos"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Saved Videos"
-                android:autoSizePresetSizes="80dp"
-                android:background="@color/grey"
-                ></Button>
-            <Button
-                android:id="@+id/btnPictures"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Pictures"
-                android:autoSizePresetSizes="80dp"
-                android:background="@color/grey"
-                ></Button>
+        <Button
+            android:id="@+id/btnHome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Home"
+            android:background="@drawable/gallery_button_border"
+            ></Button>
+        <Button
+            android:id="@+id/btnVideos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Videos"
+            android:background="@drawable/gallery_button_border_pressed"
+            ></Button>
+        <Button
+            android:id="@+id/btnSavedVideos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Saved Videos"
+            android:background="@drawable/gallery_button_border"
+            ></Button>
+        <Button
+            android:id="@+id/btnPictures"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Pictures"
+            android:background="@drawable/gallery_button_border"
+            ></Button>
     </LinearLayout>
 
     <include layout="@layout/content_scrolling"

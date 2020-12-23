@@ -95,23 +95,22 @@ public class GalleryActivity extends AppCompatActivity implements GalleryTempora
 
 
     public void setButtonPressed(String buttonName) {
-        int grey = res.getColor(R.color.grey);
-        int darkGrey = res.getColor(R.color.darkGrey);
+
         switch (buttonName) {
             case "videos":
-                btnVideos.setBackgroundColor(darkGrey);
-                btnSavedVideos.setBackgroundColor(grey);
-                btnPictures.setBackgroundColor(grey);
+                btnVideos.setBackgroundResource(R.drawable.gallery_button_border_pressed);
+                btnSavedVideos.setBackgroundColor(R.drawable.gallery_button_border);
+                btnPictures.setBackgroundColor(R.drawable.gallery_button_border);
                 break;
             case "savedVideos":
-                btnVideos.setBackgroundColor(grey);
-                btnSavedVideos.setBackgroundColor(darkGrey);
-                btnPictures.setBackgroundColor(grey);
+                btnVideos.setBackgroundColor(R.drawable.gallery_button_border);
+                btnSavedVideos.setBackgroundColor(R.drawable.gallery_button_border_pressed);
+                btnPictures.setBackgroundColor(R.drawable.gallery_button_border);
                 break;
             case "pictures":
-                btnVideos.setBackgroundColor(grey);
-                btnSavedVideos.setBackgroundColor(grey);
-                btnPictures.setBackgroundColor(darkGrey);
+                btnVideos.setBackgroundColor(R.drawable.gallery_button_border);
+                btnSavedVideos.setBackgroundColor(R.drawable.gallery_button_border);
+                btnPictures.setBackgroundColor(R.drawable.gallery_button_border_pressed);
                 break;
         }
     }

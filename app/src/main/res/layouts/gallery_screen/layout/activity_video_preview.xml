@@ -4,22 +4,37 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="otherScreens.Gallery.FullScreenActivity"
+    tools:context="Gallery.Gallery.TemporaryFiles.VideoPreviewActivity"
     android:orientation="vertical">
 
-    <Button
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="40dp"
-        android:textAlignment="viewStart"
-        android:layout_marginLeft="30dp"
-        android:text="date"/>
-
-    <VideoView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:id="@+id/video_view"></VideoView>
+        android:orientation="horizontal">
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/back_btn"
+            android:adjustViewBounds="true"
+            android:maxHeight="30dp"
+            android:maxWidth="30dp"
+            android:scaleType="fitCenter"
+            android:background="@color/white"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/back_arrow"
+            ></ImageButton>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="40dp"
+            android:textAlignment="viewStart"
+            android:layout_marginLeft="30dp"
+            android:text="date"
+            android:textColor="@color/black"
+            android:background="@color/white"
+            ></TextView>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,7 +46,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Share"
-            android:autoSizePresetSizes="80dp"
             android:background="@drawable/gallery_button_border"
             ></Button>
         <Button
@@ -40,7 +54,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Save"
-            android:autoSizePresetSizes="80dp"
             android:background="@drawable/gallery_button_border"
             ></Button>
         <Button
@@ -49,8 +62,22 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Delete"
-            android:autoSizePresetSizes="80dp"
             android:background="@drawable/gallery_button_border"
             ></Button>
     </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <VideoView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:id="@+id/video_view"/>
+    </RelativeLayout>
+
+
 </LinearLayout>

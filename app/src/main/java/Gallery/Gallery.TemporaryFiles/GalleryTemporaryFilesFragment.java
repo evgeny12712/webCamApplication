@@ -50,8 +50,4 @@ public class GalleryTemporaryFilesFragment extends Fragment  {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }
-
-    public interface OnListFragmentInteractionListener {
-        void onListFragmentInteraction(ImageView imageView);
-    }
 }
