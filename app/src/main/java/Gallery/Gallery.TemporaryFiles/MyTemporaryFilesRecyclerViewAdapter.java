@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.webcamapplication.R;
 
@@ -20,16 +21,17 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import Gallery.SavedFiles.VideoFiles;
+
 public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<MyTemporaryFilesRecyclerViewAdapter.ViewHolder> {
 
     private static final String TAG = "CustomAdapter";
-    private ArrayList<File> mDataset;
     private Context mContext;
 
-    public MyTemporaryFilesRecyclerViewAdapter(Context context, File dir) {
-        mDataset = new ArrayList<File>();
+    public MyTemporaryFilesRecyclerViewAdapter(Context context, File filesDir) {
         mContext = context;
-        loadSavedImages(dir);
+        VideoFiles.loadTemporaryFiles(filesDir);
+        Toast.makeText(context, "" + VideoFiles.getTemporaryFiles().size(), Toast.LENGTH_SHORT).show();
     }
 
 
@@ -39,7 +41,6 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
             super(itemView);
             mImageView = (ImageView) itemView.findViewById(R.id.imageView);
         }
-
     }
 
     @NonNull
@@ -53,7 +54,7 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         try {
-                holder.mImageView.setImageBitmap(convertFileToThumbnailBitmap(mDataset.get(position)));
+                holder.mImageView.setImageBitmap(VideoFiles.convertFileToThumbnailBitmap(new File(VideoFiles.getTemporaryFiles().get(position).getUri().getPath())));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -62,7 +63,7 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, VideoPreviewActivity.class);
-                intent.putExtra("video", mDataset.get(position).getPath());
+                intent.putExtra("video", VideoFiles.getTemporaryFiles().get(position).getUri().getPath());
                 mContext.startActivity(intent);
             }
         });
@@ -71,33 +72,8 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
 
     @Override
     public int getItemCount() {
-        return mDataset.size();
+        return VideoFiles.getTemporaryFiles().size();
     }
 
-    public ArrayList<File> getmDataset() {
-        return mDataset;
-    }
-
-    //convert files to thumbnails and return bitmap
-    public Bitmap convertFileToThumbnailBitmap(File file) throws IOException {
-        Size mSize = new Size(10000000,10000000);
-        CancellationSignal ca = new CancellationSignal();
-        Bitmap bitmapThumbnail = ThumbnailUtils.createVideoThumbnail(file, mSize, ca);
-        return bitmapThumbnail;
-    }
-
-    // load Files from folder
-    public void loadSavedImages(File dir) {
-        if (dir.exists()) {
-            File[] files = dir.listFiles();
-            for (File file : files) {
-                String absolutePath = file.getAbsolutePath();
-                String extension = absolutePath.substring(absolutePath.lastIndexOf("."));
-                if (extension.equals(".mp4")) {
-                    mDataset.add(file);
-                }
-            }
-        }
-    }
 
 }

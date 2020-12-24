@@ -3,6 +3,7 @@ package Gallery;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -14,11 +15,11 @@ import androidx.fragment.app.Fragment;
 import Gallery.Gallery.TemporaryFiles.GalleryTemporaryFilesFragment;
 import Gallery.Pictures.GalleryPicturesFragment;
 import Gallery.SavedFiles.GallerySavedFilesFragment;
+import Gallery.SavedFiles.VideoFiles;
 import MainWindow.MainActivity;
 import com.example.webcamapplication.R;
 
-public class GalleryActivity extends AppCompatActivity implements GalleryTemporaryFilesFragment.OnListFragmentInteractionListener,
-        GallerySavedFilesFragment.OnListFragmentInteractionListener {
+public class GalleryActivity extends AppCompatActivity {
     private Button btnSavedVideos;
     private Button btnPictures;
     private Button btnHome;
@@ -95,7 +96,6 @@ public class GalleryActivity extends AppCompatActivity implements GalleryTempora
 
 
     public void setButtonPressed(String buttonName) {
-
         switch (buttonName) {
             case "videos":
                 btnVideos.setBackgroundResource(R.drawable.gallery_button_border_pressed);
@@ -113,11 +113,5 @@ public class GalleryActivity extends AppCompatActivity implements GalleryTempora
                 btnPictures.setBackgroundColor(R.drawable.gallery_button_border_pressed);
                 break;
         }
-    }
-
-
-    @Override
-    public void onListFragmentInteraction(ImageView imageView) {
-
     }
 }

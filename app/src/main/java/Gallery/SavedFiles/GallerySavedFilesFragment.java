@@ -45,8 +45,4 @@ public class GallerySavedFilesFragment extends Fragment  {
         Toast.makeText(this.getContext() , "" + mAdapter.getmDataset().size(), Toast.LENGTH_SHORT).show();
         return view;
     }
-
-    public interface OnListFragmentInteractionListener {
-        void onListFragmentInteraction(ImageView imageView);
-    }
 }

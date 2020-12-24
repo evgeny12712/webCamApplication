@@ -19,6 +19,8 @@ import com.example.webcamapplication.R;
 import java.io.File;
 import java.util.ArrayList;
 
+import Gallery.SavedFiles.VideoFiles;
+
 public class GalleryTemporaryFilesFragment extends Fragment  {
 
     private static final String TAG = "RecyclerViewTemporaryFragment";
@@ -42,7 +44,7 @@ public class GalleryTemporaryFilesFragment extends Fragment  {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new MyTemporaryFilesRecyclerViewAdapter(getContext(), getActivity().getExternalFilesDir(Environment.DIRECTORY_MOVIES));
         mRecyclerView.setAdapter(mAdapter);
-        Toast.makeText(this.getContext() , "" + mAdapter.getmDataset().size(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this.getContext() , "" + VideoFiles.getTemporaryFiles().size(), Toast.LENGTH_SHORT).show();
         return view;
     }
 

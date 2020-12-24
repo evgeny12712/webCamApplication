@@ -7,6 +7,7 @@ import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -18,7 +19,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.webcamapplication.R;
 
+import java.io.File;
+
 import Gallery.GalleryActivity;
+import Gallery.SavedFiles.VideoFiles;
 
 public class VideoPreviewActivity extends AppCompatActivity {
 
@@ -27,6 +31,9 @@ public class VideoPreviewActivity extends AppCompatActivity {
     String videoPath;
     Uri uri;
     ImageButton backBtn;
+    Button btnSave;
+    Button btnDelete;
+    Button btnShare;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +42,10 @@ public class VideoPreviewActivity extends AppCompatActivity {
         videoView = (VideoView) findViewById(R.id.video_view);
         mediaController = new MediaController(this);
         backBtn = (ImageButton) findViewById(R.id.back_btn);
+        btnSave = (Button) findViewById(R.id.btn_save);
+        btnShare = (Button) findViewById(R.id.btn_share);
+        btnDelete = (Button) findViewById(R.id.btn_delete);
+
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -43,6 +54,23 @@ public class VideoPreviewActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                VideoFiles.saveFile(VideoFiles.findItemByUri(VideoFiles.getTemporaryFiles(), uri));
+            }
+        });
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                VideoFiles.deleteFromTemporary(VideoFiles.findItemByUri(VideoFiles.getTemporaryFiles(), uri));
+                File file = new File(uri.getPath());
+                file.delete();
+            }
+        });
+
+
     }
 
     @Override
