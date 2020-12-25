@@ -98,19 +98,19 @@ public class GalleryActivity extends AppCompatActivity {
     public void setButtonPressed(String buttonName) {
         switch (buttonName) {
             case "videos":
-                btnVideos.setBackgroundResource(R.drawable.gallery_button_border_pressed);
-                btnSavedVideos.setBackgroundColor(R.drawable.gallery_button_border);
-                btnPictures.setBackgroundColor(R.drawable.gallery_button_border);
+                btnVideos.setBackground(this.getResources().getDrawable(R.drawable.gallery_bold_button_border));
+                btnSavedVideos.setBackground(this.getResources().getDrawable(R.drawable.gallery_button_border));
+                btnPictures.setBackground(this.getResources().getDrawable(R.drawable.gallery_button_border));
                 break;
             case "savedVideos":
-                btnVideos.setBackgroundColor(R.drawable.gallery_button_border);
-                btnSavedVideos.setBackgroundColor(R.drawable.gallery_button_border_pressed);
-                btnPictures.setBackgroundColor(R.drawable.gallery_button_border);
+                btnVideos.setBackground(this.getResources().getDrawable(R.drawable.gallery_button_border));
+                btnSavedVideos.setBackground(this.getResources().getDrawable(R.drawable.gallery_bold_button_border));
+                btnPictures.setBackground(this.getResources().getDrawable(R.drawable.gallery_button_border));
                 break;
             case "pictures":
-                btnVideos.setBackgroundColor(R.drawable.gallery_button_border);
-                btnSavedVideos.setBackgroundColor(R.drawable.gallery_button_border);
-                btnPictures.setBackgroundColor(R.drawable.gallery_button_border_pressed);
+                btnVideos.setBackground(this.getResources().getDrawable(R.drawable.gallery_button_border));
+                btnSavedVideos.setBackground(this.getResources().getDrawable(R.drawable.gallery_button_border));
+                btnPictures.setBackground(this.getResources().getDrawable(R.drawable.gallery_bold_button_border));
                 break;
         }
     }

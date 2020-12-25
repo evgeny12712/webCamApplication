@@ -46,6 +46,13 @@ public class VideoPreviewActivity extends AppCompatActivity {
         btnShare = (Button) findViewById(R.id.btn_share);
         btnDelete = (Button) findViewById(R.id.btn_delete);
 
+        videoPath = getIncomingVideoPath();
+        uri = Uri.parse(videoPath);
+        videoView.setVideoURI(uri);
+        mediaController.setAnchorView(videoView);
+        videoView.setMediaController(mediaController);
+
+
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,15 +65,18 @@ public class VideoPreviewActivity extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                VideoFiles.saveFile(VideoFiles.findItemByUri(VideoFiles.getTemporaryFiles(), uri));
+                VideoFiles.saveFile(VideoFiles.findItemByUri(VideoFiles.getTemporaryFiles(), uri), getApplicationContext());
             }
         });
+
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 VideoFiles.deleteFromTemporary(VideoFiles.findItemByUri(VideoFiles.getTemporaryFiles(), uri));
                 File file = new File(uri.getPath());
                 file.delete();
+                Intent intent = new Intent(getApplicationContext(), GalleryActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -76,12 +86,6 @@ public class VideoPreviewActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        videoPath = getIncomingVideoPath();
-        Toast.makeText(this, "" + videoPath, Toast.LENGTH_SHORT).show();
-        uri = Uri.parse(videoPath);
-        videoView.setVideoURI(uri);
-        mediaController.setAnchorView(videoView);
-        videoView.setMediaController(mediaController);
         videoView.start();
     }
 

@@ -1,13 +1,22 @@
 package Gallery.SavedFiles;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.CancellationSignal;
+import android.os.Environment;
+import android.util.Log;
 import android.util.Size;
+import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,6 +27,7 @@ import Gallery.VideoItem;
 public class VideoFiles {
     private static final List<VideoItem> temporaryFiles = new ArrayList<>();
     private static final List<VideoItem> savedFiles = new ArrayList<>();
+    private static final List<VideoItem> images = new ArrayList<>();
 
     public static List<VideoItem> getTemporaryFiles() {
         return temporaryFiles;
@@ -26,15 +36,29 @@ public class VideoFiles {
         return savedFiles;
     }
 
-    //LOAD ALL IMAGES FROM A SPECIFIC DIRECTORY
-    public static void loadTemporaryFiles(File dir) {
-        temporaryFiles.clear();
+    //LOAD ALL FILES FROM A SPECIFIC DIRECTORY
+    public static void loadFiles(File dir, String filesType) {
+        String ending = "end";
+        switch(filesType) {
+            case "temporary" :
+                temporaryFiles.clear();
+                ending = ".mp4";
+                break;
+            case "saved" :
+                savedFiles.clear();
+                ending = ".mp4";
+                break;
+            case "images" :
+                images.clear();
+                ending = ".jpg";
+                break;
+        }
         if(dir.exists()) {
             File[] files = dir.listFiles();
             for (File file : files) {
                 String absolutePath = file.getAbsolutePath();
                 String extension = absolutePath.substring(absolutePath.lastIndexOf("."));
-                if(extension.equals(".mp4")) {
+                if(extension.equals(ending)) {
                     loadFile(file);
                 }
             }
@@ -74,9 +98,60 @@ public class VideoFiles {
         temporaryFiles.add(item);
     }
 
-    public static void saveFile(VideoItem item) {
-        savedFiles.add(item);
+    public static void saveFile(VideoItem item, Context context) {
+        //savedFiles.add(item);
+            String inputPath = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getPath();
+            String outputPath = context.getExternalFilesDir(Environment.DIRECTORY_MOVIES).getPath();
+            Uri inputFile = item.getUri();
+//            Toast.makeText(context, "" + inputPath, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "" + outputPath, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "" + inputFile, Toast.LENGTH_SHORT).show();
+
+            InputStream in = null;
+            OutputStream out = null;
+            try {
+                in = new FileInputStream(inputPath + inputFile.getPath());
+                out = new FileOutputStream(outputPath + inputFile.getPath());
+
+//                byte[] buffer = new byte[1024];
+//                int read;
+//                while ((read = in.read(buffer)) != -1) {
+//                    out.write(buffer, 0, read);
+//                }
+//                in.close();
+//                in = null;
+//
+//                // write the output file
+//                out.flush();
+//                out.close();
+//                out = null;
+//
+//                // delete the original file
+//                new File(inputPath + inputFile).delete();
+
+
+            }
+
+            catch (FileNotFoundException fnfe1) {
+                Toast.makeText(context, "FNFE" + inputPath, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "" + outputPath, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "" + inputFile, Toast.LENGTH_SHORT).show();
+
+                Log.e("tag", fnfe1.getMessage());
+            }
+            catch (Exception e) {
+                Toast.makeText(context, "" + inputPath, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "" + outputPath, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "" + inputFile, Toast.LENGTH_SHORT).show();
+
+                Log.e("tag", e.getMessage());
+            }
+
+        //temporaryFiles.remove(item);
+
     }
+
+
 
     public static void deleteFromTemporary(VideoItem item) {
         temporaryFiles.remove(item);
@@ -92,6 +167,6 @@ public class VideoFiles {
                 return item;
             }
         }
-        return null;
+        return items.get(0);
     }
 }

@@ -5,10 +5,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.media.ThumbnailUtils;
-import android.os.CancellationSignal;
-import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +15,6 @@ import com.example.webcamapplication.R;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import Gallery.SavedFiles.VideoFiles;
 
@@ -30,8 +25,7 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
 
     public MyTemporaryFilesRecyclerViewAdapter(Context context, File filesDir) {
         mContext = context;
-        VideoFiles.loadTemporaryFiles(filesDir);
-        Toast.makeText(context, "" + VideoFiles.getTemporaryFiles().size(), Toast.LENGTH_SHORT).show();
+        VideoFiles.loadFiles(filesDir, "temporary");
     }
 
 
@@ -67,7 +61,6 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
                 mContext.startActivity(intent);
             }
         });
-
     }
 
     @Override

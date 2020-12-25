@@ -346,30 +346,6 @@ public class  CameraRecordingFragment extends Fragment {
         }
     }
 
-//    protected void checkWriteStoragePermission() {
-//        //checking if our version is greater then marshmallow
-//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            //checking if we already got permission
-//            if(ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//                    == PackageManager.PERMISSION_GRANTED) {
-//                //create file to save video
-//                startRecord();
-//                mMediaRecorder.start();
-//                Toast.makeText(getContext(), "" + SystemClock.elapsedRealtime(), Toast.LENGTH_SHORT).show();
-//            } else {
-//                //showing message to the user if he decided to refuse to give permission
-//                if(shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-//                    Toast.makeText(getContext(), "app needs to be able to save videos", Toast.LENGTH_SHORT).show();
-//                }
-//                //requesting the permission
-//                requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
-//                        REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION_RESULT);
-//            }
-//        } else {
-//            startRecord();
-//            mMediaRecorder.start();
-//        }
-//    }
 
 
     //----BACKGROUND THREAD----//
@@ -427,11 +403,4 @@ public class  CameraRecordingFragment extends Fragment {
         }
     }
 
-//    protected void galleryAddPic() {
-//        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-//        Uri contentUri = Uri.fromFile(imageFile);
-//        Toast.makeText(getActivity().getApplicationContext(), "" + imageFile.toString(), Toast.LENGTH_SHORT).show();
-//        mediaScanIntent.setData(contentUri);
-//        getActivity().sendBroadcast(mediaScanIntent);
-//    }
 }
