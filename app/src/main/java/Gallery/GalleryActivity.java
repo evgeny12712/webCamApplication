@@ -7,6 +7,7 @@ import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -48,6 +49,8 @@ public class GalleryActivity extends AppCompatActivity {
         res = getResources();
         setSupportActionBar(toolbar);
 
+        VideoFiles.loadFiles(getExternalFilesDir(Environment.DIRECTORY_MOVIES), "temporary");
+        VideoFiles.loadFiles(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "saved");
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frameLayout, temporaryFiles)
                 .commit();

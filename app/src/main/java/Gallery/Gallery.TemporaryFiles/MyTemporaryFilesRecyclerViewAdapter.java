@@ -23,9 +23,9 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
     private static final String TAG = "CustomAdapter";
     private Context mContext;
 
-    public MyTemporaryFilesRecyclerViewAdapter(Context context, File filesDir) {
+    public MyTemporaryFilesRecyclerViewAdapter(Context context) {
         mContext = context;
-        VideoFiles.loadFiles(filesDir, "temporary");
+
     }
 
 
@@ -56,7 +56,7 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
         holder.mImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, VideoPreviewActivity.class);
+                Intent intent = new Intent(mContext, TemporaryVideoDisplayActivity.class);
                 intent.putExtra("video", VideoFiles.getTemporaryFiles().get(position).getUri().getPath());
                 mContext.startActivity(intent);
             }

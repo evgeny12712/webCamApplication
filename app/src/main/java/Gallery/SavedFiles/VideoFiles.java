@@ -1,6 +1,7 @@
 package Gallery.SavedFiles;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
@@ -17,11 +18,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.sql.Time;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import Gallery.GalleryActivity;
 import Gallery.VideoItem;
 
 public class VideoFiles {
@@ -29,6 +33,7 @@ public class VideoFiles {
     private static final List<VideoItem> savedFiles = new ArrayList<>();
     private static final List<VideoItem> images = new ArrayList<>();
 
+    public static String theDate;
     public static List<VideoItem> getTemporaryFiles() {
         return temporaryFiles;
     }
@@ -59,31 +64,24 @@ public class VideoFiles {
                 String absolutePath = file.getAbsolutePath();
                 String extension = absolutePath.substring(absolutePath.lastIndexOf("."));
                 if(extension.equals(ending)) {
-                    loadFile(file);
+                    loadFile(file, filesType);
                 }
             }
         }
     }
 
     //LOAD SPECIFIC VIDEO
-    public static void loadFile(File file) {
-        VideoItem newItem = new VideoItem(Uri.fromFile(file), getDateFromUri(Uri.fromFile(file)));
-        addItem(newItem);
+    public static void loadFile(File file, String fileType) {
+        VideoItem newItem = new VideoItem(file, Uri.fromFile(file), getDateFromUri(file));
+        addItem(newItem, fileType);
     }
 
-    private static String getDateFromUri(Uri uri) {
-        //leaving only the last part of the string
-        String[] split = uri.getPath().split("/");
-        String fileName = split[split.length - 1];
-        //getting only the part of the date and time
-        String fileNameNoExt = fileName.substring(6, 21);
-        String year = fileNameNoExt.substring(0, 4);
-        String month = fileNameNoExt.substring(4, 6);
-        String day = fileNameNoExt.substring(6, 8);
-        String hour = fileNameNoExt.substring(9, 11);
-        String minutes = fileNameNoExt.substring(11, 13);
-        String seconds = fileNameNoExt.substring(13, 15);
-        return day + " : " + month + " : " + year +" - " + hour + ":" + minutes + ":" + seconds;
+    public static String getDateFromUri(File file) {
+        Date lastModDate = new Date(file.lastModified());
+        String date = DateFormat.getDateInstance().format(lastModDate);
+        String time = DateFormat.getTimeInstance().format(lastModDate);
+        Log.d("dateTime", date + "," + time);
+        return date + "," + time;
     }
 
     //convert files to thumbnails and return bitmap
@@ -94,76 +92,61 @@ public class VideoFiles {
         return bitmapThumbnail;
     }
 
-    private static void addItem(VideoItem item) {
-        temporaryFiles.add(item);
+    private static void addItem(VideoItem item, String filesType) {
+        switch(filesType) {
+            case "temporary" :
+                temporaryFiles.add(item);
+                break;
+            case "saved" :
+                savedFiles.add(item);
+                break;
+            case "images" :
+                images.add(item);
+                break;
+        }
     }
 
-    public static void saveFile(VideoItem item, Context context) {
-        //savedFiles.add(item);
-            String inputPath = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getPath();
-            String outputPath = context.getExternalFilesDir(Environment.DIRECTORY_MOVIES).getPath();
-            Uri inputFile = item.getUri();
-//            Toast.makeText(context, "" + inputPath, Toast.LENGTH_SHORT).show();
-//            Toast.makeText(context, "" + outputPath, Toast.LENGTH_SHORT).show();
-//            Toast.makeText(context, "" + inputFile, Toast.LENGTH_SHORT).show();
+    public static void saveFile(VideoItem itemSrc, File destDir, Context context) throws IOException {
+            // getting the file name
+            String path = itemSrc.getFile().getPath();
+            String fileName = path.substring(path.lastIndexOf("/") + 1);
 
-            InputStream in = null;
-            OutputStream out = null;
-            try {
-                in = new FileInputStream(inputPath + inputFile.getPath());
-                out = new FileOutputStream(outputPath + inputFile.getPath());
-
-//                byte[] buffer = new byte[1024];
-//                int read;
-//                while ((read = in.read(buffer)) != -1) {
-//                    out.write(buffer, 0, read);
-//                }
-//                in.close();
-//                in = null;
-//
-//                // write the output file
-//                out.flush();
-//                out.close();
-//                out = null;
-//
-//                // delete the original file
-//                new File(inputPath + inputFile).delete();
-
-
+            File dst = new File(destDir, fileName);
+            try (InputStream in = new FileInputStream(itemSrc.getFile())) {
+                try (OutputStream out = new FileOutputStream(dst)) {
+                    // Transfer bytes from in to out
+                    byte[] buf = new byte[1024];
+                    int len;
+                    while ((len = in.read(buf)) > 0) {
+                        out.write(buf, 0, len);
+                    }
+                }
             }
-
-            catch (FileNotFoundException fnfe1) {
-                Toast.makeText(context, "FNFE" + inputPath, Toast.LENGTH_SHORT).show();
-                Toast.makeText(context, "" + outputPath, Toast.LENGTH_SHORT).show();
-                Toast.makeText(context, "" + inputFile, Toast.LENGTH_SHORT).show();
-
-                Log.e("tag", fnfe1.getMessage());
-            }
-            catch (Exception e) {
-                Toast.makeText(context, "" + inputPath, Toast.LENGTH_SHORT).show();
-                Toast.makeText(context, "" + outputPath, Toast.LENGTH_SHORT).show();
-                Toast.makeText(context, "" + inputFile, Toast.LENGTH_SHORT).show();
-
-                Log.e("tag", e.getMessage());
-            }
-
-        //temporaryFiles.remove(item);
-
+        deleteVideoFile(itemSrc, context, "temporary");
     }
 
-
-
-    public static void deleteFromTemporary(VideoItem item) {
-        temporaryFiles.remove(item);
-    }
-
-    private static void deleteFromSavedFiles(VideoItem item) {
-        savedFiles.remove(item);
+    public static void deleteVideoFile(VideoItem item, Context context, String fileType) {
+        switch(fileType) {
+            case "temporary" :
+                temporaryFiles.remove(item);
+                break;
+            case "saved" :
+                savedFiles.remove(item);
+                break;
+            case "images" :
+                images.remove(item);
+                break;
+        }
+        item.getFile().delete();
+        Intent intent = new Intent(context, GalleryActivity.class);
+        context.startActivity(intent);
     }
 
     public static VideoItem findItemByUri(List<VideoItem> items, Uri uri) {
         for(VideoItem item : items) {
-            if (item.getUri() == uri) {
+            if (item.getUri().getPath().equals(uri.getPath())) {
+            }
+            if (item.getUri().getPath().equals(uri.getPath())) {
                 return item;
             }
         }

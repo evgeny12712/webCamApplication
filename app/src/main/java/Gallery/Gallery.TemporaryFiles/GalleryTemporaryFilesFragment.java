@@ -42,7 +42,7 @@ public class GalleryTemporaryFilesFragment extends Fragment  {
         mRecyclerView = (RecyclerView) view.findViewById(R.id.list);
         mLayoutManager = new GridLayoutManager(getActivity(), 3);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new MyTemporaryFilesRecyclerViewAdapter(getContext(), getActivity().getExternalFilesDir(Environment.DIRECTORY_MOVIES));
+        mAdapter = new MyTemporaryFilesRecyclerViewAdapter(getContext());
         mRecyclerView.setAdapter(mAdapter);
         Toast.makeText(this.getContext() , "" + VideoFiles.getTemporaryFiles().size(), Toast.LENGTH_SHORT).show();
         return view;

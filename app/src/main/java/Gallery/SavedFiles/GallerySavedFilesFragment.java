@@ -43,7 +43,7 @@ public class GallerySavedFilesFragment extends Fragment  {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new MySavedFilesRecyclerViewAdapter(getContext(), getActivity().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS));
         mRecyclerView.setAdapter(mAdapter);
-        Toast.makeText(this.getContext() , "" + VideoFiles.getTemporaryFiles().size(), Toast.LENGTH_SHORT).show();
+
         return view;
     }
 }

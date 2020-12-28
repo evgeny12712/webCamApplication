@@ -2,10 +2,7 @@ package Gallery.SavedFiles;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.media.ThumbnailUtils;
-import android.os.CancellationSignal;
-import android.util.Size;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +16,8 @@ import com.example.webcamapplication.R;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
-import Gallery.Gallery.TemporaryFiles.VideoPreviewActivity;
+import Gallery.Gallery.TemporaryFiles.TemporaryVideoDisplayActivity;
 
 public class MySavedFilesRecyclerViewAdapter extends RecyclerView.Adapter<MySavedFilesRecyclerViewAdapter.ViewHolder> {
 
@@ -49,6 +45,8 @@ public class MySavedFilesRecyclerViewAdapter extends RecyclerView.Adapter<MySave
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.imageview_saved_files, parent, false);
+        Toast.makeText(parent.getContext(), "allgood", Toast.LENGTH_SHORT).show();
+
         return new ViewHolder(view);
     }
 
@@ -63,8 +61,11 @@ public class MySavedFilesRecyclerViewAdapter extends RecyclerView.Adapter<MySave
         holder.mImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, VideoPreviewActivity.class);
-                intent.putExtra("video", VideoFiles.getTemporaryFiles().get(position).getUri().getPath());
+                Log.d("ASD", "ASD");
+
+                Intent intent = new Intent(mContext, SavedVideoDisplayActivity.class);
+
+                intent.putExtra("video", VideoFiles.getSavedFiles().get(position).getUri().getPath());
                 mContext.startActivity(intent);
             }
         });
