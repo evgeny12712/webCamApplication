@@ -1,24 +1,25 @@
-package Gallery.SavedFiles;
+package Gallery.Pictures;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.webcamapplication.R;
 
 import Gallery.GalleryActivity;
+import Gallery.SavedFiles.VideoFiles;
 
-public class SavedVideoDisplayActivity extends AppCompatActivity {
-    private VideoView videoView;
+public class SavedImageActivity extends AppCompatActivity {
+    private ImageView imageView;
     private MediaController mediaController;
     private String videoPath;
     private Uri uri;
@@ -34,8 +35,8 @@ public class SavedVideoDisplayActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_saved_video_display);
-        videoView = (VideoView) findViewById(R.id.video_view);
+        setContentView(R.layout.activity_image_display);
+        imageView = (ImageView) findViewById(R.id.image_view);
         mediaController = new MediaController(this);
         backBtn = (ImageButton) findViewById(R.id.back_btn);
         btnShare = (Button) findViewById(R.id.btn_share);
@@ -46,7 +47,7 @@ public class SavedVideoDisplayActivity extends AppCompatActivity {
 
         videoPath = getIncomingVideoPath();
         uri = Uri.parse(videoPath);
-        videoView.setVideoURI(uri);
+        imageView.setVideoURI(uri);
         mediaController.setAnchorView(videoView);
         videoView.setMediaController(mediaController);
 
@@ -63,9 +64,9 @@ public class SavedVideoDisplayActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.setType("video/*");
-                intent.putExtra(Intent.EXTRA_SUBJECT, "Video share");
-                intent.putExtra(Intent.EXTRA_TEXT," WebCamApplication video");
+                intent.setType("image/*");
+                intent.putExtra(Intent.EXTRA_SUBJECT, "Image share");
+                intent.putExtra(Intent.EXTRA_TEXT,"Image");
                 intent.putExtra(Intent.EXTRA_STREAM, uri);
                 startActivity(intent);
             }
@@ -89,11 +90,10 @@ public class SavedVideoDisplayActivity extends AppCompatActivity {
         textViewDate.setText(date);
         textViewTime.setText(time);
 
-        videoView.start();
 
     }
 
-    private String getIncomingVideoPath() {
+    private String getIncomingImage() {
         if(getIntent().hasExtra("video")) {
             return getIntent().getStringExtra("video");
         }

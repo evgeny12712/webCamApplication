@@ -1,5 +1,7 @@
 package Gallery.Pictures;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
 import android.os.CancellationSignal;
@@ -18,10 +20,19 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import Gallery.SavedFiles.SavedVideoDisplayActivity;
+import Gallery.SavedFiles.VideoFiles;
+
 public class MyPicturesRecyclerViewAdapter extends RecyclerView.Adapter<MyPicturesRecyclerViewAdapter.ViewHolder> {
 
-    private static final String TAG = "CustomAdapter";
-    private ArrayList<File> mDataset;
+    private static final String TAG = "CustomImagesAdapter";
+    private Context mContext;
+
+    public MyPicturesRecyclerViewAdapter(File dir, Context context) {
+        mContext = context;
+        VideoFiles.loadFiles(dir, "images");
+    }
+
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView mImageView;
@@ -30,12 +41,6 @@ public class MyPicturesRecyclerViewAdapter extends RecyclerView.Adapter<MyPictur
             mImageView = (ImageView) itemView.findViewById(R.id.imageView);
         }
 
-    }
-
-
-    public MyPicturesRecyclerViewAdapter(File dir) {
-        mDataset = new ArrayList<File>();
-        loadSavedImages(dir);
     }
 
 
@@ -50,42 +55,27 @@ public class MyPicturesRecyclerViewAdapter extends RecyclerView.Adapter<MyPictur
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         try {
-                holder.mImageView.setImageBitmap(convertFileToThumbnailBitmap(mDataset.get(position)));
+                holder.mImageView.setImageBitmap(VideoFiles.convertFileToThumbnailBitmap(new File(VideoFiles.getSavedFiles().get(position).getUri().getPath())));
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        holder.mImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, SavedVideoDisplayActivity.class);
+                intent.putExtra("video", VideoFiles.getImages().get(position).getUri().getPath());
+                mContext.startActivity(intent);
+            }
+        });
+
 
     }
 
     @Override
     public int getItemCount() {
-        return mDataset.size();
+        return VideoFiles.getSavedFiles().size();
     }
 
-    public ArrayList<File> getmDataset() {
-        return mDataset;
-    }
-
-    //convert files to thumbnails and return bitmap
-    public Bitmap convertFileToThumbnailBitmap(File file) throws IOException {
-        Size mSize = new Size(10000000,10000000);
-        CancellationSignal ca = new CancellationSignal();
-        Bitmap bitmapThumbnail = ThumbnailUtils.createImageThumbnail(file, mSize, ca);
-        return bitmapThumbnail;
-    }
-
-    // load Files from folder
-    public void loadSavedImages(File dir) {
-        if (dir.exists()) {
-            File[] files = dir.listFiles();
-            for (File file : files) {
-                String absolutePath = file.getAbsolutePath();
-                String extension = absolutePath.substring(absolutePath.lastIndexOf("."));
-                if (extension.equals(".jpg")) {
-                    mDataset.add(file);
-                }
-            }
-        }
-    }
 
 }

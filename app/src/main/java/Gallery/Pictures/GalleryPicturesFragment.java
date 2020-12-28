@@ -25,7 +25,6 @@ public class GalleryPicturesFragment extends Fragment  {
     protected RecyclerView mRecyclerView;
     protected MyPicturesRecyclerViewAdapter mAdapter;
     protected RecyclerView.LayoutManager mLayoutManager;
-    protected ArrayList<File> mDataset;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,13 +39,9 @@ public class GalleryPicturesFragment extends Fragment  {
         mRecyclerView = (RecyclerView) view.findViewById(R.id.list);
         mLayoutManager = new GridLayoutManager(getActivity(), 3);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new MyPicturesRecyclerViewAdapter(getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES));
+        mAdapter = new MyPicturesRecyclerViewAdapter(getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES), getContext());
         mRecyclerView.setAdapter(mAdapter);
-        Toast.makeText(this.getContext() , "" + mAdapter.getmDataset().size(), Toast.LENGTH_SHORT).show();
         return view;
     }
 
-    public interface OnListFragmentInteractionListener {
-        void onListFragmentInteraction(ImageView imageView);
-    }
 }

@@ -105,8 +105,8 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        date = VideoFiles.getDateFromUri(VideoFiles.findItemByUri(VideoFiles.getTemporaryFiles(), uri).getFile()).split(",")[0];
-        time = VideoFiles.getDateFromUri(VideoFiles.findItemByUri(VideoFiles.getTemporaryFiles(), uri).getFile()).split(",")[1];
+        date = VideoFiles.getDateFromFile(VideoFiles.findItemByUri(VideoFiles.getTemporaryFiles(), uri).getFile()).split(",")[0];
+        time = VideoFiles.getDateFromFile(VideoFiles.findItemByUri(VideoFiles.getTemporaryFiles(), uri).getFile()).split(",")[1];
 
         textViewDate.setText(date);
         textViewTime.setText(time);

@@ -80,14 +80,14 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <VideoView
+        <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignParentBottom="true"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
-            android:id="@+id/video_view"/>
+            android:id="@+id/image_view"/>
     </RelativeLayout>
 
 

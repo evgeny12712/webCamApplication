@@ -3,24 +3,20 @@ package Gallery.SavedFiles;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.Image;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.CancellationSignal;
-import android.os.Environment;
 import android.util.Log;
 import android.util.Size;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.sql.Time;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -31,7 +27,7 @@ import Gallery.VideoItem;
 public class VideoFiles {
     private static final List<VideoItem> temporaryFiles = new ArrayList<>();
     private static final List<VideoItem> savedFiles = new ArrayList<>();
-    private static final List<VideoItem> images = new ArrayList<>();
+    private static final List<Image> images = new ArrayList<>();
 
     public static String theDate;
     public static List<VideoItem> getTemporaryFiles() {
@@ -40,6 +36,8 @@ public class VideoFiles {
     public static List<VideoItem> getSavedFiles() {
         return savedFiles;
     }
+    public static List<Image> getImages() { return images; };
+
 
     //LOAD ALL FILES FROM A SPECIFIC DIRECTORY
     public static void loadFiles(File dir, String filesType) {
@@ -72,11 +70,11 @@ public class VideoFiles {
 
     //LOAD SPECIFIC VIDEO
     public static void loadFile(File file, String fileType) {
-        VideoItem newItem = new VideoItem(file, Uri.fromFile(file), getDateFromUri(file));
+        VideoItem newItem = new VideoItem(file, Uri.fromFile(file), getDateFromFile(file));
         addItem(newItem, fileType);
     }
 
-    public static String getDateFromUri(File file) {
+    public static String getDateFromFile(File file) {
         Date lastModDate = new Date(file.lastModified());
         String date = DateFormat.getDateInstance().format(lastModDate);
         String time = DateFormat.getTimeInstance().format(lastModDate);

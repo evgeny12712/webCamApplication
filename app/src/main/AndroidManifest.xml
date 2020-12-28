@@ -15,6 +15,8 @@
         android:screenOrientation="sensorPortrait"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        <activity
+            android:name="Gallery.SavedFiles.SavedVideoDisplayActivity"/>
         <activity android:name="MainWindow.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,6 +33,7 @@
         <activity android:name="Settings.ResetFrequencyDialog" />
         <activity android:name="Gallery.ImageAdapter" />
         <activity android:name="Gallery.GalleryActivity" />
+        <activity android:name="Gallery.SavedFiles.SavedVideoDisplayActivity"/>
         <activity
             android:name="Driving.DrivingActivity"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden" />

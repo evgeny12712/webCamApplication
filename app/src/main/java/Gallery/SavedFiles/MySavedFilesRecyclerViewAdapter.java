@@ -17,8 +17,6 @@ import com.example.webcamapplication.R;
 import java.io.File;
 import java.io.IOException;
 
-import Gallery.Gallery.TemporaryFiles.TemporaryVideoDisplayActivity;
-
 public class MySavedFilesRecyclerViewAdapter extends RecyclerView.Adapter<MySavedFilesRecyclerViewAdapter.ViewHolder> {
 
     private static final String TAG = "CustomAdapter";
@@ -38,15 +36,11 @@ public class MySavedFilesRecyclerViewAdapter extends RecyclerView.Adapter<MySave
         }
     }
 
-
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.imageview_saved_files, parent, false);
-        Toast.makeText(parent.getContext(), "allgood", Toast.LENGTH_SHORT).show();
-
         return new ViewHolder(view);
     }
 
@@ -61,10 +55,7 @@ public class MySavedFilesRecyclerViewAdapter extends RecyclerView.Adapter<MySave
         holder.mImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("ASD", "ASD");
-
                 Intent intent = new Intent(mContext, SavedVideoDisplayActivity.class);
-
                 intent.putExtra("video", VideoFiles.getSavedFiles().get(position).getUri().getPath());
                 mContext.startActivity(intent);
             }
