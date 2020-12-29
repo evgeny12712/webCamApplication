@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 import com.example.webcamapplication.R;
 
-import Gallery.SavedFiles.Items;
+import Gallery.Items;
 
 public class GalleryTemporaryFilesFragment extends Fragment  {
 

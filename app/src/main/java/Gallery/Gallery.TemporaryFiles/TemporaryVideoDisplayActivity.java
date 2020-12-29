@@ -20,8 +20,10 @@ import java.io.File;
 import java.io.IOException;
 
 import Gallery.GalleryActivity;
-import Gallery.SavedFiles.Items;
+import Gallery.Items;
 import Gallery.Item;
+
+import static Gallery.GalleryActivity.*;
 
 public class TemporaryVideoDisplayActivity extends AppCompatActivity {
     private VideoView videoView;
@@ -61,6 +63,7 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
             public void onClick(View v) {
                 videoView.stopPlayback();
                 Intent intent = new Intent(getApplicationContext(), GalleryActivity.class);
+                intent.putExtra("fragment", fileTypes[0]);
                 startActivity(intent);
             }
         });
@@ -85,7 +88,6 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
                 try {
                     Items.saveFile(item, saveDir, getApplicationContext());
                 } catch (IOException e) {
-                    Toast.makeText(TemporaryVideoDisplayActivity.this, "EE", Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 }
             }
@@ -95,7 +97,7 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Items.deleteFile(Items.findItemByUri(Items.getTemporaryFiles(), uri),
-                        getApplicationContext(), "temporary");
+                        getApplicationContext(), fileTypes[0]);
             }
         });
 
@@ -114,8 +116,8 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
     }
 
     private String getIncomingVideoPath() {
-        if(getIntent().hasExtra("video")) {
-            return getIntent().getStringExtra("video");
+        if(getIntent().hasExtra(fileTypes[0])) {
+            return getIntent().getStringExtra(fileTypes[0]);
         }
         return null;
     }

@@ -14,7 +14,8 @@ import com.example.webcamapplication.R;
 
 import java.io.IOException;
 
-import Gallery.SavedFiles.Items;
+import Gallery.GalleryActivity;
+import Gallery.Items;
 
 public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<MyTemporaryFilesRecyclerViewAdapter.ViewHolder> {
 
@@ -46,7 +47,7 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         try {
-                holder.mImageView.setImageBitmap(Items.convertFileToThumbnailBitmap(Items.getTemporaryFiles().get(position).getFile(), "temporary"));
+                holder.mImageView.setImageBitmap(Items.convertFileToThumbnailBitmap(Items.getTemporaryFiles().get(position).getFile(), GalleryActivity.fileTypes[0]));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -55,7 +56,7 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, TemporaryVideoDisplayActivity.class);
-                intent.putExtra("video", Items.getTemporaryFiles().get(position).getUri().getPath());
+                intent.putExtra(GalleryActivity.fileTypes[0], Items.getTemporaryFiles().get(position).getUri().getPath());
                 mContext.startActivity(intent);
             }
         });

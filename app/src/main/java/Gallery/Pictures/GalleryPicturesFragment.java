@@ -20,7 +20,6 @@ import java.util.ArrayList;
 public class GalleryPicturesFragment extends Fragment  {
 
     private static final String TAG = "RecyclerViewTemporaryFragment";
-    private static final int DATASET_COUNT = 60;
 
     protected RecyclerView mRecyclerView;
     protected MyPicturesRecyclerViewAdapter mAdapter;

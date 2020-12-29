@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,8 +16,7 @@ import java.io.File;
 import java.io.IOException;
 
 import Gallery.GalleryActivity;
-import Gallery.SavedFiles.SavedVideoDisplayActivity;
-import Gallery.SavedFiles.Items;
+import Gallery.Items;
 
 public class MyPicturesRecyclerViewAdapter extends RecyclerView.Adapter<MyPicturesRecyclerViewAdapter.ViewHolder> {
 
@@ -27,7 +25,7 @@ public class MyPicturesRecyclerViewAdapter extends RecyclerView.Adapter<MyPictur
 
     public MyPicturesRecyclerViewAdapter(File dir, Context context) {
         mContext = context;
-        Items.loadFiles(dir, "images");
+        Items.loadFiles(dir, GalleryActivity.fileTypes[2]);
     }
 
 
@@ -52,7 +50,7 @@ public class MyPicturesRecyclerViewAdapter extends RecyclerView.Adapter<MyPictur
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         try {
-            holder.mImageView.setImageBitmap(Items.convertFileToThumbnailBitmap(Items.getImages().get(position).getFile(),  "images"));
+            holder.mImageView.setImageBitmap(Items.convertFileToThumbnailBitmap(Items.getImages().get(position).getFile(),  GalleryActivity.fileTypes[2]));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -61,7 +59,7 @@ public class MyPicturesRecyclerViewAdapter extends RecyclerView.Adapter<MyPictur
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, ImageDisplayActivity.class);
-                intent.putExtra("image", Items.getImages().get(position).getFile().getPath());
+                intent.putExtra(GalleryActivity.fileTypes[2], Items.getImages().get(position).getFile().getPath());
                 mContext.startActivity(intent);
             }
         });

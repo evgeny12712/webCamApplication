@@ -15,6 +15,9 @@ import com.example.webcamapplication.R;
 import java.io.File;
 import java.io.IOException;
 
+import Gallery.GalleryActivity;
+import Gallery.Items;
+
 public class MySavedFilesRecyclerViewAdapter extends RecyclerView.Adapter<MySavedFilesRecyclerViewAdapter.ViewHolder> {
 
     private static final String TAG = "CustomAdapter";
@@ -23,7 +26,7 @@ public class MySavedFilesRecyclerViewAdapter extends RecyclerView.Adapter<MySave
 
     public MySavedFilesRecyclerViewAdapter(Context context, File filesDir) {
         mContext = context;
-        Items.loadFiles(filesDir, "saved");
+        Items.loadFiles(filesDir, GalleryActivity.fileTypes[1]);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -45,7 +48,7 @@ public class MySavedFilesRecyclerViewAdapter extends RecyclerView.Adapter<MySave
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         try {
-            holder.mImageView.setImageBitmap(Items.convertFileToThumbnailBitmap(new File(Items.getSavedFiles().get(position).getUri().getPath()), "savedFiles"));
+            holder.mImageView.setImageBitmap(Items.convertFileToThumbnailBitmap(new File(Items.getSavedFiles().get(position).getUri().getPath()), GalleryActivity.fileTypes[1]));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -54,7 +57,7 @@ public class MySavedFilesRecyclerViewAdapter extends RecyclerView.Adapter<MySave
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, SavedVideoDisplayActivity.class);
-                intent.putExtra("video", Items.getSavedFiles().get(position).getUri().getPath());
+                intent.putExtra("temporary videos", Items.getSavedFiles().get(position).getUri().getPath());
                 mContext.startActivity(intent);
             }
         });

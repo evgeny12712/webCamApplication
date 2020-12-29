@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -16,8 +17,12 @@ import android.widget.VideoView;
 import com.example.webcamapplication.R;
 
 import Gallery.GalleryActivity;
+import Gallery.Items;
+
+import static Gallery.GalleryActivity.fileTypes;
 
 public class SavedVideoDisplayActivity extends AppCompatActivity {
+    private static final String TAG = "SavedVideoDisplayActivity";
     private VideoView videoView;
     private MediaController mediaController;
     private String videoPath;
@@ -44,7 +49,7 @@ public class SavedVideoDisplayActivity extends AppCompatActivity {
         textViewTime = (TextView) findViewById(R.id.time_recorded_text);
 
 
-        videoPath = getIncomingVideoPath();
+        videoPath = getIncomingPath();
         uri = Uri.parse(videoPath);
         videoView.setVideoURI(uri);
         mediaController.setAnchorView(videoView);
@@ -55,6 +60,7 @@ public class SavedVideoDisplayActivity extends AppCompatActivity {
             public void onClick(View v) {
                 videoView.stopPlayback();
                 Intent intent = new Intent(getApplicationContext(), GalleryActivity.class);
+                intent.putExtra("fragment", fileTypes[1]);
                 startActivity(intent);
             }
         });
@@ -75,7 +81,7 @@ public class SavedVideoDisplayActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Items.deleteFile(Items.findItemByUri(Items.getSavedFiles(), uri),
-                        getApplicationContext(), "saved");
+                        getApplicationContext(), fileTypes[1]);
             }
         });
     }
@@ -93,9 +99,9 @@ public class SavedVideoDisplayActivity extends AppCompatActivity {
 
     }
 
-    private String getIncomingVideoPath() {
-        if(getIntent().hasExtra("video")) {
-            return getIntent().getStringExtra("video");
+    private String getIncomingPath() {
+        if(getIntent().hasExtra(fileTypes[1])) {
+            return getIntent().getStringExtra(fileTypes[1]);
         }
         return null;
     }

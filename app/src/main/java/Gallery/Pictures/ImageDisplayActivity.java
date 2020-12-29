@@ -1,10 +1,13 @@
 package Gallery.Pictures;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -18,7 +21,7 @@ import com.example.webcamapplication.R;
 import java.io.File;
 
 import Gallery.GalleryActivity;
-import Gallery.SavedFiles.Items;
+import Gallery.Items;
 
 public class ImageDisplayActivity extends AppCompatActivity {
     private ImageView imageView;
@@ -55,6 +58,7 @@ public class ImageDisplayActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), GalleryActivity.class);
+                intent.putExtra("fragment", GalleryActivity.fileTypes[2]);
                 startActivity(intent);
             }
         });
@@ -65,7 +69,7 @@ public class ImageDisplayActivity extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("image/*");
                 intent.putExtra(Intent.EXTRA_SUBJECT, "Image share");
-                intent.putExtra(Intent.EXTRA_TEXT,"Image");
+                intent.putExtra(Intent.EXTRA_TEXT,GalleryActivity.fileTypes[2]);
                 intent.putExtra(Intent.EXTRA_STREAM, imageUri);
                 startActivity(intent);
             }
@@ -75,7 +79,7 @@ public class ImageDisplayActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Items.deleteFile(Items.findItemByUri(Items.getSavedFiles(), imageUri),
-                        getApplicationContext(), "saved");
+                        getApplicationContext(), GalleryActivity.fileTypes[2]);
             }
         });
     }
@@ -83,17 +87,18 @@ public class ImageDisplayActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-//        date = Items.getDateFromFile(Items.findItemByUri(Items.getTemporaryFiles(), imageUri).getFile()).split(",")[0];
-//        time = Items.getDateFromFile(Items.findItemByUri(Items.getTemporaryFiles(), imageUri).getFile()).split(",")[1];
-//        textViewDate.setText(date);
-//        textViewTime.setText(time);
+        date = Items.getDateFromFile(Items.findItemByUri(Items.getImages(), imageUri).getFile()).split(",")[0];
+        time = Items.getDateFromFile(Items.findItemByUri(Items.getImages(), imageUri).getFile()).split(",")[1];
+        textViewDate.setText(date);
+        textViewTime.setText(time);
+        if(imageView.getRotation() == 0 || imageView.getRotation() == 180)
+            imageView.setRotation(90);
     }
 
     private String getIncomingImage() {
-        if(getIntent().hasExtra("image")) {
-            return getIntent().getStringExtra("image");
+        if(getIntent().hasExtra(GalleryActivity.fileTypes[2])) {
+            return getIntent().getStringExtra(GalleryActivity.fileTypes[2]);
         }
         return null;
     }
-
 }

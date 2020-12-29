@@ -1,4 +1,4 @@
-package Gallery.SavedFiles;
+package Gallery;
 
 import android.content.Context;
 import android.content.Intent;
@@ -21,14 +21,11 @@ import java.util.Date;
 import java.util.List;
 
 import Gallery.GalleryActivity;
-import Gallery.Item;
 
 public class Items {
     private static final List<Item> temporaryFiles = new ArrayList<>();
     private static final List<Item> savedFiles = new ArrayList<>();
     private static final List<Item> images = new ArrayList<>();
-
-    public static String theDate;
     public static List<Item> getTemporaryFiles() {
         return temporaryFiles;
     }
@@ -37,16 +34,15 @@ public class Items {
     }
     public static List<Item> getImages() { return images; };
 
-
     //LOAD ALL FILES FROM A SPECIFIC DIRECTORY
     public static void loadFiles(File dir, String filesType) {
         String ending = "end";
         switch(filesType) {
-            case "temporary" :
+            case "temporary videos" :
                 temporaryFiles.clear();
                 ending = ".mp4";
                 break;
-            case "saved" :
+            case "saved videos" :
                 savedFiles.clear();
                 ending = ".mp4";
                 break;
@@ -85,7 +81,7 @@ public class Items {
     public static Bitmap convertFileToThumbnailBitmap(File file, String fileType) throws IOException {
         Size mSize = new Size(10000000,10000000);
         CancellationSignal ca = new CancellationSignal();
-        if(fileType != "images") {
+        if(!fileType.equals("images")) {
             Bitmap bitmapThumbnail = ThumbnailUtils.createVideoThumbnail(file, mSize, ca);
             return bitmapThumbnail;
         }
@@ -95,10 +91,10 @@ public class Items {
 
     private static void addItem(Item item, String filesType) {
         switch(filesType) {
-            case "temporary" :
+            case "temporary videos" :
                 temporaryFiles.add(item);
                 break;
-            case "saved" :
+            case "saved videos" :
                 savedFiles.add(item);
                 break;
             case "images" :
@@ -123,15 +119,15 @@ public class Items {
                     }
                 }
             }
-        deleteFile(itemSrc, context, "temporary");
+        deleteFile(itemSrc, context, "temporary videos");
     }
 
     public static void deleteFile(Item item, Context context, String fileType) {
         switch(fileType) {
-            case "temporary" :
+            case "temporary videos" :
                 temporaryFiles.remove(item);
                 break;
-            case "saved" :
+            case "saved videos" :
                 savedFiles.remove(item);
                 break;
             case "images" :
