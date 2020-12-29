@@ -2,12 +2,10 @@ package Gallery.SavedFiles;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,7 +23,7 @@ public class MySavedFilesRecyclerViewAdapter extends RecyclerView.Adapter<MySave
 
     public MySavedFilesRecyclerViewAdapter(Context context, File filesDir) {
         mContext = context;
-        VideoFiles.loadFiles(filesDir, "saved");
+        Items.loadFiles(filesDir, "saved");
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -47,7 +45,7 @@ public class MySavedFilesRecyclerViewAdapter extends RecyclerView.Adapter<MySave
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         try {
-            holder.mImageView.setImageBitmap(VideoFiles.convertFileToThumbnailBitmap(new File(VideoFiles.getSavedFiles().get(position).getUri().getPath())));
+            holder.mImageView.setImageBitmap(Items.convertFileToThumbnailBitmap(new File(Items.getSavedFiles().get(position).getUri().getPath()), "savedFiles"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -56,7 +54,7 @@ public class MySavedFilesRecyclerViewAdapter extends RecyclerView.Adapter<MySave
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, SavedVideoDisplayActivity.class);
-                intent.putExtra("video", VideoFiles.getSavedFiles().get(position).getUri().getPath());
+                intent.putExtra("video", Items.getSavedFiles().get(position).getUri().getPath());
                 mContext.startActivity(intent);
             }
         });
@@ -65,7 +63,7 @@ public class MySavedFilesRecyclerViewAdapter extends RecyclerView.Adapter<MySave
 
     @Override
     public int getItemCount() {
-        return VideoFiles.getSavedFiles().size();
+        return Items.getSavedFiles().size();
     }
 
 }

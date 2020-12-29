@@ -3,7 +3,6 @@ package Gallery.SavedFiles;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.CancellationSignal;
@@ -22,21 +21,21 @@ import java.util.Date;
 import java.util.List;
 
 import Gallery.GalleryActivity;
-import Gallery.VideoItem;
+import Gallery.Item;
 
-public class VideoFiles {
-    private static final List<VideoItem> temporaryFiles = new ArrayList<>();
-    private static final List<VideoItem> savedFiles = new ArrayList<>();
-    private static final List<Image> images = new ArrayList<>();
+public class Items {
+    private static final List<Item> temporaryFiles = new ArrayList<>();
+    private static final List<Item> savedFiles = new ArrayList<>();
+    private static final List<Item> images = new ArrayList<>();
 
     public static String theDate;
-    public static List<VideoItem> getTemporaryFiles() {
+    public static List<Item> getTemporaryFiles() {
         return temporaryFiles;
     }
-    public static List<VideoItem> getSavedFiles() {
+    public static List<Item> getSavedFiles() {
         return savedFiles;
     }
-    public static List<Image> getImages() { return images; };
+    public static List<Item> getImages() { return images; };
 
 
     //LOAD ALL FILES FROM A SPECIFIC DIRECTORY
@@ -70,7 +69,7 @@ public class VideoFiles {
 
     //LOAD SPECIFIC VIDEO
     public static void loadFile(File file, String fileType) {
-        VideoItem newItem = new VideoItem(file, Uri.fromFile(file), getDateFromFile(file));
+        Item newItem = new Item(file, Uri.fromFile(file), getDateFromFile(file));
         addItem(newItem, fileType);
     }
 
@@ -83,14 +82,18 @@ public class VideoFiles {
     }
 
     //convert files to thumbnails and return bitmap
-    public static Bitmap convertFileToThumbnailBitmap(File file) throws IOException {
+    public static Bitmap convertFileToThumbnailBitmap(File file, String fileType) throws IOException {
         Size mSize = new Size(10000000,10000000);
         CancellationSignal ca = new CancellationSignal();
-        Bitmap bitmapThumbnail = ThumbnailUtils.createVideoThumbnail(file, mSize, ca);
+        if(fileType != "images") {
+            Bitmap bitmapThumbnail = ThumbnailUtils.createVideoThumbnail(file, mSize, ca);
+            return bitmapThumbnail;
+        }
+        Bitmap bitmapThumbnail = ThumbnailUtils.createImageThumbnail(file, mSize, ca);
         return bitmapThumbnail;
     }
 
-    private static void addItem(VideoItem item, String filesType) {
+    private static void addItem(Item item, String filesType) {
         switch(filesType) {
             case "temporary" :
                 temporaryFiles.add(item);
@@ -104,7 +107,7 @@ public class VideoFiles {
         }
     }
 
-    public static void saveFile(VideoItem itemSrc, File destDir, Context context) throws IOException {
+    public static void saveFile(Item itemSrc, File destDir, Context context) throws IOException {
             // getting the file name
             String path = itemSrc.getFile().getPath();
             String fileName = path.substring(path.lastIndexOf("/") + 1);
@@ -120,10 +123,10 @@ public class VideoFiles {
                     }
                 }
             }
-        deleteVideoFile(itemSrc, context, "temporary");
+        deleteFile(itemSrc, context, "temporary");
     }
 
-    public static void deleteVideoFile(VideoItem item, Context context, String fileType) {
+    public static void deleteFile(Item item, Context context, String fileType) {
         switch(fileType) {
             case "temporary" :
                 temporaryFiles.remove(item);
@@ -140,8 +143,8 @@ public class VideoFiles {
         context.startActivity(intent);
     }
 
-    public static VideoItem findItemByUri(List<VideoItem> items, Uri uri) {
-        for(VideoItem item : items) {
+    public static Item findItemByUri(List<Item> items, Uri uri) {
+        for(Item item : items) {
             if (item.getUri().getPath().equals(uri.getPath())) {
             }
             if (item.getUri().getPath().equals(uri.getPath())) {

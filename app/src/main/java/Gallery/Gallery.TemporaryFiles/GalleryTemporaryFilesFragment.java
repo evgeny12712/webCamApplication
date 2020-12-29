@@ -7,19 +7,14 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.webcamapplication.R;
 
-import java.io.File;
-import java.util.ArrayList;
-
-import Gallery.SavedFiles.VideoFiles;
+import Gallery.SavedFiles.Items;
 
 public class GalleryTemporaryFilesFragment extends Fragment  {
 
@@ -44,7 +39,7 @@ public class GalleryTemporaryFilesFragment extends Fragment  {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new MyTemporaryFilesRecyclerViewAdapter(getContext());
         mRecyclerView.setAdapter(mAdapter);
-        Toast.makeText(this.getContext() , "" + VideoFiles.getTemporaryFiles().size(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this.getContext() , "" + Items.getTemporaryFiles().size(), Toast.LENGTH_SHORT).show();
         return view;
     }
 

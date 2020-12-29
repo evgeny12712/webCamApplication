@@ -2,14 +2,11 @@ package Gallery.Pictures;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.media.ThumbnailUtils;
-import android.os.CancellationSignal;
-import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,10 +15,10 @@ import com.example.webcamapplication.R;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
+import Gallery.GalleryActivity;
 import Gallery.SavedFiles.SavedVideoDisplayActivity;
-import Gallery.SavedFiles.VideoFiles;
+import Gallery.SavedFiles.Items;
 
 public class MyPicturesRecyclerViewAdapter extends RecyclerView.Adapter<MyPicturesRecyclerViewAdapter.ViewHolder> {
 
@@ -30,7 +27,7 @@ public class MyPicturesRecyclerViewAdapter extends RecyclerView.Adapter<MyPictur
 
     public MyPicturesRecyclerViewAdapter(File dir, Context context) {
         mContext = context;
-        VideoFiles.loadFiles(dir, "images");
+        Items.loadFiles(dir, "images");
     }
 
 
@@ -55,7 +52,7 @@ public class MyPicturesRecyclerViewAdapter extends RecyclerView.Adapter<MyPictur
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         try {
-                holder.mImageView.setImageBitmap(VideoFiles.convertFileToThumbnailBitmap(new File(VideoFiles.getSavedFiles().get(position).getUri().getPath())));
+            holder.mImageView.setImageBitmap(Items.convertFileToThumbnailBitmap(Items.getImages().get(position).getFile(),  "images"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -63,8 +60,8 @@ public class MyPicturesRecyclerViewAdapter extends RecyclerView.Adapter<MyPictur
         holder.mImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, SavedVideoDisplayActivity.class);
-                intent.putExtra("video", VideoFiles.getImages().get(position).getUri().getPath());
+                Intent intent = new Intent(mContext, ImageDisplayActivity.class);
+                intent.putExtra("image", Items.getImages().get(position).getFile().getPath());
                 mContext.startActivity(intent);
             }
         });
@@ -74,7 +71,7 @@ public class MyPicturesRecyclerViewAdapter extends RecyclerView.Adapter<MyPictur
 
     @Override
     public int getItemCount() {
-        return VideoFiles.getSavedFiles().size();
+        return Items.getImages().size();
     }
 
 

@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,7 +14,7 @@ import androidx.fragment.app.Fragment;
 import Gallery.Gallery.TemporaryFiles.GalleryTemporaryFilesFragment;
 import Gallery.Pictures.GalleryPicturesFragment;
 import Gallery.SavedFiles.GallerySavedFilesFragment;
-import Gallery.SavedFiles.VideoFiles;
+import Gallery.SavedFiles.Items;
 import MainWindow.MainActivity;
 import com.example.webcamapplication.R;
 
@@ -49,8 +47,8 @@ public class GalleryActivity extends AppCompatActivity {
         res = getResources();
         setSupportActionBar(toolbar);
 
-        VideoFiles.loadFiles(getExternalFilesDir(Environment.DIRECTORY_MOVIES), "temporary");
-        VideoFiles.loadFiles(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "saved");
+        Items.loadFiles(getExternalFilesDir(Environment.DIRECTORY_MOVIES), "temporary");
+        Items.loadFiles(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "saved");
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frameLayout, temporaryFiles)
                 .commit();

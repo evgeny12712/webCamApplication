@@ -4,12 +4,12 @@ import android.net.Uri;
 
 import java.io.File;
 
-public class VideoItem {
+public class Item {
     private Uri uri;
     private String date;
     private File file;
 
-    public VideoItem(File file, Uri uri, String date) {
+    public Item(File file, Uri uri, String date) {
         this.file = file;
         this.uri = uri;
         this.date = date;

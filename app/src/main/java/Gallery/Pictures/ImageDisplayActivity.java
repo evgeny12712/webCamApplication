@@ -1,43 +1,42 @@
 package Gallery.Pictures;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.webcamapplication.R;
 
-import Gallery.GalleryActivity;
-import Gallery.SavedFiles.VideoFiles;
+import java.io.File;
 
-public class SavedImageActivity extends AppCompatActivity {
+import Gallery.GalleryActivity;
+import Gallery.SavedFiles.Items;
+
+public class ImageDisplayActivity extends AppCompatActivity {
     private ImageView imageView;
-    private MediaController mediaController;
-    private String videoPath;
-    private Uri uri;
+    private String imagePath;
+    private File imageFile;
     private ImageButton backBtn;
-    private Button btnSave;
     private Button btnDelete;
     private Button btnShare;
     private TextView textViewDate;
     private TextView textViewTime;
     private String date;
     private String time;
-
+    private Uri imageUri;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_display);
         imageView = (ImageView) findViewById(R.id.image_view);
-        mediaController = new MediaController(this);
         backBtn = (ImageButton) findViewById(R.id.back_btn);
         btnShare = (Button) findViewById(R.id.btn_share);
         btnDelete = (Button) findViewById(R.id.btn_delete);
@@ -45,16 +44,16 @@ public class SavedImageActivity extends AppCompatActivity {
         textViewTime = (TextView) findViewById(R.id.time_recorded_text);
 
 
-        videoPath = getIncomingVideoPath();
-        uri = Uri.parse(videoPath);
-        imageView.setVideoURI(uri);
-        mediaController.setAnchorView(videoView);
-        videoView.setMediaController(mediaController);
+        imagePath = getIncomingImage();
+        imageFile = new File(imagePath);
+        imageUri = Uri.parse(imageFile.getPath());
+        Bitmap bitmap = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
+        imageView.setImageBitmap(bitmap);
+
 
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                videoView.stopPlayback();
                 Intent intent = new Intent(getApplicationContext(), GalleryActivity.class);
                 startActivity(intent);
             }
@@ -67,7 +66,7 @@ public class SavedImageActivity extends AppCompatActivity {
                 intent.setType("image/*");
                 intent.putExtra(Intent.EXTRA_SUBJECT, "Image share");
                 intent.putExtra(Intent.EXTRA_TEXT,"Image");
-                intent.putExtra(Intent.EXTRA_STREAM, uri);
+                intent.putExtra(Intent.EXTRA_STREAM, imageUri);
                 startActivity(intent);
             }
         });
@@ -75,7 +74,7 @@ public class SavedImageActivity extends AppCompatActivity {
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                VideoFiles.deleteVideoFile(VideoFiles.findItemByUri(VideoFiles.getSavedFiles(), uri),
+                Items.deleteFile(Items.findItemByUri(Items.getSavedFiles(), imageUri),
                         getApplicationContext(), "saved");
             }
         });
@@ -84,18 +83,15 @@ public class SavedImageActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        date = VideoFiles.getDateFromFile(VideoFiles.findItemByUri(VideoFiles.getTemporaryFiles(), uri).getFile()).split(",")[0];
-        time = VideoFiles.getDateFromFile(VideoFiles.findItemByUri(VideoFiles.getTemporaryFiles(), uri).getFile()).split(",")[1];
-
-        textViewDate.setText(date);
-        textViewTime.setText(time);
-
-
+//        date = Items.getDateFromFile(Items.findItemByUri(Items.getTemporaryFiles(), imageUri).getFile()).split(",")[0];
+//        time = Items.getDateFromFile(Items.findItemByUri(Items.getTemporaryFiles(), imageUri).getFile()).split(",")[1];
+//        textViewDate.setText(date);
+//        textViewTime.setText(time);
     }
 
     private String getIncomingImage() {
-        if(getIntent().hasExtra("video")) {
-            return getIntent().getStringExtra("video");
+        if(getIntent().hasExtra("image")) {
+            return getIntent().getStringExtra("image");
         }
         return null;
     }

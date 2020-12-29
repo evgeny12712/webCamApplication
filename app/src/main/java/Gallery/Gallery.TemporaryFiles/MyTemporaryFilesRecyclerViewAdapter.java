@@ -9,14 +9,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.example.webcamapplication.R;
 
-import java.io.File;
 import java.io.IOException;
 
-import Gallery.SavedFiles.VideoFiles;
+import Gallery.SavedFiles.Items;
 
 public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<MyTemporaryFilesRecyclerViewAdapter.ViewHolder> {
 
@@ -48,7 +46,7 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         try {
-                holder.mImageView.setImageBitmap(VideoFiles.convertFileToThumbnailBitmap(new File(VideoFiles.getTemporaryFiles().get(position).getUri().getPath())));
+                holder.mImageView.setImageBitmap(Items.convertFileToThumbnailBitmap(Items.getTemporaryFiles().get(position).getFile(), "temporary"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -57,7 +55,7 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, TemporaryVideoDisplayActivity.class);
-                intent.putExtra("video", VideoFiles.getTemporaryFiles().get(position).getUri().getPath());
+                intent.putExtra("video", Items.getTemporaryFiles().get(position).getUri().getPath());
                 mContext.startActivity(intent);
             }
         });
@@ -65,7 +63,7 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
 
     @Override
     public int getItemCount() {
-        return VideoFiles.getTemporaryFiles().size();
+        return Items.getTemporaryFiles().size();
     }
 
 

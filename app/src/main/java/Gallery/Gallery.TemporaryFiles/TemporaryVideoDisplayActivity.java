@@ -20,8 +20,8 @@ import java.io.File;
 import java.io.IOException;
 
 import Gallery.GalleryActivity;
-import Gallery.SavedFiles.VideoFiles;
-import Gallery.VideoItem;
+import Gallery.SavedFiles.Items;
+import Gallery.Item;
 
 public class TemporaryVideoDisplayActivity extends AppCompatActivity {
     private VideoView videoView;
@@ -81,9 +81,9 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 File saveDir = getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
-                VideoItem item = VideoFiles.findItemByUri(VideoFiles.getTemporaryFiles(), uri);
+                Item item = Items.findItemByUri(Items.getTemporaryFiles(), uri);
                 try {
-                    VideoFiles.saveFile(item, saveDir, getApplicationContext());
+                    Items.saveFile(item, saveDir, getApplicationContext());
                 } catch (IOException e) {
                     Toast.makeText(TemporaryVideoDisplayActivity.this, "EE", Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
@@ -94,7 +94,7 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                VideoFiles.deleteVideoFile(VideoFiles.findItemByUri(VideoFiles.getTemporaryFiles(), uri),
+                Items.deleteFile(Items.findItemByUri(Items.getTemporaryFiles(), uri),
                         getApplicationContext(), "temporary");
             }
         });
@@ -105,8 +105,8 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        date = VideoFiles.getDateFromFile(VideoFiles.findItemByUri(VideoFiles.getTemporaryFiles(), uri).getFile()).split(",")[0];
-        time = VideoFiles.getDateFromFile(VideoFiles.findItemByUri(VideoFiles.getTemporaryFiles(), uri).getFile()).split(",")[1];
+        date = Items.getDateFromFile(Items.findItemByUri(Items.getTemporaryFiles(), uri).getFile()).split(",")[0];
+        time = Items.getDateFromFile(Items.findItemByUri(Items.getTemporaryFiles(), uri).getFile()).split(",")[1];
 
         textViewDate.setText(date);
         textViewTime.setText(time);
