@@ -1,5 +1,6 @@
 package Gallery.Gallery.TemporaryFiles;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -38,6 +39,7 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
     private TextView textViewTime;
     private String date;
     private String time;
+    private Context context;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +52,7 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
         btnDelete = (Button) findViewById(R.id.btn_delete);
         textViewDate = (TextView) findViewById(R.id.date_recorded_text);
         textViewTime = (TextView) findViewById(R.id.time_recorded_text);
-
+        context = this;
 
         videoPath = getIncomingVideoPath();
         uri = Uri.parse(videoPath);
@@ -62,7 +64,7 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 videoView.stopPlayback();
-                Intent intent = new Intent(getApplicationContext(), GalleryActivity.class);
+                Intent intent = new Intent(context, GalleryActivity.class);
                 intent.putExtra("fragment", fileTypes[0]);
                 startActivity(intent);
             }
@@ -83,10 +85,10 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                File saveDir = getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+                File saveDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
                 Item item = Items.findItemByUri(Items.getTemporaryFiles(), uri);
                 try {
-                    Items.saveFile(item, saveDir, getApplicationContext());
+                    Items.saveFile(item, saveDir, context);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -97,7 +99,7 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Items.deleteFile(Items.findItemByUri(Items.getTemporaryFiles(), uri),
-                        getApplicationContext(), fileTypes[0]);
+                        context, fileTypes[0]);
             }
         });
 

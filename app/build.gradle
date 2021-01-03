@@ -23,7 +23,7 @@ android {
     sourceSets {
         main {
             res {
-                srcDirs 'src\\main\\res', 'src\\main\\res\\2', 'src\\main\\res\\1', 'src\\main\\res\\layouts\\Main', 'src\\main\\res\\layouts\\main', 'src\\main\\res\\main', 'src\\main\\res\\driving', 'src\\main\\res\\gallery', 'src\\main\\res\\settings', 'src\\main\\res\\main_screen', 'src\\main\\res\\main\\layouts\\main', 'src\\main\\res\\driving_screen', 'src\\main\\res\\gallery_screen', 'src\\main\\res\\settings_screen', 'src\\main\\res\\camera_others', 'src\\main\\res\\3', 'src\\main\\res\\4', 'src\\main\\res\\5', 'src\\main\\res\\6', 'src\\main\\res\\layouts', 'src\\main\\res\\layouts\\settings_screen', 'src\\main\\res\\layouts\\main_screen', 'src\\main\\res\\layouts\\driving_screen', 'src\\main\\res\\layouts\\gallery_screen', 'src\\main\\res\\layouts\\camera_n_others'
+                srcDirs 'src\\main\\res', 'src\\main\\res\\2', 'src\\main\\res\\1', 'src\\main\\res\\layouts\\Main', 'src\\main\\res\\layouts\\main', 'src\\main\\res\\main', 'src\\main\\res\\driving', 'src\\main\\res\\gallery', 'src\\main\\res\\settings', 'src\\main\\res\\main_screen', 'src\\main\\res\\main\\layouts\\main', 'src\\main\\res\\driving_screen', 'src\\main\\res\\gallery_screen', 'src\\main\\res\\settings_screen', 'src\\main\\res\\camera_others', 'src\\main\\res\\3', 'src\\main\\res\\4', 'src\\main\\res\\5', 'src\\main\\res\\6', 'src\\main\\res\\layouts', 'src\\main\\res\\layouts\\settings_screen', 'src\\main\\res\\layouts\\main_screen', 'src\\main\\res\\layouts\\driving_screen', 'src\\main\\res\\layouts\\gallery_screen', 'src\\main\\res\\layouts\\camera_n_others', 'src\\main\\res\\layout\\Gallery', 'res\\layout\\Gallery'
             }
         }
     }
@@ -44,8 +44,9 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
-//    //recyclerview
+    //recyclerview
     implementation "androidx.recyclerview:recyclerview:1.1.0"
+    implementation 'androidx.recyclerview:recyclerview-selection:1.0.0'
 
 
     //glide

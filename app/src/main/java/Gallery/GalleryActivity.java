@@ -49,17 +49,11 @@ public class GalleryActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         fileTypes = getResources().getStringArray(R.array.fileTypes);
-        chosenFragment = "none";
         setSupportActionBar(toolbar);
 
         Items.loadFiles(getExternalFilesDir(Environment.DIRECTORY_MOVIES), fileTypes[0]);
         Items.loadFiles(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileTypes[1]);
-        if(!getIncomingIntent()) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frameLayout, temporaryFiles)
-                    .commit();
-        }
-
+        getIncomingIntent();
         btnHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -122,29 +116,40 @@ public class GalleryActivity extends AppCompatActivity {
         }
     }
 
-    private boolean getIncomingIntent() {
+    private void getIncomingIntent() {
         if(getIntent().hasExtra("fragment")) {
             chosenFragment = getIntent().getStringExtra("fragment");
-            setButtonPressed(chosenFragment);
-            switch (chosenFragment) {
-                case "temporary videos":
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.frameLayout, temporaryFiles)
-                            .commit();
-                    break;
-                case "saved videos":
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.frameLayout, savedFiles)
-                            .commit();
-                    break;
-                case "images":
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.frameLayout, images)
-                            .commit();
-                    break;
+            if(chosenFragment != null) {
+                Toast.makeText(this, "chosen : " + chosenFragment, Toast.LENGTH_SHORT).show();
+                setButtonPressed(chosenFragment);
+                switch (chosenFragment) {
+                    case "temporary videos":
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.frameLayout, temporaryFiles)
+                                .commit();
+                        break;
+                    case "saved videos":
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.frameLayout, savedFiles)
+                                .commit();
+                        break;
+                    case "images":
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.frameLayout, images)
+                                .commit();
+                        break;
+                    default :
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.frameLayout, temporaryFiles)
+                                .commit();
+                        break;
                 }
-            return true;
+            } else {
+                Toast.makeText(this, "isnull", Toast.LENGTH_SHORT).show();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.frameLayout, temporaryFiles)
+                        .commit();
+            }
         }
-        return false;
     }
 }

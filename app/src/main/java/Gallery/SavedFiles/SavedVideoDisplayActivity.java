@@ -1,5 +1,6 @@
 package Gallery.SavedFiles;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,13 +29,13 @@ public class SavedVideoDisplayActivity extends AppCompatActivity {
     private String videoPath;
     private Uri uri;
     private ImageButton backBtn;
-    private Button btnSave;
     private Button btnDelete;
     private Button btnShare;
     private TextView textViewDate;
     private TextView textViewTime;
     private String date;
     private String time;
+    Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +48,7 @@ public class SavedVideoDisplayActivity extends AppCompatActivity {
         btnDelete = (Button) findViewById(R.id.btn_delete);
         textViewDate = (TextView) findViewById(R.id.date_recorded_text);
         textViewTime = (TextView) findViewById(R.id.time_recorded_text);
-
+        context = this;
 
         videoPath = getIncomingPath();
         uri = Uri.parse(videoPath);
@@ -59,7 +60,7 @@ public class SavedVideoDisplayActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 videoView.stopPlayback();
-                Intent intent = new Intent(getApplicationContext(), GalleryActivity.class);
+                Intent intent = new Intent(context, GalleryActivity.class);
                 intent.putExtra("fragment", fileTypes[1]);
                 startActivity(intent);
             }
@@ -81,7 +82,7 @@ public class SavedVideoDisplayActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Items.deleteFile(Items.findItemByUri(Items.getSavedFiles(), uri),
-                        getApplicationContext(), fileTypes[1]);
+                        context , fileTypes[1]);
             }
         });
     }
@@ -89,8 +90,8 @@ public class SavedVideoDisplayActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        date = Items.getDateFromFile(Items.findItemByUri(Items.getTemporaryFiles(), uri).getFile()).split(",")[0];
-        time = Items.getDateFromFile(Items.findItemByUri(Items.getTemporaryFiles(), uri).getFile()).split(",")[1];
+        date = Items.getDateFromFile(Items.findItemByUri(Items.getSavedFiles(), uri).getFile()).split(",")[0];
+        time = Items.getDateFromFile(Items.findItemByUri(Items.getSavedFiles(), uri).getFile()).split(",")[1];
 
         textViewDate.setText(date);
         textViewTime.setText(time);

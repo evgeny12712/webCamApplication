@@ -39,7 +39,6 @@ public class GalleryTemporaryFilesFragment extends Fragment  {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new MyTemporaryFilesRecyclerViewAdapter(getContext());
         mRecyclerView.setAdapter(mAdapter);
-        Toast.makeText(this.getContext() , "" + Items.getTemporaryFiles().size(), Toast.LENGTH_SHORT).show();
         return view;
     }
 

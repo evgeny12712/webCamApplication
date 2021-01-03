@@ -3,11 +3,13 @@ package Gallery;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.icu.util.LocaleData;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.CancellationSignal;
 import android.util.Log;
 import android.util.Size;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -123,18 +125,21 @@ public class Items {
     }
 
     public static void deleteFile(Item item, Context context, String fileType) {
+
         switch(fileType) {
-            case "temporary videos" :
+            case "temporary videos":
                 temporaryFiles.remove(item);
+                item.getFile().delete();
                 break;
-            case "saved videos" :
+            case "saved videos":
+                item.getFile().delete();
                 savedFiles.remove(item);
                 break;
-            case "images" :
+            case "images":
                 images.remove(item);
+                item.getFile().delete();
                 break;
         }
-        item.getFile().delete();
         Intent intent = new Intent(context, GalleryActivity.class);
         context.startActivity(intent);
     }

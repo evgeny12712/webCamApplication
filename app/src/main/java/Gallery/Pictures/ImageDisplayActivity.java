@@ -22,6 +22,7 @@ import java.io.File;
 
 import Gallery.GalleryActivity;
 import Gallery.Items;
+import static Gallery.GalleryActivity.fileTypes;
 
 public class ImageDisplayActivity extends AppCompatActivity {
     private ImageView imageView;
@@ -35,6 +36,8 @@ public class ImageDisplayActivity extends AppCompatActivity {
     private String date;
     private String time;
     private Uri imageUri;
+    private Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,7 +48,7 @@ public class ImageDisplayActivity extends AppCompatActivity {
         btnDelete = (Button) findViewById(R.id.btn_delete);
         textViewDate = (TextView) findViewById(R.id.date_recorded_text);
         textViewTime = (TextView) findViewById(R.id.time_recorded_text);
-
+        context = this;
 
         imagePath = getIncomingImage();
         imageFile = new File(imagePath);
@@ -57,8 +60,8 @@ public class ImageDisplayActivity extends AppCompatActivity {
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), GalleryActivity.class);
-                intent.putExtra("fragment", GalleryActivity.fileTypes[2]);
+                Intent intent = new Intent(context, GalleryActivity.class);
+                intent.putExtra("fragment", fileTypes[2]);
                 startActivity(intent);
             }
         });
@@ -69,7 +72,7 @@ public class ImageDisplayActivity extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("image/*");
                 intent.putExtra(Intent.EXTRA_SUBJECT, "Image share");
-                intent.putExtra(Intent.EXTRA_TEXT,GalleryActivity.fileTypes[2]);
+                intent.putExtra(Intent.EXTRA_TEXT,fileTypes[2]);
                 intent.putExtra(Intent.EXTRA_STREAM, imageUri);
                 startActivity(intent);
             }
@@ -79,7 +82,7 @@ public class ImageDisplayActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Items.deleteFile(Items.findItemByUri(Items.getSavedFiles(), imageUri),
-                        getApplicationContext(), GalleryActivity.fileTypes[2]);
+                        context, fileTypes[2]);
             }
         });
     }
@@ -96,8 +99,8 @@ public class ImageDisplayActivity extends AppCompatActivity {
     }
 
     private String getIncomingImage() {
-        if(getIntent().hasExtra(GalleryActivity.fileTypes[2])) {
-            return getIntent().getStringExtra(GalleryActivity.fileTypes[2]);
+        if(getIntent().hasExtra(fileTypes[2])) {
+            return getIntent().getStringExtra(fileTypes[2]);
         }
         return null;
     }

@@ -57,7 +57,7 @@ public class MySavedFilesRecyclerViewAdapter extends RecyclerView.Adapter<MySave
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, SavedVideoDisplayActivity.class);
-                intent.putExtra("temporary videos", Items.getSavedFiles().get(position).getUri().getPath());
+                intent.putExtra(GalleryActivity.fileTypes[1], Items.getSavedFiles().get(position).getUri().getPath());
                 mContext.startActivity(intent);
             }
         });
