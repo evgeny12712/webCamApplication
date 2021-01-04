@@ -1,13 +1,17 @@
 package Gallery.Gallery.TemporaryFiles;
 
+import android.app.Activity;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.MotionEventCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -23,10 +27,12 @@ public class GalleryTemporaryFilesFragment extends Fragment  {
     protected RecyclerView mRecyclerView;
     protected MyTemporaryFilesRecyclerViewAdapter mAdapter;
     protected RecyclerView.LayoutManager mLayoutManager;
-
+    protected Activity parentActivity;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        parentActivity = getActivity();
+
     }
 
     @Override
@@ -37,8 +43,9 @@ public class GalleryTemporaryFilesFragment extends Fragment  {
         mRecyclerView = (RecyclerView) view.findViewById(R.id.list);
         mLayoutManager = new GridLayoutManager(getActivity(), 3);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new MyTemporaryFilesRecyclerViewAdapter(getContext());
+        mAdapter = new MyTemporaryFilesRecyclerViewAdapter(getContext(), parentActivity);
         mRecyclerView.setAdapter(mAdapter);
+
         return view;
     }
 
@@ -46,4 +53,13 @@ public class GalleryTemporaryFilesFragment extends Fragment  {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }
+
+
+
+
+
+    public Activity getParentActivity() {
+        return parentActivity;
+    }
+
 }

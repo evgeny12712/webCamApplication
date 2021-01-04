@@ -10,7 +10,7 @@ public class SelectedGalleryAdapter {
     @SuppressWarnings("unused")
     private static final String TAG = SelectedGalleryAdapter.class.getSimpleName();
 
-    private static SparseBooleanArray selectedItems = new SparseBooleanArray();;
+    private static SparseBooleanArray allItems = new SparseBooleanArray();;
 
     /**
      * Indicates if the item at position position is selected
@@ -18,7 +18,7 @@ public class SelectedGalleryAdapter {
      * @return true if the item is selected, false otherwise
      */
     public static boolean isSelected(int position) {
-        return getSelectedItems().contains(position);
+        return allItems.get(position) == true;
     }
 
     /**
@@ -26,12 +26,15 @@ public class SelectedGalleryAdapter {
      * @param position Position of the item to toggle the selection status for
      */
     public static void toggleSelection(int position) {
-            selectedItems.put(position, true);
+        allItems.setValueAt(position, true);
+    }
+    public static void toggleOffSelection(int position) {
+        allItems.setValueAt(position, false);
     }
 
     public static void initSelection(List<Item> items) {
         for(Item i : items) {
-            selectedItems.append(items.indexOf(i), false);
+            allItems.append(items.indexOf(i), false);
         }
     }
 
@@ -39,10 +42,8 @@ public class SelectedGalleryAdapter {
      * Clear the selection status for all items
      */
     public static void clearSelection() {
-        List<Integer> selection = getSelectedItems();
-        selectedItems.clear();
-        for (Integer i : selection) {
-            //notifyItemChanged(i);
+        for(int i = 0 ; i < allItems.size() ; i++) {
+            allItems.setValueAt(i, false);
         }
     }
 
@@ -51,7 +52,13 @@ public class SelectedGalleryAdapter {
      * @return Selected items count
      */
     public static int getSelectedItemCount() {
-        return selectedItems.size();
+        int counter = 0;
+        for(int i = 0; i< allItems.size() ; i++) {
+            if(allItems.get(i) == true) {
+                counter++;
+            }
+        }
+        return counter;
     }
 
     /**
@@ -59,9 +66,9 @@ public class SelectedGalleryAdapter {
      * @return List of selected items ids
      */
     public static List<Integer> getSelectedItems() {
-        List<Integer> items = new ArrayList<>(selectedItems.size());
-        for (int i = 0; i < selectedItems.size(); ++i) {
-            items.add(selectedItems.keyAt(i));
+        List<Integer> items = new ArrayList<>(allItems.size());
+        for (int i = 0; i < allItems.size(); ++i) {
+            items.add(allItems.keyAt(i));
         }
         return items;
     }

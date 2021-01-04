@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -47,7 +48,6 @@ public class GalleryActivity extends AppCompatActivity {
         images = new GalleryPicturesFragment();
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-
         fileTypes = getResources().getStringArray(R.array.fileTypes);
         setSupportActionBar(toolbar);
 
@@ -152,4 +152,11 @@ public class GalleryActivity extends AppCompatActivity {
             }
         }
     }
+    
+
+
+
+
+
+
 }

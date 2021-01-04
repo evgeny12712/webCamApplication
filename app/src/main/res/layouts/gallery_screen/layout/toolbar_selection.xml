@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:theme="@style/Widget.AppCompat.Toolbar">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="X"
+            android:textSize="25dp"
+            android:layout_marginRight="@dimen/gallery_margin"
+            android:fontFamily="@font/roboto_regular_datetime"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text=" items selected"
+            android:textSize="25dp"
+            android:layout_marginRight="@dimen/gallery_margin"
+            android:fontFamily="@font/roboto_regular_datetime"
+            android:textColor="@color/black" />
+
+        <ImageButton
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:layout_margin="@dimen/gallery_margin"
+            android:id="@+id/multi_selection_save"
+            android:src="@drawable/ic_baseline_save_24"
+            android:background="#00000000" />
+        <ImageButton
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:layout_margin="@dimen/gallery_margin"
+            android:id="@+id/multi_selection_share"
+            android:src="@drawable/ic_baseline_share_24"
+            android:background="#00000000" />
+        <ImageButton
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:layout_margin="@dimen/gallery_margin"
+            android:id="@+id/multi_selection_delete"
+            android:src="@drawable/ic_baseline_delete_24"
+            android:background="#00000000" />
+    </LinearLayout>
+
+
+</androidx.appcompat.widget.Toolbar>
