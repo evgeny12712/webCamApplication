@@ -5,22 +5,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:clickable="true"
+    android:id="@+id/linear_Layout_gallery_background">
 
     <include
         android:id="@+id/toolbar_selection"
         layout = "@layout/toolbar_selection"
         android:visibility="gone"/>
-
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="top"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context="Gallery.GalleryActivity"
-        tools:showIn="@layout/activity_gallery"
-        android:layout_weight="1"
-        android:id="@+id/nested_scroll">
 
         <FrameLayout
             android:id="@+id/frameLayout"
@@ -28,7 +20,5 @@
             android:layout_height="match_parent"
             android:layout_weight="1">
         </FrameLayout>
-
-    </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>

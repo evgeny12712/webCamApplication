@@ -2,12 +2,13 @@ package Gallery;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
@@ -28,11 +29,13 @@ public class GalleryActivity extends AppCompatActivity {
     private Button btnVideos;
     private Resources res;
     private Toolbar toolbar;
+    private Toolbar selectionToolBar;
     private Fragment temporaryFiles;
     private Fragment savedFiles;
     private Fragment images;
     private String chosenFragment;
     public static String[] fileTypes;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +51,7 @@ public class GalleryActivity extends AppCompatActivity {
         images = new GalleryPicturesFragment();
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        selectionToolBar = (Toolbar) findViewById(R.id.toolbar_selection);
         fileTypes = getResources().getStringArray(R.array.fileTypes);
         setSupportActionBar(toolbar);
 
@@ -69,7 +73,6 @@ public class GalleryActivity extends AppCompatActivity {
                         .replace(R.id.frameLayout, temporaryFiles)
                         .commit();
             setButtonPressed(fileTypes[0]);
-
             }
         });
 
@@ -95,6 +98,18 @@ public class GalleryActivity extends AppCompatActivity {
         });
 
     }
+
+    public void switchToolbar() {
+        if(toolbar.getVisibility() == View.VISIBLE) {
+            toolbar.setVisibility(View.GONE);
+            selectionToolBar.setVisibility(View.VISIBLE);
+        }
+        else {
+            toolbar.setVisibility(View.VISIBLE);
+            selectionToolBar.setVisibility(View.GONE);
+        }
+    }
+
 
     public void setButtonPressed(String buttonName) {
         switch (buttonName) {
@@ -152,11 +167,4 @@ public class GalleryActivity extends AppCompatActivity {
             }
         }
     }
-    
-
-
-
-
-
-
 }

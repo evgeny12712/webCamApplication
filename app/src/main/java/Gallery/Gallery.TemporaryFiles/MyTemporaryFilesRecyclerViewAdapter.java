@@ -33,7 +33,6 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
     private boolean isSelectionState;
     private Toolbar toolbarSelection;
     private Activity parentActivity;
-    private NestedScrollView nestedScroll;
     public MyTemporaryFilesRecyclerViewAdapter(Context context, Activity parentActivity) {
         mContext = context;
         isSelectionState = false;
@@ -66,7 +65,6 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         toolbarSelection = (Toolbar) parentActivity.findViewById(R.id.toolbar_selection);
-        nestedScroll = (NestedScrollView) parentActivity.findViewById(R.id.nested_scroll);
         try {
             holder.mImageView.setImageBitmap(Items.convertFileToThumbnailBitmap(Items.getTemporaryFiles().get(position).getFile(), GalleryActivity.fileTypes[0]));
         } catch (IOException e) {
@@ -100,6 +98,7 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
                     toolbarSelection.setVisibility(View.VISIBLE);
                     isSelectionState = true;
                     toggleSelection(position);
+                    //parentActivity.
                     for (int pos : getSelectedItems()) {
                         if (isSelected(pos)) {
                             holder.mImageViewSelected.setVisibility(View.VISIBLE);
@@ -115,8 +114,5 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
     public int getItemCount() {
         return Items.getTemporaryFiles().size();
     }
-
-
-
 
 }
