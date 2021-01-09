@@ -1,5 +1,6 @@
 package Gallery.Pictures;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.LayoutInflater;
@@ -15,7 +16,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.webcamapplication.R;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+
+import Gallery.GalleryActivity;
+import Gallery.Items;
 
 public class GalleryPicturesFragment extends Fragment  {
 

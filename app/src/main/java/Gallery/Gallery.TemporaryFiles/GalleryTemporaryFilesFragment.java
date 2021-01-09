@@ -46,6 +46,7 @@ public class GalleryTemporaryFilesFragment extends Fragment  {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new MyTemporaryFilesRecyclerViewAdapter(getContext(), parentActivity);
         mRecyclerView.setAdapter(mAdapter);
+        //getActivity().
         return view;
     }
 

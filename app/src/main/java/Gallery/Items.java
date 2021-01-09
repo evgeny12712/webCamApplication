@@ -28,6 +28,7 @@ public class Items {
     private static final List<Item> temporaryFiles = new ArrayList<>();
     private static final List<Item> savedFiles = new ArrayList<>();
     private static final List<Item> images = new ArrayList<>();
+
     public static List<Item> getTemporaryFiles() {
         return temporaryFiles;
     }
@@ -36,46 +37,23 @@ public class Items {
     }
     public static List<Item> getImages() { return images; };
 
+
     //LOAD ALL FILES FROM A SPECIFIC DIRECTORY
     public static void loadFiles(File dir, String filesType) {
-        String ending = "end";
-        switch(filesType) {
-            case "temporary videos" :
-                temporaryFiles.clear();
-                ending = ".mp4";
-                break;
-            case "saved videos" :
-                savedFiles.clear();
-                ending = ".mp4";
-                break;
-            case "images" :
-                images.clear();
-                ending = ".jpg";
-                break;
-        }
         if(dir.exists()) {
             File[] files = dir.listFiles();
             for (File file : files) {
-                String absolutePath = file.getAbsolutePath();
-                String extension = absolutePath.substring(absolutePath.lastIndexOf("."));
-                if(extension.equals(ending)) {
-                    loadFile(file, filesType);
-                }
+                Item newItem = new Item(file, filesType);
+                addItem(newItem, filesType);
             }
         }
-    }
 
-    //LOAD SPECIFIC VIDEO
-    public static void loadFile(File file, String fileType) {
-        Item newItem = new Item(file, Uri.fromFile(file), getDateFromFile(file));
-        addItem(newItem, fileType);
     }
 
     public static String getDateFromFile(File file) {
         Date lastModDate = new Date(file.lastModified());
         String date = DateFormat.getDateInstance().format(lastModDate);
         String time = DateFormat.getTimeInstance().format(lastModDate);
-        Log.d("dateTime", date + "," + time);
         return date + "," + time;
     }
 
@@ -145,13 +123,17 @@ public class Items {
     }
 
     public static Item findItemByUri(List<Item> items, Uri uri) {
+        Log.d("TAG", "HERE?");
+
         for(Item item : items) {
-            if (item.getUri().getPath().equals(uri.getPath())) {
-            }
-            if (item.getUri().getPath().equals(uri.getPath())) {
+            Log.d("TAG", "AND HERE?");
+            if (item.getUri().equals(uri)) {
+                Log.d("TAG", "GOTITEM!");
+
                 return item;
             }
         }
+        Log.d("TAG", "DIDNT!");
         return items.get(0);
     }
 }

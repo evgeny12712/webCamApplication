@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -58,6 +59,7 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
                 .inflate(R.layout.imageview_temporary_files, parent, false);
         initSelection(Items.getTemporaryFiles());
 
+        //parentActivity.setB
 
         return new ViewHolder(view);
     }
@@ -65,11 +67,12 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         toolbarSelection = (Toolbar) parentActivity.findViewById(R.id.toolbar_selection);
-        try {
-            holder.mImageView.setImageBitmap(Items.convertFileToThumbnailBitmap(Items.getTemporaryFiles().get(position).getFile(), GalleryActivity.fileTypes[0]));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            holder.mImageView.setImageBitmap(Items.convertFileToThumbnailBitmap(Items.getTemporaryFiles().get(position).getFile(), GalleryActivity.fileTypes[0]));
+            holder.mImageView.setImageDrawable(parentActivity.getResources().getDrawable(R.drawable.minimize_button));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         holder.mImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,7 +101,6 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
                     toolbarSelection.setVisibility(View.VISIBLE);
                     isSelectionState = true;
                     toggleSelection(position);
-                    //parentActivity.
                     for (int pos : getSelectedItems()) {
                         if (isSelected(pos)) {
                             holder.mImageViewSelected.setVisibility(View.VISIBLE);

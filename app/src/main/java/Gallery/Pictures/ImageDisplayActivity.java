@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -21,6 +22,7 @@ import com.example.webcamapplication.R;
 import java.io.File;
 
 import Gallery.GalleryActivity;
+import Gallery.Item;
 import Gallery.Items;
 import static Gallery.GalleryActivity.fileTypes;
 
@@ -37,7 +39,7 @@ public class ImageDisplayActivity extends AppCompatActivity {
     private String time;
     private Uri imageUri;
     private Context context;
-
+    private Item item;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,8 +92,8 @@ public class ImageDisplayActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        date = Items.getDateFromFile(Items.findItemByUri(Items.getImages(), imageUri).getFile()).split(",")[0];
-        time = Items.getDateFromFile(Items.findItemByUri(Items.getImages(), imageUri).getFile()).split(",")[1];
+        date = Items.findItemByUri(Items.getImages(), imageUri).getDate().split(",")[0];
+        time = Items.findItemByUri(Items.getImages(), imageUri).getDate().split(",")[1];
         textViewDate.setText(date);
         textViewTime.setText(time);
         if(imageView.getRotation() == 0 || imageView.getRotation() == 180)

@@ -2,9 +2,12 @@ package Gallery;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -20,6 +23,9 @@ import Gallery.Pictures.GalleryPicturesFragment;
 import Gallery.SavedFiles.GallerySavedFilesFragment;
 import MainWindow.MainActivity;
 import com.example.webcamapplication.R;
+
+import java.io.IOException;
+import java.util.List;
 
 public class GalleryActivity extends AppCompatActivity {
     private static final String TAG = "GalleryActivity";
@@ -41,6 +47,8 @@ public class GalleryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
 
+        Toast.makeText(this, "onCreate" , Toast.LENGTH_SHORT).show();
+
         btnHome = (Button)findViewById(R.id.btnHome);
         btnVideos = (Button)findViewById(R.id.btnVideos);
         btnSavedVideos = (Button) findViewById(R.id.btnSavedVideos);
@@ -55,8 +63,10 @@ public class GalleryActivity extends AppCompatActivity {
         fileTypes = getResources().getStringArray(R.array.fileTypes);
         setSupportActionBar(toolbar);
 
-        Items.loadFiles(getExternalFilesDir(Environment.DIRECTORY_MOVIES), fileTypes[0]);
-        Items.loadFiles(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileTypes[1]);
+                Items.loadFiles(getExternalFilesDir(Environment.DIRECTORY_MOVIES), fileTypes[0]);
+                Items.loadFiles(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileTypes[1]);
+                Items.loadFiles(getExternalFilesDir(Environment.DIRECTORY_PICTURES), fileTypes[2]);
+
         getIncomingIntent();
         btnHome.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,6 +109,8 @@ public class GalleryActivity extends AppCompatActivity {
 
     }
 
+
+
     public void switchToolbar() {
         if(toolbar.getVisibility() == View.VISIBLE) {
             toolbar.setVisibility(View.GONE);
@@ -109,7 +121,6 @@ public class GalleryActivity extends AppCompatActivity {
             selectionToolBar.setVisibility(View.GONE);
         }
     }
-
 
     public void setButtonPressed(String buttonName) {
         switch (buttonName) {
