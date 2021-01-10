@@ -55,4 +55,5 @@ public class GalleryTemporaryFilesFragment extends Fragment  {
         super.onActivityCreated(savedInstanceState);
     }
 
+
 }

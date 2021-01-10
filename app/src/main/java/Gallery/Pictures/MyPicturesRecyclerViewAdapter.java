@@ -31,7 +31,6 @@ public class MyPicturesRecyclerViewAdapter extends RecyclerView.Adapter<MyPictur
 
     public MyPicturesRecyclerViewAdapter(File dir, Context context) {
         mContext = context;
-        //Items.loadFiles(dir, GalleryActivity.fileTypes[2]);
     }
 
 

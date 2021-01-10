@@ -1,22 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.recyclerview.widget.RecyclerView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_height="match_parent"
+    android:id="@+id/list"
     android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:clickable="true"
-    android:id="@+id/linear_layout">
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        tools:context="Gallery.Gallery.TemporaryFiles.GalleryTemporaryFilesFragment"
-        tools:listitem="@layout/fragment_image">
-    </androidx.recyclerview.widget.RecyclerView>
-
-</LinearLayout>
+    android:layout_height="match_parent"
+    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+    tools:context="Gallery.Gallery.TemporaryFiles.TemporaryVideoDisplayActivity"
+    tools:listitem="@layout/imageview_temporary_files" />

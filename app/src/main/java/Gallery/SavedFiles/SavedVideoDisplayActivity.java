@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
 import android.util.Log;
 import android.view.View;
@@ -17,10 +18,15 @@ import android.widget.VideoView;
 
 import com.example.webcamapplication.R;
 
+import java.io.File;
+
 import Gallery.GalleryActivity;
 import Gallery.Items;
 
 import static Gallery.GalleryActivity.fileTypes;
+import static Gallery.Items.*;
+import static Gallery.Items.findItemByUri;
+import static Gallery.Items.getTemporaryFiles;
 
 public class SavedVideoDisplayActivity extends AppCompatActivity {
     private static final String TAG = "SavedVideoDisplayActivity";
@@ -28,6 +34,7 @@ public class SavedVideoDisplayActivity extends AppCompatActivity {
     private MediaController mediaController;
     private String videoPath;
     private Uri uri;
+    private File videoFile;
     private ImageButton backBtn;
     private Button btnDelete;
     private Button btnShare;
@@ -51,7 +58,8 @@ public class SavedVideoDisplayActivity extends AppCompatActivity {
         context = this;
 
         videoPath = getIncomingPath();
-        uri = Uri.parse(videoPath);
+        videoFile = new File(videoPath);
+        uri = Uri.fromFile(videoFile);
         videoView.setVideoURI(uri);
         mediaController.setAnchorView(videoView);
         videoView.setMediaController(mediaController);
@@ -69,7 +77,9 @@ public class SavedVideoDisplayActivity extends AppCompatActivity {
         btnShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_SEND);
+                uri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", videoFile);
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_SEND);
                 intent.setType("video/*");
                 intent.putExtra(Intent.EXTRA_SUBJECT, "Video share");
                 intent.putExtra(Intent.EXTRA_TEXT," WebCamApplication video");
@@ -81,7 +91,7 @@ public class SavedVideoDisplayActivity extends AppCompatActivity {
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Items.deleteFile(Items.findItemByUri(Items.getSavedFiles(), uri),
+                Items.deleteFile(findItemByUri(getSavedFiles(), uri),
                         context , fileTypes[1]);
             }
         });
@@ -90,14 +100,17 @@ public class SavedVideoDisplayActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        date = Items.getDateFromFile(Items.findItemByUri(Items.getSavedFiles(), uri).getFile()).split(",")[0];
-        time = Items.getDateFromFile(Items.findItemByUri(Items.getSavedFiles(), uri).getFile()).split(",")[1];
-
-        textViewDate.setText(date);
-        textViewTime.setText(time);
-
+        if (findItemByUri(getSavedFiles(), uri) != null) {
+            date = findItemByUri(getSavedFiles(), uri)
+                    .getDate()
+                    .split(",")[0];
+            time = findItemByUri(getSavedFiles(), uri)
+                    .getDate()
+                    .split(",")[1];
+            textViewDate.setText(date);
+            textViewTime.setText(time);
+        }
         videoView.start();
-
     }
 
     private String getIncomingPath() {

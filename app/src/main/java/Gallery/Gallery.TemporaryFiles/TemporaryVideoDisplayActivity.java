@@ -14,6 +14,7 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
 import com.example.webcamapplication.R;
 
@@ -25,11 +26,13 @@ import Gallery.Items;
 import Gallery.Item;
 
 import static Gallery.GalleryActivity.*;
+import static Gallery.Items.*;
 
 public class TemporaryVideoDisplayActivity extends AppCompatActivity {
     private VideoView videoView;
     private MediaController mediaController;
     private String videoPath;
+    private File videoFile;
     private Uri uri;
     private ImageButton backBtn;
     private Button btnSave;
@@ -55,7 +58,8 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
         context = this;
 
         videoPath = getIncomingVideoPath();
-        uri = Uri.parse(videoPath);
+        videoFile = new File(videoPath);
+        uri = Uri.fromFile(videoFile);
         videoView.setVideoURI(uri);
         mediaController.setAnchorView(videoView);
         videoView.setMediaController(mediaController);
@@ -73,12 +77,15 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
         btnShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_SEND);
+                uri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", videoFile);
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_SEND);
                 intent.setType("video/*");
                 intent.putExtra(Intent.EXTRA_SUBJECT, "Video share");
                 intent.putExtra(Intent.EXTRA_TEXT," WebCamApplication video");
                 intent.putExtra(Intent.EXTRA_STREAM, uri);
                 startActivity(intent);
+
             }
         });
 
@@ -86,9 +93,9 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 File saveDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
-                Item item = Items.findItemByUri(Items.getTemporaryFiles(), uri);
+                Item item = findItemByUri(getTemporaryFiles(), uri);
                 try {
-                    Items.saveFile(item, saveDir, context);
+                    saveFile(item, context);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -98,7 +105,7 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Items.deleteFile(Items.findItemByUri(Items.getTemporaryFiles(), uri),
+                Items.deleteFile(findItemByUri(getTemporaryFiles(), uri),
                         context, fileTypes[0]);
             }
         });
@@ -109,11 +116,17 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        date = Items.getDateFromFile(Items.findItemByUri(Items.getTemporaryFiles(), uri).getFile()).split(",")[0];
-        time = Items.getDateFromFile(Items.findItemByUri(Items.getTemporaryFiles(), uri).getFile()).split(",")[1];
+        if (findItemByUri(getTemporaryFiles(), uri) != null) {
+            date = findItemByUri(getTemporaryFiles(), uri)
+                    .getDate()
+                    .split(",")[0];
+            time = findItemByUri(getTemporaryFiles(), uri)
+                    .getDate()
+                    .split(",")[1];
+            textViewDate.setText(date);
+            textViewTime.setText(time);
+        }
 
-        textViewDate.setText(date);
-        textViewTime.setText(time);
         videoView.start();
     }
 

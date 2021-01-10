@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
@@ -26,6 +27,8 @@ import com.example.webcamapplication.R;
 
 import java.io.IOException;
 import java.util.List;
+
+import static Gallery.Items.*;
 
 public class GalleryActivity extends AppCompatActivity {
     private static final String TAG = "GalleryActivity";
@@ -54,6 +57,7 @@ public class GalleryActivity extends AppCompatActivity {
         btnSavedVideos = (Button) findViewById(R.id.btnSavedVideos);
         btnPictures = (Button) findViewById(R.id.btnPictures);
 
+
         temporaryFiles = new GalleryTemporaryFilesFragment();
         savedFiles = new GallerySavedFilesFragment();
         images = new GalleryPicturesFragment();
@@ -63,11 +67,16 @@ public class GalleryActivity extends AppCompatActivity {
         fileTypes = getResources().getStringArray(R.array.fileTypes);
         setSupportActionBar(toolbar);
 
-                Items.loadFiles(getExternalFilesDir(Environment.DIRECTORY_MOVIES), fileTypes[0]);
-                Items.loadFiles(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileTypes[1]);
-                Items.loadFiles(getExternalFilesDir(Environment.DIRECTORY_PICTURES), fileTypes[2]);
+        loadFiles(getExternalFilesDir(Environment.DIRECTORY_MOVIES), fileTypes[0]);
+        loadFiles(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileTypes[1]);
+        loadFiles(getExternalFilesDir(Environment.DIRECTORY_PICTURES), fileTypes[2]);
 
-        getIncomingIntent();
+        if(!getIncomingIntent()) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frameLayout, temporaryFiles)
+                    .commit();
+        }
+
         btnHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -115,10 +124,13 @@ public class GalleryActivity extends AppCompatActivity {
         if(toolbar.getVisibility() == View.VISIBLE) {
             toolbar.setVisibility(View.GONE);
             selectionToolBar.setVisibility(View.VISIBLE);
+            toolbar.setElevation(0);
+
         }
         else {
             toolbar.setVisibility(View.VISIBLE);
             selectionToolBar.setVisibility(View.GONE);
+            toolbar.setElevation(0);
         }
     }
 
@@ -142,40 +154,29 @@ public class GalleryActivity extends AppCompatActivity {
         }
     }
 
-    private void getIncomingIntent() {
+    private boolean getIncomingIntent() {
         if(getIntent().hasExtra("fragment")) {
             chosenFragment = getIntent().getStringExtra("fragment");
-            if(chosenFragment != null) {
-                Toast.makeText(this, "chosen : " + chosenFragment, Toast.LENGTH_SHORT).show();
                 setButtonPressed(chosenFragment);
                 switch (chosenFragment) {
                     case "temporary videos":
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.frameLayout, temporaryFiles)
                                 .commit();
-                        break;
+                        return true;
                     case "saved videos":
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.frameLayout, savedFiles)
                                 .commit();
-                        break;
+                        return true;
                     case "images":
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.frameLayout, images)
                                 .commit();
-                        break;
-                    default :
-                        getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.frameLayout, temporaryFiles)
-                                .commit();
-                        break;
+                        return true;
                 }
-            } else {
-                Toast.makeText(this, "isnull", Toast.LENGTH_SHORT).show();
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.frameLayout, temporaryFiles)
-                        .commit();
             }
-        }
+        return false;
     }
+
 }

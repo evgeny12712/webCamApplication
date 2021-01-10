@@ -12,7 +12,7 @@
 
     <include
         android:id="@+id/toolbar_selection"
-        layout = "@layout/toolbar_for_selection"
+        layout = "@layout/toolbar_selection"
         android:visibility="gone"/>
 
 

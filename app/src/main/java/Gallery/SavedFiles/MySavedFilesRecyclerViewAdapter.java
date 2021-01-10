@@ -2,6 +2,7 @@ package Gallery.SavedFiles;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.webcamapplication.R;
 
 import java.io.File;
@@ -47,11 +49,9 @@ public class MySavedFilesRecyclerViewAdapter extends RecyclerView.Adapter<MySave
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        try {
-            holder.mImageView.setImageBitmap(Items.convertFileToThumbnailBitmap(new File(Items.getSavedFiles().get(position).getUri().getPath()), GalleryActivity.fileTypes[1]));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Glide.with(mContext)
+                .load(Uri.fromFile(Items.getSavedFiles().get(position).getFile()))
+                .into(holder.mImageView);
 
         holder.mImageView.setOnClickListener(new View.OnClickListener() {
             @Override

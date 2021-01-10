@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:layout_margin="@dimen/gallery_margin"
+    android:scaleType="fitXY"
     android:layout_alignParentTop="true"
     android:layout_centerHorizontal="true" >
 
@@ -9,8 +11,7 @@
 <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/imageView"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
-    android:layout_margin="@dimen/gallery_margin"
+    android:layout_height="match_parent"
     android:scaleType="fitXY"
     android:background="@color/darkGrey"/>
 
@@ -18,10 +19,9 @@
     <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/imageViewSelected"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_margin="@dimen/gallery_margin"
-        android:scaleType="fitXY"
+        android:layout_height="match_parent"
         android:src="@mipmap/selected_v_icon_foreground"
+        android:scaleType="fitXY"
         android:visibility="invisible" />
 
 

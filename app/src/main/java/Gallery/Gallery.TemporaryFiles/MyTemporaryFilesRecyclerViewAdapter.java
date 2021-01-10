@@ -9,21 +9,27 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.webcamapplication.R;
 
 import java.io.IOException;
 
 import Gallery.GalleryActivity;
 import Gallery.Items;
+import Gallery.SelectedGalleryAdapter;
 
 import static Gallery.SelectedGalleryAdapter.*;
 
@@ -34,6 +40,12 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
     private boolean isSelectionState;
     private Toolbar toolbarSelection;
     private Activity parentActivity;
+    //selection toolbar
+    private TextView numOfSelectedItems;
+    private ImageButton selectionSave;
+    private ImageButton selectionShare;
+    private ImageButton selectionDelete;
+
     public MyTemporaryFilesRecyclerViewAdapter(Context context, Activity parentActivity) {
         mContext = context;
         isSelectionState = false;
@@ -67,12 +79,28 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         toolbarSelection = (Toolbar) parentActivity.findViewById(R.id.toolbar_selection);
-//        try {
-//            holder.mImageView.setImageBitmap(Items.convertFileToThumbnailBitmap(Items.getTemporaryFiles().get(position).getFile(), GalleryActivity.fileTypes[0]));
-            holder.mImageView.setImageDrawable(parentActivity.getResources().getDrawable(R.drawable.minimize_button));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        numOfSelectedItems = (TextView) parentActivity.findViewById(R.id.items_num);
+        selectionSave = (ImageButton) parentActivity.findViewById(R.id.selection_save);
+        selectionShare = (ImageButton) parentActivity.findViewById(R.id.selection_share);
+        selectionDelete = (ImageButton) parentActivity.findViewById(R.id.selection_delete);
+        toolbarSelection.setElevation(5);
+
+        Glide.with(mContext)
+                .load(Uri.fromFile(Items.getTemporaryFiles().get(position).getFile()))
+                .into(holder.mImageView);
+
+        selectionSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        saveSelectedItems(mContext, GalleryActivity.fileTypes[0]);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         holder.mImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,9 +109,11 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
                     if (isSelected(position)) {
                         toggleOffSelection(position);
                         holder.mImageViewSelected.setVisibility(View.GONE);
+                        numOfSelectedItems.setText("" + getSelectedItemCount());
                     } else if (!isSelected(position)) {
                         toggleSelection(position);
                         holder.mImageViewSelected.setVisibility(View.VISIBLE);
+                        numOfSelectedItems.setText("" + getSelectedItemCount());
                     }
                 }
                 else {
@@ -101,8 +131,9 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
                     toolbarSelection.setVisibility(View.VISIBLE);
                     isSelectionState = true;
                     toggleSelection(position);
-                    for (int pos : getSelectedItems()) {
-                        if (isSelected(pos)) {
+                    numOfSelectedItems.setText("" + getSelectedItemCount());
+                    for (int i = 0 ; i < getAllItems().size() ; i++) {
+                        if (isSelected(i)) {
                             holder.mImageViewSelected.setVisibility(View.VISIBLE);
                         }
                     }

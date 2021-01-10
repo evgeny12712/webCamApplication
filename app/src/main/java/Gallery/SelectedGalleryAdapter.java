@@ -1,10 +1,19 @@
 package Gallery;
 
+import android.content.Context;
+import android.os.Build;
+import android.util.Log;
 import android.util.SparseBooleanArray;
+import android.widget.Toast;
 
 
+import androidx.annotation.RequiresApi;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static Gallery.Items.*;
 
 public class SelectedGalleryAdapter {
     @SuppressWarnings("unused")
@@ -38,6 +47,9 @@ public class SelectedGalleryAdapter {
         }
     }
 
+    public static SparseBooleanArray getAllItems() {
+        return allItems;
+    }
     /**
      * Clear the selection status for all items
      */
@@ -65,11 +77,29 @@ public class SelectedGalleryAdapter {
      * Indicates the list of selected items
      * @return List of selected items ids
      */
-    public static List<Integer> getSelectedItems() {
-        List<Integer> items = new ArrayList<>(allItems.size());
-        for (int i = 0; i < allItems.size(); ++i) {
-            items.add(allItems.keyAt(i));
+    public static List<Item> getSelectedItems(String filesType) {
+        List<Item> items = new ArrayList<>();
+        for (int i = 0; i < allItems.size(); i++) {
+            if (isSelected(i)) {
+                switch (filesType) {
+                    case "temporary videos":
+                        items.add(getTemporaryFiles().get(i));
+                        break;
+                    case "saved videos":
+                        items.add(getSavedFiles().get(i));
+                        break;
+                    case "images":
+                        items.add(getImages().get(i));
+                        break;
+                }
+            }
         }
         return items;
+    }
+
+    public static void saveSelectedItems(Context context, String filesType) throws IOException {
+        for(Item item : getSelectedItems(filesType)) {
+            saveFile(item, context);
+        }
     }
 }

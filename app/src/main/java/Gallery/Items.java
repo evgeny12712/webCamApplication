@@ -7,6 +7,7 @@ import android.icu.util.LocaleData;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.CancellationSignal;
+import android.os.Environment;
 import android.util.Log;
 import android.util.Size;
 import android.widget.Toast;
@@ -24,10 +25,13 @@ import java.util.List;
 
 import Gallery.GalleryActivity;
 
+import static Gallery.GalleryActivity.fileTypes;
+
 public class Items {
     private static final List<Item> temporaryFiles = new ArrayList<>();
     private static final List<Item> savedFiles = new ArrayList<>();
     private static final List<Item> images = new ArrayList<>();
+    private static final String TAG = "Items";
 
     public static List<Item> getTemporaryFiles() {
         return temporaryFiles;
@@ -44,10 +48,16 @@ public class Items {
             File[] files = dir.listFiles();
             for (File file : files) {
                 Item newItem = new Item(file, filesType);
-                addItem(newItem, filesType);
+                if(findItemByUri(temporaryFiles, newItem.getUri()) != null
+                        || findItemByUri(savedFiles, newItem.getUri()) != null
+                        || findItemByUri(images, newItem.getUri()) != null) {
+                    continue;
+                }
+                else {
+                    addItem(newItem, filesType);
+                }
             }
         }
-
     }
 
     public static String getDateFromFile(File file) {
@@ -57,38 +67,33 @@ public class Items {
         return date + "," + time;
     }
 
-    //convert files to thumbnails and return bitmap
-    public static Bitmap convertFileToThumbnailBitmap(File file, String fileType) throws IOException {
-        Size mSize = new Size(10000000,10000000);
-        CancellationSignal ca = new CancellationSignal();
-        if(!fileType.equals("images")) {
-            Bitmap bitmapThumbnail = ThumbnailUtils.createVideoThumbnail(file, mSize, ca);
-            return bitmapThumbnail;
-        }
-        Bitmap bitmapThumbnail = ThumbnailUtils.createImageThumbnail(file, mSize, ca);
-        return bitmapThumbnail;
-    }
 
     private static void addItem(Item item, String filesType) {
         switch(filesType) {
             case "temporary videos" :
-                temporaryFiles.add(item);
-                break;
+                if(!Items.getTemporaryFiles().contains(item)) {
+                    temporaryFiles.add(item);
+                }
+                    break;
             case "saved videos" :
-                savedFiles.add(item);
+                if(!Items.getSavedFiles().contains(item)) {
+                    savedFiles.add(item);
+                }
                 break;
             case "images" :
-                images.add(item);
+                if(!Items.getImages().contains(item)) {
+                    images.add(item);
+                }
                 break;
         }
     }
 
-    public static void saveFile(Item itemSrc, File destDir, Context context) throws IOException {
+    public static void saveFile(Item itemSrc, Context context) throws IOException {
             // getting the file name
             String path = itemSrc.getFile().getPath();
             String fileName = path.substring(path.lastIndexOf("/") + 1);
 
-            File dst = new File(destDir, fileName);
+            File dst = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileName);
             try (InputStream in = new FileInputStream(itemSrc.getFile())) {
                 try (OutputStream out = new FileOutputStream(dst)) {
                     // Transfer bytes from in to out
@@ -119,21 +124,18 @@ public class Items {
                 break;
         }
         Intent intent = new Intent(context, GalleryActivity.class);
+        intent.putExtra("fragment", fileType);
         context.startActivity(intent);
     }
 
     public static Item findItemByUri(List<Item> items, Uri uri) {
-        Log.d("TAG", "HERE?");
-
         for(Item item : items) {
-            Log.d("TAG", "AND HERE?");
-            if (item.getUri().equals(uri)) {
-                Log.d("TAG", "GOTITEM!");
 
+            if (item.getUri().equals(uri)) {
                 return item;
             }
         }
-        Log.d("TAG", "DIDNT!");
-        return items.get(0);
+        return null;
     }
+
 }

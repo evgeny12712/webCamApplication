@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
 import com.example.webcamapplication.R;
 
@@ -27,6 +28,7 @@ import Gallery.Items;
 import static Gallery.GalleryActivity.fileTypes;
 
 public class ImageDisplayActivity extends AppCompatActivity {
+    private static final String TAG = "imageDisplayActivity";
     private ImageView imageView;
     private String imagePath;
     private File imageFile;
@@ -39,7 +41,6 @@ public class ImageDisplayActivity extends AppCompatActivity {
     private String time;
     private Uri imageUri;
     private Context context;
-    private Item item;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +55,7 @@ public class ImageDisplayActivity extends AppCompatActivity {
 
         imagePath = getIncomingImage();
         imageFile = new File(imagePath);
-        imageUri = Uri.parse(imageFile.getPath());
+        imageUri = Uri.fromFile(imageFile);
         Bitmap bitmap = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
         imageView.setImageBitmap(bitmap);
 
@@ -71,19 +72,19 @@ public class ImageDisplayActivity extends AppCompatActivity {
         btnShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.setType("image/*");
-                intent.putExtra(Intent.EXTRA_SUBJECT, "Image share");
-                intent.putExtra(Intent.EXTRA_TEXT,fileTypes[2]);
-                intent.putExtra(Intent.EXTRA_STREAM, imageUri);
-                startActivity(intent);
+                imageUri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", imageFile);
+                Intent shareIntent = new Intent();
+                shareIntent.setAction(Intent.ACTION_SEND);
+                shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
+                shareIntent.setType("image/*");
+                startActivity(Intent.createChooser(shareIntent, "image sharing"));
             }
         });
 
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Items.deleteFile(Items.findItemByUri(Items.getSavedFiles(), imageUri),
+                Items.deleteFile(Items.findItemByUri(Items.getImages(), imageUri),
                         context, fileTypes[2]);
             }
         });
@@ -92,10 +93,16 @@ public class ImageDisplayActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        date = Items.findItemByUri(Items.getImages(), imageUri).getDate().split(",")[0];
-        time = Items.findItemByUri(Items.getImages(), imageUri).getDate().split(",")[1];
-        textViewDate.setText(date);
-        textViewTime.setText(time);
+        if (Items.findItemByUri(Items.getImages(), imageUri) != null) {
+            date = Items.findItemByUri(Items.getImages(), imageUri)
+                    .getDate()
+                    .split(",")[0];
+            time = Items.findItemByUri(Items.getImages(), imageUri)
+                    .getDate()
+                    .split(",")[1];
+            textViewDate.setText(date);
+            textViewTime.setText(time);
+        }
         if(imageView.getRotation() == 0 || imageView.getRotation() == 180)
             imageView.setRotation(90);
     }
