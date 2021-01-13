@@ -67,9 +67,9 @@ public class GalleryActivity extends AppCompatActivity {
         fileTypes = getResources().getStringArray(R.array.fileTypes);
         setSupportActionBar(toolbar);
 
-        loadFiles(getExternalFilesDir(Environment.DIRECTORY_MOVIES), fileTypes[0]);
-        loadFiles(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileTypes[1]);
-        loadFiles(getExternalFilesDir(Environment.DIRECTORY_PICTURES), fileTypes[2]);
+        loadFiles(getExternalFilesDir(Environment.DIRECTORY_MOVIES), fileTypes[0], getApplicationContext());
+        loadFiles(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileTypes[1], getApplicationContext());
+        loadFiles(getExternalFilesDir(Environment.DIRECTORY_PICTURES), fileTypes[2], getApplicationContext());
 
         if(!getIncomingIntent()) {
             getSupportFragmentManager().beginTransaction()
@@ -118,21 +118,6 @@ public class GalleryActivity extends AppCompatActivity {
 
     }
 
-
-
-    public void switchToolbar() {
-        if(toolbar.getVisibility() == View.VISIBLE) {
-            toolbar.setVisibility(View.GONE);
-            selectionToolBar.setVisibility(View.VISIBLE);
-            toolbar.setElevation(0);
-
-        }
-        else {
-            toolbar.setVisibility(View.VISIBLE);
-            selectionToolBar.setVisibility(View.GONE);
-            toolbar.setElevation(0);
-        }
-    }
 
     public void setButtonPressed(String buttonName) {
         switch (buttonName) {

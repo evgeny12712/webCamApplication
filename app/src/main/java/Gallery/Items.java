@@ -12,6 +12,8 @@ import android.util.Log;
 import android.util.Size;
 import android.widget.Toast;
 
+import androidx.core.content.FileProvider;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -43,14 +45,15 @@ public class Items {
 
 
     //LOAD ALL FILES FROM A SPECIFIC DIRECTORY
-    public static void loadFiles(File dir, String filesType) {
+    public static void loadFiles(File dir, String filesType, Context context) {
+        Log.d(TAG, "exists");
         if(dir.exists()) {
             File[] files = dir.listFiles();
             for (File file : files) {
                 Item newItem = new Item(file, filesType);
-                if(findItemByUri(temporaryFiles, newItem.getUri()) != null
-                        || findItemByUri(savedFiles, newItem.getUri()) != null
-                        || findItemByUri(images, newItem.getUri()) != null) {
+                if(getItemByFile(temporaryFiles, file) != null
+                        || getItemByFile(savedFiles, file) != null
+                        || getItemByFile(images, file) != null) {
                     continue;
                 }
                 else {
@@ -104,15 +107,16 @@ public class Items {
                     }
                 }
             }
-        deleteFile(itemSrc, context, "temporary videos");
+        deleteFile(itemSrc, context, fileTypes[0]);
     }
 
     public static void deleteFile(Item item, Context context, String fileType) {
 
         switch(fileType) {
             case "temporary videos":
-                temporaryFiles.remove(item);
+                Log.d(TAG, item.getFile().getPath());
                 item.getFile().delete();
+                temporaryFiles.remove(item);
                 break;
             case "saved videos":
                 item.getFile().delete();
@@ -128,14 +132,38 @@ public class Items {
         context.startActivity(intent);
     }
 
-    public static Item findItemByUri(List<Item> items, Uri uri) {
+    public static Item findItemByUri(List<Item> items, Uri uri, Context context) {
+        Uri itemsUri;
         for(Item item : items) {
+            itemsUri = FileProvider.getUriForFile(context
+                    , context.getApplicationContext().getPackageName() + ".provider"
+                    , item.getFile());
+            if (itemsUri == uri) {
+                return item;
+            }
+        }
 
-            if (item.getUri().equals(uri)) {
+        return null;
+    }
+
+    public static Item getItemByFile(List<Item> items, File file) {
+        for(Item item : items) {
+            Log.d(TAG, item.getFile().getPath());
+            Log.d(TAG, file.getPath());
+
+            if(item.getFile().equals(file)) {
                 return item;
             }
         }
         return null;
+    }
+
+    public static List<File> getFilesFromItems(List<Item> items) {
+        List<File> files = new ArrayList<File>();
+        for(Item item : items) {
+            files.add(item.getFile());
+        }
+        return files;
     }
 
 }

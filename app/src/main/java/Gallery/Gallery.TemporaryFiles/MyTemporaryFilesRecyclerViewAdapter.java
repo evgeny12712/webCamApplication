@@ -25,12 +25,19 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.webcamapplication.R;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import Gallery.GalleryActivity;
+import Gallery.Item;
 import Gallery.Items;
 import Gallery.SelectedGalleryAdapter;
 
+import static Gallery.GalleryActivity.*;
+import static Gallery.Items.getFilesFromItems;
+import static Gallery.Items.getTemporaryFiles;
 import static Gallery.SelectedGalleryAdapter.*;
 
 public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<MyTemporaryFilesRecyclerViewAdapter.ViewHolder> {
@@ -38,14 +45,14 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
     private static final String TAG = "CustomAdapter";
     private Context mContext;
     private boolean isSelectionState;
-    private Toolbar toolbarSelection;
+    protected Toolbar toolbarSelection;
     private Activity parentActivity;
     //selection toolbar
     private TextView numOfSelectedItems;
     private ImageButton selectionSave;
     private ImageButton selectionShare;
     private ImageButton selectionDelete;
-
+    private ImageButton deselectButton;
     public MyTemporaryFilesRecyclerViewAdapter(Context context, Activity parentActivity) {
         mContext = context;
         isSelectionState = false;
@@ -69,9 +76,7 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.imageview_temporary_files, parent, false);
-        initSelection(Items.getTemporaryFiles());
-
-        //parentActivity.setB
+        initSelection(fileTypes[0]);
 
         return new ViewHolder(view);
     }
@@ -83,22 +88,52 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
         selectionSave = (ImageButton) parentActivity.findViewById(R.id.selection_save);
         selectionShare = (ImageButton) parentActivity.findViewById(R.id.selection_share);
         selectionDelete = (ImageButton) parentActivity.findViewById(R.id.selection_delete);
+        deselectButton = (ImageButton) parentActivity.findViewById(R.id.deselect_button);
         toolbarSelection.setElevation(5);
 
         Glide.with(mContext)
                 .load(Uri.fromFile(Items.getTemporaryFiles().get(position).getFile()))
                 .into(holder.mImageView);
-
+        holder.mImageViewSelected.setVisibility(View.GONE);
         selectionSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                        saveSelectedItems(mContext, GalleryActivity.fileTypes[0]);
+                        saveSelectedItems(mContext, fileTypes[0]);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+
+        selectionShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<File> files = getFilesFromItems(getSelectedItems(fileTypes[0]));
+                shareSelectedItems(files, mContext);
+            }
+        });
+
+        selectionDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<File> files = getFilesFromItems(getSelectedItems(fileTypes[0]));
+                deleteSelectedItems(files, mContext, getSelectedItems(fileTypes[0]));
+                isSelectionState = false;
+            }
+        });
+
+        deselectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toolbarSelection.setVisibility(View.GONE);
+                deselectButton.setVisibility(View.GONE);
+                isSelectionState = false;
+                clearSelection();
+                holder.mImageViewSelected.setVisibility(View.GONE);
+                notifyDataSetChanged();
             }
         });
 
@@ -118,7 +153,7 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
                 }
                 else {
                     Intent intent = new Intent(mContext, TemporaryVideoDisplayActivity.class);
-                    intent.putExtra(GalleryActivity.fileTypes[0], Items.getTemporaryFiles().get(position).getUri().getPath());
+                    intent.putExtra(fileTypes[0], Items.getTemporaryFiles().get(position).getUri().getPath());
                     mContext.startActivity(intent);
                 }
             }
@@ -132,6 +167,7 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
                     isSelectionState = true;
                     toggleSelection(position);
                     numOfSelectedItems.setText("" + getSelectedItemCount());
+                    deselectButton.setVisibility(View.VISIBLE);
                     for (int i = 0 ; i < getAllItems().size() ; i++) {
                         if (isSelected(i)) {
                             holder.mImageViewSelected.setVisibility(View.VISIBLE);
@@ -143,9 +179,11 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
         });
     }
 
+
     @Override
     public int getItemCount() {
         return Items.getTemporaryFiles().size();
     }
+
 
 }

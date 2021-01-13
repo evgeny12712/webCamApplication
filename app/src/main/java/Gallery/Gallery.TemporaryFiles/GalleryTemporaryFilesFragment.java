@@ -15,6 +15,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -46,6 +48,7 @@ public class GalleryTemporaryFilesFragment extends Fragment  {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new MyTemporaryFilesRecyclerViewAdapter(getContext(), parentActivity);
         mRecyclerView.setAdapter(mAdapter);
+        mAdapter.getItemCount();
         //getActivity().
         return view;
     }

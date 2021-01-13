@@ -84,7 +84,7 @@ public class ImageDisplayActivity extends AppCompatActivity {
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Items.deleteFile(Items.findItemByUri(Items.getImages(), imageUri),
+                Items.deleteFile(Items.findItemByUri(Items.getImages(), imageUri, context),
                         context, fileTypes[2]);
             }
         });
@@ -93,11 +93,11 @@ public class ImageDisplayActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (Items.findItemByUri(Items.getImages(), imageUri) != null) {
-            date = Items.findItemByUri(Items.getImages(), imageUri)
+        if (Items.findItemByUri(Items.getImages(), imageUri, context) != null) {
+            date = Items.findItemByUri(Items.getImages(), imageUri, context)
                     .getDate()
                     .split(",")[0];
-            time = Items.findItemByUri(Items.getImages(), imageUri)
+            time = Items.findItemByUri(Items.getImages(), imageUri, context)
                     .getDate()
                     .split(",")[1];
             textViewDate.setText(date);

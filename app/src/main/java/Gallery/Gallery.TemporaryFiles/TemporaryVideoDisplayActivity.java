@@ -92,8 +92,7 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                File saveDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
-                Item item = findItemByUri(getTemporaryFiles(), uri);
+                Item item = getItemByFile(getTemporaryFiles(), videoFile);
                 try {
                     saveFile(item, context);
                 } catch (IOException e) {
@@ -105,7 +104,7 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Items.deleteFile(findItemByUri(getTemporaryFiles(), uri),
+                Items.deleteFile(getItemByFile(getTemporaryFiles(), videoFile),
                         context, fileTypes[0]);
             }
         });
@@ -116,11 +115,11 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (findItemByUri(getTemporaryFiles(), uri) != null) {
-            date = findItemByUri(getTemporaryFiles(), uri)
+        if (getItemByFile(getTemporaryFiles(), videoFile) != null) {
+            date = getItemByFile(getTemporaryFiles(), videoFile)
                     .getDate()
                     .split(",")[0];
-            time = findItemByUri(getTemporaryFiles(), uri)
+            time = getItemByFile(getTemporaryFiles(), videoFile)
                     .getDate()
                     .split(",")[1];
             textViewDate.setText(date);

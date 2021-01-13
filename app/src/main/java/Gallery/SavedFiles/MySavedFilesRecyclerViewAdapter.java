@@ -28,7 +28,7 @@ public class MySavedFilesRecyclerViewAdapter extends RecyclerView.Adapter<MySave
 
     public MySavedFilesRecyclerViewAdapter(Context context, File filesDir) {
         mContext = context;
-        Items.loadFiles(filesDir, GalleryActivity.fileTypes[1]);
+        Items.loadFiles(filesDir, GalleryActivity.fileTypes[1], context);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

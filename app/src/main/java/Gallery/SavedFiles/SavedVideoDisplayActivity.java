@@ -91,7 +91,7 @@ public class SavedVideoDisplayActivity extends AppCompatActivity {
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Items.deleteFile(findItemByUri(getSavedFiles(), uri),
+                Items.deleteFile(findItemByUri(getSavedFiles(), uri, context),
                         context , fileTypes[1]);
             }
         });
@@ -100,11 +100,11 @@ public class SavedVideoDisplayActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (findItemByUri(getSavedFiles(), uri) != null) {
-            date = findItemByUri(getSavedFiles(), uri)
+        if (findItemByUri(getSavedFiles(), uri, context) != null) {
+            date = findItemByUri(getSavedFiles(), uri, context)
                     .getDate()
                     .split(",")[0];
-            time = findItemByUri(getSavedFiles(), uri)
+            time = findItemByUri(getSavedFiles(), uri, context)
                     .getDate()
                     .split(",")[1];
             textViewDate.setText(date);

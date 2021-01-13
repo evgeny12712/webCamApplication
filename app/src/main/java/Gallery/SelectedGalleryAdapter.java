@@ -1,6 +1,8 @@
 package Gallery;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -8,7 +10,9 @@ import android.widget.Toast;
 
 
 import androidx.annotation.RequiresApi;
+import androidx.core.content.FileProvider;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +45,19 @@ public class SelectedGalleryAdapter {
         allItems.setValueAt(position, false);
     }
 
-    public static void initSelection(List<Item> items) {
+    public static void initSelection(String filesType) {
+        List<Item> items = null;
+        switch(filesType) {
+            case "temporary videos" :
+                items = getTemporaryFiles();
+                break;
+            case "saved videos" :
+                items = getSavedFiles();
+                break;
+            case "images" :
+                items = getImages();
+                break;
+        }
         for(Item i : items) {
             allItems.append(items.indexOf(i), false);
         }
@@ -101,5 +117,29 @@ public class SelectedGalleryAdapter {
         for(Item item : getSelectedItems(filesType)) {
             saveFile(item, context);
         }
+        allItems.clear();
+        initSelection(filesType);
     }
+
+    public static void shareSelectedItems(List<File> files, Context context) {
+        ArrayList<Uri> uris = new ArrayList<>();
+        for(File file : files) {
+            uris.add(FileProvider.getUriForFile(context
+                    , context.getApplicationContext().getPackageName() + ".provider"
+                    , file));
+        }
+        Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+        intent.setType("video/*");
+        intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
+        context.startActivity(Intent.createChooser(intent, "How to share"));
+    }
+
+    public static void deleteSelectedItems(List<File> files, Context context, List<Item> items) {
+        for(File file : files) {
+            deleteFile(getItemByFile(items, file), context, items.get(0).getFileType());
+            initSelection(items.get(0).getFileType());
+        }
+    }
+
+
 }
