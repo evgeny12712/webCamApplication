@@ -2,9 +2,12 @@ package Gallery.Gallery.TemporaryFiles;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -13,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
@@ -108,8 +112,6 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
                         context, fileTypes[0]);
             }
         });
-
-
     }
 
     @Override
@@ -126,7 +128,33 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
             textViewTime.setText(time);
         }
 
+        int orientation = getResources().getConfiguration().orientation;
+        if(orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            videoView.setRotation(90);
+        } else {
+            videoView.setRotation(360);
+            Toast.makeText(context, "portrait", Toast.LENGTH_SHORT).show();
+        }
+        //videoView.setZOrderOnTop(true);
+        videoView.requestFocus();
         videoView.start();
+
+
+        Toast.makeText(context, "" + mediaController.getHeight(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "" + mediaController.getWidth(), Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            int deviceOrientation = getWindowManager().getDefaultDisplay().getRotation();
+
+        }
+        else if(newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+
+        }
     }
 
     private String getIncomingVideoPath() {

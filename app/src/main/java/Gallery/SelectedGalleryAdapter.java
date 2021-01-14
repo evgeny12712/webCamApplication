@@ -138,6 +138,7 @@ public class SelectedGalleryAdapter {
         for(File file : files) {
             deleteFile(getItemByFile(items, file), context, items.get(0).getFileType());
             initSelection(items.get(0).getFileType());
+            Log.d(TAG, getSelectedItemCount() + "");
         }
     }
 

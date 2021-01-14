@@ -6,6 +6,7 @@ import android.os.Build;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
+import android.widget.VideoView;
 
 import androidx.annotation.RequiresApi;
 
@@ -34,6 +35,8 @@ public class Functions {
         textureView.setTransform(matrix);
         return textureView;
     }
+
+
 
 
 }

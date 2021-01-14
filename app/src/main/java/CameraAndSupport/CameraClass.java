@@ -87,7 +87,6 @@ public class CameraClass extends AppCompatActivity {
     public String getmVideoFileName() {
         return mVideoFileName;
     }
-    public static File getmImageFolder() { return mImageFolder; }
     private static class CompareSizeByArea implements Comparator<Size> {
         //class to compare different resolutions by the preview
         @Override
@@ -142,9 +141,6 @@ public class CameraClass extends AppCompatActivity {
     //converting the camera sensor orientations to the device orientations
     private static int sensorToDeviceRotation(int cameraSensorOrientation, int deviceOrientation) {
         deviceOrientation = ORIENTATIONS.get(deviceOrientation); // getting the device orientation and converting it to real number.
-        Log.i("orientations", "sensorOrientation " + cameraSensorOrientation);
-        Log.i("device orientation", deviceOrientation + " deviceOrientation");
-        Log.i("Both", (cameraSensorOrientation + deviceOrientation + 360) % 360 + " Both");
         return (cameraSensorOrientation + deviceOrientation + 360) % 360;
     }
 
@@ -173,8 +169,6 @@ public class CameraClass extends AppCompatActivity {
             return choices[0];
         }
     }
-
-
 
     /////------------RECORDING-FUNCTIONS------------/////
 
@@ -211,37 +205,6 @@ public class CameraClass extends AppCompatActivity {
     }
 
 
-//    private void checkWriteStoragePermission() {
-//        //checking if our version is greater then marshmallow
-//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            //checking if we already got permission
-//            if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//                    == PackageManager.PERMISSION_GRANTED) {
-//                try {
-//                    //create file to save video
-//                    createVideoFileName();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                mMediaRecorder.start();
-//            } else {
-//                //showing message to the user if he decided to refuse to give permission
-//                if(shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-//                    Toast.makeText(this, "app needs to be able to save videos", Toast.LENGTH_SHORT).show();
-//                }
-//                //requesting the permission
-//                requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
-//                        REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION_RESULT);
-//            }
-//        } else {
-//            try {
-//                createVideoFileName();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            mMediaRecorder.start();
-//        }
-//    }
 
     //give camera permission to preview and save files
     @Override
@@ -282,7 +245,6 @@ public class CameraClass extends AppCompatActivity {
             mMediaRecorder.prepare();
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(this, "EXCEPT-PREPARE", Toast.LENGTH_SHORT).show();
         }
         return mMediaRecorder;
     }

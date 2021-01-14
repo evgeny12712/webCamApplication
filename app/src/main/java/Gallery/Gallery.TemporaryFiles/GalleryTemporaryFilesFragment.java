@@ -49,7 +49,6 @@ public class GalleryTemporaryFilesFragment extends Fragment  {
         mAdapter = new MyTemporaryFilesRecyclerViewAdapter(getContext(), parentActivity);
         mRecyclerView.setAdapter(mAdapter);
         mAdapter.getItemCount();
-        //getActivity().
         return view;
     }
 

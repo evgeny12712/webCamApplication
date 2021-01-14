@@ -46,7 +46,6 @@ public class Items {
 
     //LOAD ALL FILES FROM A SPECIFIC DIRECTORY
     public static void loadFiles(File dir, String filesType, Context context) {
-        Log.d(TAG, "exists");
         if(dir.exists()) {
             File[] files = dir.listFiles();
             for (File file : files) {
