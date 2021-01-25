@@ -65,7 +65,7 @@ public class  CameraRecordingFragment extends Fragment {
             //making sure that the camera does'nt reset when moving from landscape and portrait mode
             textureView = Functions.transformImage(textureView.getWidth(), textureView.getHeight(), deviceOrientation, camera.getPreviewSize(), textureView);
             mMediaRecorder = camera.setupMediaRecorder();
-            Toast.makeText(getContext(), "IN SURFACE LISTENER!!!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "" + camera.getmTotalRotation(), Toast.LENGTH_SHORT).show();
             connectCamera();
         }
 
@@ -88,7 +88,6 @@ public class  CameraRecordingFragment extends Fragment {
         @Override
         public void onOpened(@NonNull CameraDevice camera) {
             cameraDevice = camera;
-            Toast.makeText(getActivity().getApplicationContext(), "cameraOPENED!!!", Toast.LENGTH_SHORT).show();
             startRecord();
             mMediaRecorder.start();
         }
@@ -113,7 +112,6 @@ public class  CameraRecordingFragment extends Fragment {
     private Handler backgroundHandler;
 
     private MediaRecorder mMediaRecorder;
-    private Size mImageSize;
     private ImageReader mImageReader;
     private final ImageReader.OnImageAvailableListener mOnImageAvailableListener = new
             ImageReader.OnImageAvailableListener() {
@@ -169,7 +167,6 @@ public class  CameraRecordingFragment extends Fragment {
         isFirstTime = true;
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -195,6 +192,8 @@ public class  CameraRecordingFragment extends Fragment {
                 mMediaRecorder = camera.setupMediaRecorder();
                 mImageReader = camera.getmImageReader();
                 mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, backgroundHandler);
+                Toast.makeText(getContext(), "" + camera.getmTotalRotation(), Toast.LENGTH_SHORT).show();
+
                 connectCamera();
             } else {
                 textureView.setSurfaceTextureListener(surfaceTextureListener);
@@ -205,7 +204,6 @@ public class  CameraRecordingFragment extends Fragment {
         // Inflate the layout for this fragment
         return v;
     }
-
 
     @Override
     public void onDestroy() {

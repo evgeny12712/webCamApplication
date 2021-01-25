@@ -10,8 +10,8 @@
     android:id="@+id/linear_Layout_gallery_background">
 
     <include
-        android:id="@+id/toolbar_selection"
-        layout = "@layout/toolbar_selection"
+        android:id="@+id/toolbar_temporary_selection"
+        layout = "@layout/toolbar_temporary_selection"
         android:visibility="gone"/>
 
         <FrameLayout

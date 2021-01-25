@@ -1,5 +1,7 @@
 package Gallery.Pictures;
 
+import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
@@ -14,6 +16,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.webcamapplication.R;
+import com.google.android.exoplayer2.source.MediaSource;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +25,7 @@ import java.util.List;
 
 import Gallery.GalleryActivity;
 import Gallery.Items;
+import Gallery.SavedFiles.MySavedFilesRecyclerViewAdapter;
 
 public class GalleryPicturesFragment extends Fragment  {
 
@@ -30,10 +34,14 @@ public class GalleryPicturesFragment extends Fragment  {
     protected RecyclerView mRecyclerView;
     protected MyPicturesRecyclerViewAdapter mAdapter;
     protected RecyclerView.LayoutManager mLayoutManager;
+    protected Activity parentActivity;
+    protected static Context context;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        parentActivity = (GalleryActivity) getActivity();
+        context = this.getContext();
     }
 
     @Override
@@ -44,8 +52,9 @@ public class GalleryPicturesFragment extends Fragment  {
         mRecyclerView = (RecyclerView) view.findViewById(R.id.list);
         mLayoutManager = new GridLayoutManager(getActivity(), 3);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new MyPicturesRecyclerViewAdapter(getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES), getContext());
+        mAdapter = new MyPicturesRecyclerViewAdapter(context, parentActivity);
         mRecyclerView.setAdapter(mAdapter);
+        mAdapter.getItemCount();
         return view;
     }
 

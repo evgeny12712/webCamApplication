@@ -27,13 +27,14 @@
         <activity android:name="Settings.NotificationsDialog" />
         <activity android:name="Settings.FragmentationDialog" />
         <activity android:name="Settings.HowToStartDialog" />
-        <activity android:name="Gallery.Gallery.TemporaryFiles.TemporaryVideoDisplayActivity" />
         <activity android:name="Settings.SoundDialog" />
         <activity android:name="Settings.SettingsActivity" />
         <activity android:name="Settings.ResetFrequencyDialog" />
         <activity android:name="Gallery.ImageAdapter" />
         <activity android:name="Gallery.GalleryActivity" />
         <activity android:name="Gallery.Pictures.ImageDisplayActivity"/>
+        <activity android:name="Gallery.Gallery.TemporaryFiles.TemporaryVideoDisplayActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"/>
         <activity
             android:name="Driving.DrivingActivity"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden" />

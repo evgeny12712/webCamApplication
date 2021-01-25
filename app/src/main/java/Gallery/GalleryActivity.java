@@ -2,17 +2,10 @@ package Gallery;
 
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
@@ -24,9 +17,6 @@ import Gallery.Pictures.GalleryPicturesFragment;
 import Gallery.SavedFiles.GallerySavedFilesFragment;
 import MainWindow.MainActivity;
 import com.example.webcamapplication.R;
-
-import java.io.IOException;
-import java.util.List;
 
 import static Gallery.Items.*;
 
@@ -63,7 +53,7 @@ public class GalleryActivity extends AppCompatActivity {
         images = new GalleryPicturesFragment();
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        selectionToolBar = (Toolbar) findViewById(R.id.toolbar_selection);
+        selectionToolBar = (Toolbar) findViewById(R.id.toolbar_temporary_selection);
         fileTypes = getResources().getStringArray(R.array.fileTypes);
         setSupportActionBar(toolbar);
 

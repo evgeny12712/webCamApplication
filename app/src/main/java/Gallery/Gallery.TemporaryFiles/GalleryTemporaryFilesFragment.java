@@ -1,29 +1,30 @@
 package Gallery.Gallery.TemporaryFiles;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.view.MotionEventCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.example.webcamapplication.R;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.ProgressiveMediaSource;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import Gallery.GalleryActivity;
-import Gallery.Items;
+import Gallery.Item;
+
+import static Gallery.Items.*;
 
 public class GalleryTemporaryFilesFragment extends Fragment  {
 
@@ -33,10 +34,16 @@ public class GalleryTemporaryFilesFragment extends Fragment  {
     protected MyTemporaryFilesRecyclerViewAdapter mAdapter;
     protected RecyclerView.LayoutManager mLayoutManager;
     protected Activity parentActivity;
+    protected static List<MediaSource> mediaSources;
+    protected static Context context;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         parentActivity = (GalleryActivity) getActivity();
+        context = this.getContext();
+        mediaSources = new ArrayList<MediaSource>();
+        createMediaSources();
     }
 
     @Override
@@ -55,6 +62,13 @@ public class GalleryTemporaryFilesFragment extends Fragment  {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+    }
+
+    public void createMediaSources() {
+        for(Item item : getTemporaryFiles()) {
+            DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(context, "sample");
+            mediaSources.add(new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(item.getUri()));
+        }
     }
 
 

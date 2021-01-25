@@ -1,46 +1,71 @@
 package Gallery.Pictures;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.webcamapplication.R;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
-import Gallery.GalleryActivity;
 import Gallery.Items;
+import Gallery.SavedFiles.SavedVideoDisplayActivity;
+
+import static Gallery.GalleryActivity.fileTypes;
+import static Gallery.Items.getFilesFromItems;
+import static Gallery.SelectedGalleryAdapter.clearSelection;
+import static Gallery.SelectedGalleryAdapter.deleteSelectedItems;
+import static Gallery.SelectedGalleryAdapter.getAllItems;
+import static Gallery.SelectedGalleryAdapter.getSelectedItemCount;
+import static Gallery.SelectedGalleryAdapter.getSelectedItems;
+import static Gallery.SelectedGalleryAdapter.isSelected;
+import static Gallery.SelectedGalleryAdapter.shareSelectedItems;
+import static Gallery.SelectedGalleryAdapter.toggleOffSelection;
+import static Gallery.SelectedGalleryAdapter.toggleSelection;
 
 public class MyPicturesRecyclerViewAdapter extends RecyclerView.Adapter<MyPicturesRecyclerViewAdapter.ViewHolder> {
 
     private static final String TAG = "CustomImagesAdapter";
     private Context mContext;
+    private boolean isSelectionState;
+    protected Toolbar toolbarSelection;
+    private Activity parentActivity;
+    //selection toolbar
+    private TextView numOfSelectedItems;
+    private ImageButton selectionShare;
+    private ImageButton selectionDelete;
+    private ImageButton deselectButton;
 
-    public MyPicturesRecyclerViewAdapter(File dir, Context context) {
+
+    public MyPicturesRecyclerViewAdapter(Context context, Activity parentActivity) {
         mContext = context;
-    }
+        isSelectionState = false;
+        this.parentActivity = parentActivity;
 
+    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView mImageView;
+        public ImageView mImageViewSelected;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             mImageView = (ImageView) itemView.findViewById(R.id.imageView);
+            mImageViewSelected = (ImageView) itemView.findViewById(R.id.imageViewSelected);
         }
-
     }
 
 
@@ -54,16 +79,89 @@ public class MyPicturesRecyclerViewAdapter extends RecyclerView.Adapter<MyPictur
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
+        toolbarSelection = (Toolbar) parentActivity.findViewById(R.id.toolbar_selection);
+        numOfSelectedItems = (TextView) parentActivity.findViewById(R.id.items_num);
+        selectionShare = (ImageButton) parentActivity.findViewById(R.id.selection_share);
+        selectionDelete = (ImageButton) parentActivity.findViewById(R.id.selection_delete);
+        deselectButton = (ImageButton) parentActivity.findViewById(R.id.deselect_button);
+        toolbarSelection.setElevation(5);
+
         Glide.with(mContext)
                 .load(Uri.fromFile(Items.getImages().get(position).getFile()))
                 .into(holder.mImageView);
 
+
+        holder.mImageViewSelected.setVisibility(View.GONE);
+
+
+        selectionShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<File> files = getFilesFromItems(getSelectedItems(fileTypes[2]));
+                shareSelectedItems(files, mContext);
+            }
+        });
+
+        selectionDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<File> files = getFilesFromItems(getSelectedItems(fileTypes[2]));
+                deleteSelectedItems(files, mContext, getSelectedItems(fileTypes[2]));
+                isSelectionState = false;
+            }
+        });
+
+        deselectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toolbarSelection.setVisibility(View.GONE);
+                deselectButton.setVisibility(View.GONE);
+                isSelectionState = false;
+                clearSelection();
+                holder.mImageViewSelected.setVisibility(View.GONE);
+                notifyDataSetChanged();
+            }
+        });
+
         holder.mImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, ImageDisplayActivity.class);
-                intent.putExtra(GalleryActivity.fileTypes[2], Items.getImages().get(position).getFile().getPath());
-                mContext.startActivity(intent);
+                if(isSelectionState) {
+                    if (isSelected(position)) {
+                        toggleOffSelection(position);
+                        holder.mImageViewSelected.setVisibility(View.GONE);
+                        numOfSelectedItems.setText("" + getSelectedItemCount());
+                    } else if (!isSelected(position)) {
+                        toggleSelection(position);
+                        holder.mImageViewSelected.setVisibility(View.VISIBLE);
+                        numOfSelectedItems.setText("" + getSelectedItemCount());
+                    }
+                }
+                else {
+                    Intent intent = new Intent(mContext, SavedVideoDisplayActivity.class);
+                    intent.putExtra(fileTypes[2], position);
+                    mContext.startActivity(intent);
+                }
+            }
+        });
+
+        holder.mImageView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (!isSelectionState) {
+                    toolbarSelection.setVisibility(View.VISIBLE);
+                    isSelectionState = true;
+                    toggleSelection(position);
+                    numOfSelectedItems.setText("" + getSelectedItemCount());
+                    Toast.makeText(mContext, "" + numOfSelectedItems.getText(), Toast.LENGTH_SHORT).show();
+                    deselectButton.setVisibility(View.VISIBLE);
+                    for (int i = 0 ; i < getAllItems().size() ; i++) {
+                        if (isSelected(i)) {
+                            holder.mImageViewSelected.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+                return true;
             }
         });
     }

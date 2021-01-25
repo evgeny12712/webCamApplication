@@ -44,16 +44,16 @@ import java.util.List;
 public class CameraClass extends AppCompatActivity {
     private static final int REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION_RESULT = 1;
     private static final int REQUEST_CAMERA_PERMISSION_RESULT = 0;
+    private static final String TAG = "CameraClass";
 
     private CameraDevice cameraDevice;
 
     private String mCameraId;
     private Size mPreviewSize;
-    private Size mVideoSize;
     private Size mImageSize;
     private ImageReader mImageReader;
     private MediaRecorder mMediaRecorder;
-    private int mTotalRotation;
+    private static int mTotalRotation;
     private CaptureRequest.Builder mCaptureRequestBuilder;
 
     private File mVideoFolder; //file path
@@ -80,7 +80,7 @@ public class CameraClass extends AppCompatActivity {
         return mPreviewSize;
     }
     public String getmImageFileName() { return mImageFileName; }
-    public int getmTotalRotation() {return mTotalRotation;}
+    public static int getmTotalRotation() {return mTotalRotation;}
     public ImageReader getmImageReader() {
         return mImageReader;
     }
@@ -110,6 +110,7 @@ public class CameraClass extends AppCompatActivity {
                 StreamConfigurationMap map = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                 // getting the rotation of the sensor
                 mTotalRotation = sensorToDeviceRotation(cameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION), deviceOrientation);
+                Log.d(TAG, mTotalRotation + "total rotation");
                 boolean swapRotation = mTotalRotation == 90 || mTotalRotation == 270; //check is the phone is landscape mode
                 int rotatedWidth = width;
                 int rotatedHeight = height;

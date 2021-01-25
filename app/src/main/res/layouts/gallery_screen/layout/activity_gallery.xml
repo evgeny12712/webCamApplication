@@ -11,6 +11,11 @@
         android:visibility="visible"/>
 
     <include
+        android:id="@+id/toolbar_temporary_selection"
+        layout = "@layout/toolbar_temporary_selection"
+        android:visibility="gone"/>
+
+    <include
         android:id="@+id/toolbar_selection"
         layout = "@layout/toolbar_selection"
         android:visibility="gone"/>

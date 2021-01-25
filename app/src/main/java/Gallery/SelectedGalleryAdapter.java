@@ -38,6 +38,7 @@ public class SelectedGalleryAdapter {
      * Toggle the selection status of the item at a given position
      * @param position Position of the item to toggle the selection status for
      */
+
     public static void toggleSelection(int position) {
         allItems.setValueAt(position, true);
     }

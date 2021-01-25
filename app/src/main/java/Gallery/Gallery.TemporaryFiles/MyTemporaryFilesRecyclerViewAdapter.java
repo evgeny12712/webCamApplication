@@ -2,42 +2,31 @@ package Gallery.Gallery.TemporaryFiles;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.webcamapplication.R;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-import Gallery.GalleryActivity;
-import Gallery.Item;
 import Gallery.Items;
-import Gallery.SelectedGalleryAdapter;
 
 import static Gallery.GalleryActivity.*;
 import static Gallery.Items.getFilesFromItems;
-import static Gallery.Items.getTemporaryFiles;
 import static Gallery.SelectedGalleryAdapter.*;
 
 public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<MyTemporaryFilesRecyclerViewAdapter.ViewHolder> {
@@ -83,17 +72,19 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        toolbarSelection = (Toolbar) parentActivity.findViewById(R.id.toolbar_selection);
-        numOfSelectedItems = (TextView) parentActivity.findViewById(R.id.items_num);
-        selectionSave = (ImageButton) parentActivity.findViewById(R.id.selection_save);
-        selectionShare = (ImageButton) parentActivity.findViewById(R.id.selection_share);
-        selectionDelete = (ImageButton) parentActivity.findViewById(R.id.selection_delete);
+        toolbarSelection = (Toolbar) parentActivity.findViewById(R.id.toolbar_temporary_selection);
+        numOfSelectedItems = (TextView) parentActivity.findViewById(R.id.items_temporary_num);
+        selectionSave = (ImageButton) parentActivity.findViewById(R.id.selection_temporary_save);
+        selectionShare = (ImageButton) parentActivity.findViewById(R.id.selection_temporary_share);
+        selectionDelete = (ImageButton) parentActivity.findViewById(R.id.selection_temporary_delete);
         deselectButton = (ImageButton) parentActivity.findViewById(R.id.deselect_button);
         toolbarSelection.setElevation(5);
 
         Glide.with(mContext)
                 .load(Uri.fromFile(Items.getTemporaryFiles().get(position).getFile()))
                 .into(holder.mImageView);
+
+
         holder.mImageViewSelected.setVisibility(View.GONE);
         selectionSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,7 +144,7 @@ public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<My
                 }
                 else {
                     Intent intent = new Intent(mContext, TemporaryVideoDisplayActivity.class);
-                    intent.putExtra(fileTypes[0], Items.getTemporaryFiles().get(position).getUri().getPath());
+                    intent.putExtra(fileTypes[0], position);
                     mContext.startActivity(intent);
                 }
             }
