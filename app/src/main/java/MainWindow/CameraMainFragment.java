@@ -70,7 +70,6 @@ public class CameraMainFragment extends Fragment {
         @Override
         public void onOpened(@NonNull CameraDevice camera) {
             cameraDevice = camera;
-            Toast.makeText(getContext(), "CameraConnectionDONE!", Toast.LENGTH_LONG).show();
             startPreview(); //staring the preview
         }
 

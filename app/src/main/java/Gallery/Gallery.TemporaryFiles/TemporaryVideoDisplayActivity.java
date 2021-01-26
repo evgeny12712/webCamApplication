@@ -151,6 +151,7 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
 
             }
         });
+
     }
 
     @Override
@@ -201,5 +202,14 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
         videoPlayer.setRepeatMode(Player.REPEAT_MODE_ONE);
         //preparing the video player with the list
         videoPlayer.prepare(concatenatingMediaSource);
+    }
+
+    //Make back button on navigation bar go back to the gallery and not to the last file played
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(context, GalleryActivity.class);
+        intent.putExtra("fragment", fileTypes[0]);
+        context.startActivity(intent);
     }
 }

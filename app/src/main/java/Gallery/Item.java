@@ -35,11 +35,4 @@ public class Item {
     public void setUri(Uri uri) {
         this.uri = uri;
     }
-    public void setDate(String date) {
-        this.date = date;
-    }
-    public void setFileType(String fileType) {
-        this.fileType = fileType;
-    }
-
 }

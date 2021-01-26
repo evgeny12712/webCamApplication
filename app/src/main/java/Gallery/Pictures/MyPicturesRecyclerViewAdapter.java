@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
@@ -27,6 +26,7 @@ import Gallery.SavedFiles.SavedVideoDisplayActivity;
 
 import static Gallery.GalleryActivity.fileTypes;
 import static Gallery.Items.getFilesFromItems;
+import static Gallery.Items.getImages;
 import static Gallery.SelectedGalleryAdapter.clearSelection;
 import static Gallery.SelectedGalleryAdapter.deleteSelectedItems;
 import static Gallery.SelectedGalleryAdapter.getAllItems;
@@ -138,8 +138,8 @@ public class MyPicturesRecyclerViewAdapter extends RecyclerView.Adapter<MyPictur
                     }
                 }
                 else {
-                    Intent intent = new Intent(mContext, SavedVideoDisplayActivity.class);
-                    intent.putExtra(fileTypes[2], position);
+                    Intent intent = new Intent(mContext, ImageDisplayActivity.class);
+                    intent.putExtra(fileTypes[2], getImages().get(position).getFile().getPath());
                     mContext.startActivity(intent);
                 }
             }
@@ -153,7 +153,6 @@ public class MyPicturesRecyclerViewAdapter extends RecyclerView.Adapter<MyPictur
                     isSelectionState = true;
                     toggleSelection(position);
                     numOfSelectedItems.setText("" + getSelectedItemCount());
-                    Toast.makeText(mContext, "" + numOfSelectedItems.getText(), Toast.LENGTH_SHORT).show();
                     deselectButton.setVisibility(View.VISIBLE);
                     for (int i = 0 ; i < getAllItems().size() ; i++) {
                         if (isSelected(i)) {

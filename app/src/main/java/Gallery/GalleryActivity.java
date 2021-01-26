@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,8 +38,6 @@ public class GalleryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
-
-        Toast.makeText(this, "onCreate" , Toast.LENGTH_SHORT).show();
 
         btnHome = (Button)findViewById(R.id.btnHome);
         btnVideos = (Button)findViewById(R.id.btnVideos);

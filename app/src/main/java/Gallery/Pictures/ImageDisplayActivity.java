@@ -13,7 +13,6 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
@@ -41,6 +40,7 @@ public class ImageDisplayActivity extends AppCompatActivity {
     private String time;
     private Uri imageUri;
     private Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,13 +93,10 @@ public class ImageDisplayActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (Items.findItemByUri(Items.getImages(), imageUri, context) != null) {
-            date = Items.findItemByUri(Items.getImages(), imageUri, context)
-                    .getDate()
-                    .split(",")[0];
-            time = Items.findItemByUri(Items.getImages(), imageUri, context)
-                    .getDate()
-                    .split(",")[1];
+        if (Items.getItemByFile(Items.getImages(), imageFile) != null) {
+            Item item = Items.getItemByFile(Items.getImages(), imageFile);
+            date = item.getDate().split(",")[0];
+            time = item.getDate().split(",")[1];
             textViewDate.setText(date);
             textViewTime.setText(time);
         }
@@ -112,5 +109,14 @@ public class ImageDisplayActivity extends AppCompatActivity {
             return getIntent().getStringExtra(fileTypes[2]);
         }
         return null;
+    }
+
+    //Make back button on navigation bar go back to the gallery and not to the last file played
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(context, GalleryActivity.class);
+        intent.putExtra("fragment", fileTypes[2]);
+        context.startActivity(intent);
     }
 }

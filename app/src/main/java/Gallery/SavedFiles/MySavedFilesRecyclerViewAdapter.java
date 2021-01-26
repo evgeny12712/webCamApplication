@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
@@ -152,7 +151,6 @@ public class MySavedFilesRecyclerViewAdapter extends RecyclerView.Adapter<MySave
                     isSelectionState = true;
                     toggleSelection(position);
                     numOfSelectedItems.setText("" + getSelectedItemCount());
-                    Toast.makeText(mContext, "" + numOfSelectedItems.getText(), Toast.LENGTH_SHORT).show();
                     deselectButton.setVisibility(View.VISIBLE);
                     for (int i = 0 ; i < getAllItems().size() ; i++) {
                         if (isSelected(i)) {

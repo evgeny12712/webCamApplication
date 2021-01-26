@@ -195,4 +195,13 @@ public class SavedVideoDisplayActivity extends AppCompatActivity {
         //preparing the video player with the list
         videoPlayer.prepare(concatenatingMediaSource);
     }
+
+    //Make back button on navigation bar go back to the gallery and not to the last file played
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(context, GalleryActivity.class);
+        intent.putExtra("fragment", fileTypes[1]);
+        context.startActivity(intent);
+    }
 }
