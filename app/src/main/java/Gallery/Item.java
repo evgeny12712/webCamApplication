@@ -12,7 +12,6 @@ public class Item {
     private String date;
     private File file;
     String fileType;
-    private Bitmap thumbnailBitmap;
 
     public Item(File file, String fileType) {
         this.file = file;

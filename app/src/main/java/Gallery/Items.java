@@ -66,6 +66,7 @@ public class Items {
         Date lastModDate = new Date(file.lastModified());
         String date = DateFormat.getDateInstance().format(lastModDate);
         String time = DateFormat.getTimeInstance().format(lastModDate);
+
         return date + "," + time;
     }
 
@@ -165,4 +166,28 @@ public class Items {
         return files;
     }
 
+    public static File getOldestItem(String fileType) {
+        List<Item> items = temporaryFiles;
+        String currentCompare;
+        String dateTime;
+        // check which of the items we want to get
+        switch(fileType) {
+            case "temporary videos":
+                items = temporaryFiles;
+                break;
+            case "saved videos":
+                items = savedFiles;
+                break;
+            case "images":
+                items = images;
+                break;
+        }
+
+        //go through all items
+        for(Item item : items) {
+            //compare year, if equal continue to month, day, hour, minutes, seconds
+            dateTime = item.getDate();
+        }
+        return items.get(0).getFile();
+    }
 }
