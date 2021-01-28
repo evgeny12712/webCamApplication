@@ -1,5 +1,8 @@
 package Gallery;
 
+import java.io.File;
+import java.util.List;
+
 public class Dates {
     String dateTime;
     String date;
@@ -54,36 +57,80 @@ public class Dates {
         return Integer.parseInt(date.split(":")[2]);
     }
 
-
-
     private static int getNumericMonth(String monthName) {
         int num;
-        switch(monthName) {
-            case "Jan" :
+        switch (monthName) {
+            case "Jan":
                 return 1;
-            case "Fed" :
+            case "Fed":
                 return 2;
-            case "Mar" :
+            case "Mar":
                 return 3;
-            case "Apr" :
+            case "Apr":
                 return 4;
-            case "May" :
+            case "May":
                 return 5;
-            case "jun" :
+            case "jun":
                 return 6;
-            case "jul" :
+            case "jul":
                 return 7;
-            case "Aug" :
+            case "Aug":
                 return 8;
-            case "Sept" :
+            case "Sept":
                 return 9;
-            case "Oct" :
+            case "Oct":
                 return 10;
-            case "Nov" :
+            case "Nov":
                 num = 11;
-            case "Dec" :
+            case "Dec":
                 num = 12;
         }
         return 0;
     }
+
+
+    public static File getOldestItem(String fileType) {
+        List<Item> items = Items.getTemporaryFiles();
+        String currentCompare;
+        String dateTime;
+        // check which of the items we want to get
+        switch (fileType) {
+            case "temporary videos":
+                items = Items.getTemporaryFiles();
+                break;
+            case "saved videos":
+                items = Items.getSavedFiles();
+                break;
+            case "images":
+                items = Items.getImages();
+                break;
+        }
+
+        //go through all items
+        for (Item item : items) {
+            //compare year, if equal continue to month, day, hour, minutes, seconds
+            int year = getYear(item.getDate());
+
+        }
+        return items.get(0).getFile();
+    }
+
+//    public static List<File> getEqualItems(List<Item> items) {
+//        int min = getYear(items.get(0).getDate());
+//        Item minItem = items.get(0);
+//
+//        for (Item item : items) {
+//            if (getYear(item.getDate()) <= min) {
+//                min = getYear(item.getDate());
+//                minItem = item;
+//            }
+//        }
+//        for (Item item : items) {
+//            if (getYear(item.getDate()) == min) {
+//
+//            }
+//        }
+//
+//
+//    }
 }

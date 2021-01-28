@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,6 +20,10 @@ import com.example.webcamapplication.R;
 
 import Driving.DrivingActivity;
 import Gallery.GalleryActivity;
+import Gallery.Items;
+
+import static Gallery.GalleryActivity.*;
+import static Gallery.Items.loadFiles;
 
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -27,12 +32,18 @@ public class MainActivity extends AppCompatActivity {
         private ImageButton startBtn;
         private ImageButton galleryBtn;
         private ImageButton settingsBtn;
+        public static String[] fileTypes;
+
 
     @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_main);
+            fileTypes = getResources().getStringArray(R.array.fileTypes);
 
+            loadFiles(getExternalFilesDir(Environment.DIRECTORY_MOVIES), fileTypes[0], getApplicationContext());
+            loadFiles(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileTypes[1], getApplicationContext());
+            loadFiles(getExternalFilesDir(Environment.DIRECTORY_PICTURES), fileTypes[2], getApplicationContext());
 
 //            cameraMainPreviewFragment = (CameraMainPreviewFragment) getSupportFragmentManager().findFragmentById(R.id.cameraPreviewFragment);
             startBtn = (ImageButton) findViewById(R.id.btnStart);
