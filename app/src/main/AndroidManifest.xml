@@ -29,7 +29,7 @@
         <activity android:name="Settings.HowToStartDialog" />
         <activity android:name="Settings.SoundDialog" />
         <activity android:name="Settings.SettingsActivity" />
-        <activity android:name="Settings.ResetFrequencyDialog" />
+        <activity android:name="Settings.numOfFilesDialog" />
         <activity android:name="Gallery.ImageAdapter" />
         <activity android:name="Gallery.GalleryActivity" />
         <activity android:name="Gallery.Pictures.ImageDisplayActivity"/>

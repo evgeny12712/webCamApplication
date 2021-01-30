@@ -1,5 +1,6 @@
 package Settings;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -10,11 +11,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.webcamapplication.R;
 
 public class SettingsActivity extends AppCompatActivity {
-    Button howToStartBtn;
-    Button resetFreqBtn;
-    Button fragmentationSizeBtn;
-    Button notificationsBtn;
-    Button soundBtn;
+    private Button howToStartBtn;
+    private Button resetFreqBtn;
+    private Button fragmentationSizeBtn;
+    private Button notificationsBtn;
+    private Button soundBtn;
+    private Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,7 +31,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        resetFreqBtn = (Button)findViewById(R.id.frequencyBtn);
+        resetFreqBtn = (Button)findViewById(R.id.num_of_files_btn);
         resetFreqBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,7 +67,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     }
 
-
     public void openDialog(String dialogType) {
         switch(dialogType) {
             case "howToStart":
@@ -72,8 +74,8 @@ public class SettingsActivity extends AppCompatActivity {
                 howToStartDialog.show(getSupportFragmentManager(), "How to start dialog");
                 break;
             case "resetFreq":
-                ResetFrequencyDialog resetFrequencyDialog = new ResetFrequencyDialog();
-                resetFrequencyDialog.show(getSupportFragmentManager(), "Reset frequency dialog");
+                numOfFilesDialog numOfFilesDialog = new numOfFilesDialog();
+                numOfFilesDialog.show(getSupportFragmentManager(), "Reset frequency dialog");
                 break;
             case "fragSize":
                 FragmentationDialog fragmentationDialog = new FragmentationDialog();
@@ -89,8 +91,10 @@ public class SettingsActivity extends AppCompatActivity {
                 break;
             default:
                 Toast.makeText(this, "SOMETHING WENT WRONG!!", Toast.LENGTH_SHORT).show();
-
-
         }
+    }
+
+    public static void initSettings(Context context) {
+
     }
 }

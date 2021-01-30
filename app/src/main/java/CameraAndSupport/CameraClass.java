@@ -39,6 +39,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import Gallery.Items;
+
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class CameraClass extends AppCompatActivity {
@@ -186,6 +188,10 @@ public class CameraClass extends AppCompatActivity {
         File videoFile = File.createTempFile(prepend, ".mp4", mVideoFolder);
         //setting the file inside the folder that we created on "createVideoFolder" func
         mVideoFileName = videoFile.getAbsolutePath();
+        //if we reached the max files that we can save so delete the oldest file
+        if(mVideoFolder.listFiles().length > Items.getMaxTempFiles()) {
+            Items.deleteOldestItem();
+        }
         return videoFile;
     }
 

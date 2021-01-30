@@ -19,7 +19,7 @@ public class FragmentationDialog extends AppCompatDialogFragment {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.dialog_reset_frequency, null);
+        View view = inflater.inflate(R.layout.dialog_number_of_files, null);
         builder.setView(view).setMessage("How do you want to fragment your clips? please choose with jumps of 5 minute's drive.")
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override

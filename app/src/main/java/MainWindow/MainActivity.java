@@ -2,6 +2,7 @@ package MainWindow;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -33,7 +34,8 @@ public class MainActivity extends AppCompatActivity {
         private ImageButton galleryBtn;
         private ImageButton settingsBtn;
         public static String[] fileTypes;
-
+        private static SharedPreferences sharedPreferences;
+        private static SharedPreferences.Editor sharedPreferencesEditor;
 
     @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +43,11 @@ public class MainActivity extends AppCompatActivity {
             setContentView(R.layout.activity_main);
             fileTypes = getResources().getStringArray(R.array.fileTypes);
 
-            loadFiles(getExternalFilesDir(Environment.DIRECTORY_MOVIES), fileTypes[0], getApplicationContext());
+        sharedPreferences = getSharedPreferences("settings", MODE_PRIVATE);
+        sharedPreferencesEditor = sharedPreferences.edit();
+
+
+        loadFiles(getExternalFilesDir(Environment.DIRECTORY_MOVIES), fileTypes[0], getApplicationContext());
             loadFiles(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileTypes[1], getApplicationContext());
             loadFiles(getExternalFilesDir(Environment.DIRECTORY_PICTURES), fileTypes[2], getApplicationContext());
 
@@ -86,6 +92,19 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onResume() {
             super.onResume();
+            if (sharedPreferences.getBoolean("firstRun", true)) {
+                // Do first run stuff here then set 'firstrun' as false
+                // using the following line to edit/commit prefs
+                sharedPreferencesEditor.putBoolean("firstRun", false).commit();
+                //setting up the default settings
+                sharedPreferencesEditor.putInt("howToStart", 0);
+                sharedPreferencesEditor.putInt("numOfFiles", 12);
+                sharedPreferencesEditor.putInt("sizeOfFiles", 5);
+                sharedPreferencesEditor.putBoolean("notificationsWhileDriving", true);
+                sharedPreferencesEditor.putBoolean("soundWhileDriving", true);
+            }
+            //initialize settings
+            Items.setMaxTempFiles(sharedPreferences.getInt("numOfFiles", 12));
         }
 
         @Override
@@ -106,4 +125,8 @@ public class MainActivity extends AppCompatActivity {
          );
             }
         }
-    }
+
+        public static SharedPreferences.Editor getSharedPreferencesEditor() {
+            return sharedPreferencesEditor;
+        }
+}
