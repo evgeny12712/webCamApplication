@@ -78,8 +78,8 @@ public class SettingsActivity extends AppCompatActivity {
                 numOfFilesDialog.show(getSupportFragmentManager(), "Reset frequency dialog");
                 break;
             case "fragSize":
-                FragmentationDialog fragmentationDialog = new FragmentationDialog();
-                fragmentationDialog.show(getSupportFragmentManager(), "Fragmentation size dialog");
+                sizeOfFilesDialog sizeOfFilesDialog = new sizeOfFilesDialog();
+                sizeOfFilesDialog.show(getSupportFragmentManager(), "Fragmentation size dialog");
                 break;
             case "notifications":
                 NotificationsDialog notificationsDialog = new NotificationsDialog();

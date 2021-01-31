@@ -13,14 +13,16 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 
 import com.example.webcamapplication.R;
 
-public class FragmentationDialog extends AppCompatDialogFragment {
+import MainWindow.MainActivity;
+
+public class sizeOfFilesDialog extends AppCompatDialogFragment {
     private EditText editTextResetFreq;
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.dialog_number_of_files, null);
-        builder.setView(view).setMessage("How do you want to fragment your clips? please choose with jumps of 5 minute's drive.")
+        builder.setView(view).setMessage("Please choose the size of your clips, it must be between 0 and 60 minutes for each")
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -32,13 +34,28 @@ public class FragmentationDialog extends AppCompatDialogFragment {
                 String text = editTextResetFreq.getText().toString();
                 if(text.length() > 0) {
                     int num = Integer.parseInt(text);
-                    if (num % 5 != 0) {
-                        Toast.makeText(getContext(), "Wrong Input!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
+                    for(int i = 0 ; i< text.length() ; i++) {
+                        if (!Character.isDigit(text.charAt(i))) {
+                            Toast.makeText(getContext(), "Please enter only digits", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                    }
+                    if(num == 0) {
+                        Toast.makeText(getContext(), "File size cannot be 0", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    if(num > 60) {
+                        Toast.makeText(getContext(), "Please select an hour or less", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    if(num < 10) {
+                        text = "0" + text;
+                        MainActivity.getSharedPreferencesEditor().putString("sizeOfFiles", text).commit();
+                        return;
+                    }
+                    MainActivity.getSharedPreferencesEditor().putString("sizeOfFiles", text).commit();
                     }
                 }
-            }
         });
         editTextResetFreq = (EditText)view.findViewById(R.id.frequencyEditText);
         return builder.create();

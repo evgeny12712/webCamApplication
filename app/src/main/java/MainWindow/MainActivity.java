@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
             }
             //initialize settings
             Items.setMaxTempFiles(sharedPreferences.getInt("numOfFiles", 12));
-            DrivingActivity.setSizeOfFiles(sharedPreferences.getInt("sizeOfFiles", 05));
+            DrivingActivity.setSizeOfFiles(sharedPreferences.getString("sizeOfFiles", "01"));
         }
 
         @Override

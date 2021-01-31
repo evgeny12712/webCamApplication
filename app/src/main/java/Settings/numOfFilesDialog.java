@@ -42,8 +42,7 @@ public class numOfFilesDialog extends AppCompatDialogFragment {
                                     Toast.LENGTH_LONG).show();
                         }
                         else {
-                            MainActivity.getSharedPreferencesEditor().putInt("numOfFiles", num);
-                            Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
+                            MainActivity.getSharedPreferencesEditor().putInt("numOfFiles", num).commit();
                         }
                     }
                 }
