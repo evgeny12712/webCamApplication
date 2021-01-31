@@ -12,7 +12,7 @@ import com.example.webcamapplication.R;
 
 public class SettingsActivity extends AppCompatActivity {
     private Button howToStartBtn;
-    private Button resetFreqBtn;
+    private Button numOfFilesBtn;
     private Button fragmentationSizeBtn;
     private Button notificationsBtn;
     private Button soundBtn;
@@ -31,8 +31,8 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        resetFreqBtn = (Button)findViewById(R.id.num_of_files_btn);
-        resetFreqBtn.setOnClickListener(new View.OnClickListener() {
+        numOfFilesBtn = (Button)findViewById(R.id.num_of_files_btn);
+        numOfFilesBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openDialog("resetFreq");

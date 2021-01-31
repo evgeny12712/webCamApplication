@@ -25,6 +25,7 @@ public class DrivingActivity extends AppCompatActivity {
     private ImageButton btnPicture;
     private Chronometer mChronometer;
     private CameraRecordingFragment cameraFragment;
+    private static int sizeOfFile;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driving);
@@ -70,6 +71,15 @@ public class DrivingActivity extends AppCompatActivity {
 
         mChronometer.setBase(SystemClock.elapsedRealtime());
         mChronometer.start();
+        mChronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+
+            @Override
+            public void onChronometerTick(Chronometer chronometer) {
+                if(mChronometer.getText().toString().equalsIgnoreCase("00:05")) {
+                    Toast.makeText(DrivingActivity.this, "05", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     //setting the application fullscreen
@@ -90,4 +100,7 @@ public class DrivingActivity extends AppCompatActivity {
         this.moveTaskToBack(true);
     }
 
+    public static void setSizeOfFiles(int size) {
+        sizeOfFile = size;
+    }
 }
