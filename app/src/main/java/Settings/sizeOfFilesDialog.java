@@ -60,8 +60,4 @@ public class sizeOfFilesDialog extends AppCompatDialogFragment {
         editTextResetFreq = (EditText)view.findViewById(R.id.frequencyEditText);
         return builder.create();
     }
-
-    public interface EditTextInputListener {
-        void theText(String text);
-    }
 }

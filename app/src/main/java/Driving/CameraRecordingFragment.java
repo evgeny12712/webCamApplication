@@ -2,7 +2,6 @@ package Driving;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.SurfaceTexture;
@@ -15,14 +14,11 @@ import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.media.ImageReader;
 import android.media.MediaRecorder;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.SystemClock;
-import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -101,12 +97,11 @@ public class  CameraRecordingFragment extends Fragment {
         public void onError( CameraDevice camera, int error) {
             camera.close();
             cameraDevice = null;
-
         }
     };
 
-    private static File movieFile;
-    private File imageFile;
+    private static File movieFolder;
+    private File imageFolder;
 
     private HandlerThread backgroundHandlerThread;
     private Handler backgroundHandler;
@@ -162,8 +157,8 @@ public class  CameraRecordingFragment extends Fragment {
         mMediaRecorder = new MediaRecorder();
         cameraManager = (CameraManager) getActivity().getSystemService(Context.CAMERA_SERVICE);
         camera = new CameraClass();
-        movieFile = getContext().getExternalFilesDir(Environment.DIRECTORY_MOVIES);
-        imageFile = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        movieFolder = getContext().getExternalFilesDir(Environment.DIRECTORY_MOVIES);
+        imageFolder = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         isFirstTime = true;
     }
 
@@ -176,8 +171,8 @@ public class  CameraRecordingFragment extends Fragment {
             textureView = (TextureView) v.findViewById(R.id.textureView);
 
             //creating folder to save videos
-            camera.createVideoFolder(movieFile);
-            camera.createImageFolder(imageFile);
+            camera.createVideoFolder(movieFolder);
+            camera.createImageFolder(imageFolder);
             try {
                 camera.createVideoFileName();
             } catch (IOException e) {
@@ -192,8 +187,7 @@ public class  CameraRecordingFragment extends Fragment {
                 mMediaRecorder = camera.setupMediaRecorder();
                 mImageReader = camera.getmImageReader();
                 mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, backgroundHandler);
-                Toast.makeText(getContext(), "" + camera.getmTotalRotation(), Toast.LENGTH_SHORT).show();
-
+                //Toast.makeText(getContext(), "" + camera.getmTotalRotation(), Toast.LENGTH_SHORT).show();
                 connectCamera();
             } else {
                 textureView.setSurfaceTextureListener(surfaceTextureListener);
@@ -203,12 +197,6 @@ public class  CameraRecordingFragment extends Fragment {
 
         // Inflate the layout for this fragment
         return v;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        //moviewFile = getContext().getExternal
     }
 
     @RequiresApi(api = Build.VERSION_CODES.P)
@@ -241,9 +229,14 @@ public class  CameraRecordingFragment extends Fragment {
     protected CameraDevice getCameraDevice() {
         return cameraDevice;
     }
-    public static File getMovieFile() {
-        return movieFile;
+    public static File getMovieFolder() {
+        return movieFolder;
     }
+
+    protected void setMediaRecorder(MediaRecorder mediaRecorder) {
+        mMediaRecorder = mediaRecorder;
+    }
+
 
     //connecting to the camera, getting the camera service, asking for permission
     protected void connectCamera() {
@@ -343,7 +336,6 @@ public class  CameraRecordingFragment extends Fragment {
             e.printStackTrace();
         }
     }
-
 
 
     //----BACKGROUND THREAD----//

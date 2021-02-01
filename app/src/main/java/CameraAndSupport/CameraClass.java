@@ -75,6 +75,10 @@ public class CameraClass extends AppCompatActivity {
 
     }
 
+    private static boolean isSoundEnabled;
+
+
+
     public String getCameraId() {
         return mCameraId;
     }
@@ -86,9 +90,6 @@ public class CameraClass extends AppCompatActivity {
     public ImageReader getmImageReader() {
         return mImageReader;
     }
-    public String getmVideoFileName() {
-        return mVideoFileName;
-    }
     private static class CompareSizeByArea implements Comparator<Size> {
         //class to compare different resolutions by the preview
         @Override
@@ -99,7 +100,7 @@ public class CameraClass extends AppCompatActivity {
         }
     }
 
-    public void setupCamera(int width, int height,int deviceOrientation, CameraManager cameraManager) {
+    public void setupCamera(int width, int height, int deviceOrientation, CameraManager cameraManager) {
         try {
             for (String cameraId : cameraManager.getCameraIdList()) {
                 cameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId);
@@ -239,14 +240,18 @@ public class CameraClass extends AppCompatActivity {
     public MediaRecorder setupMediaRecorder() {
         mMediaRecorder = new MediaRecorder();
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
-        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        if(isSoundEnabled) {
+            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        }
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         mMediaRecorder.setOutputFile(mVideoFileName);
         mMediaRecorder.setVideoEncodingBitRate(3000000);
         mMediaRecorder.setVideoFrameRate(16);
         mMediaRecorder.setVideoSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-        mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+        if(isSoundEnabled) {
+            mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+        }
         mMediaRecorder.setOrientationHint(cameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION));
         try {
             mMediaRecorder.prepare();
@@ -254,6 +259,10 @@ public class CameraClass extends AppCompatActivity {
             e.printStackTrace();
         }
         return mMediaRecorder;
+    }
+
+    public static void setIsSoundEnabled(Boolean isEnabled){
+        isSoundEnabled = isEnabled;
     }
 
     public static class ImageSaver implements Runnable {

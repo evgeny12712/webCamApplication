@@ -1,10 +1,14 @@
 package Driving;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.View;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
@@ -13,6 +17,7 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import CameraAndSupport.CameraClass;
 import MainWindow.MainActivity;
 import com.example.webcamapplication.R;
 
@@ -26,6 +31,7 @@ public class DrivingActivity extends AppCompatActivity {
     private Chronometer mChronometer;
     private CameraRecordingFragment cameraFragment;
     private static String sizeOfFile;
+    @RequiresApi(api = Build.VERSION_CODES.M)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driving);
@@ -44,16 +50,7 @@ public class DrivingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 cameraFragment.setIsFirstTime(true);
-                cameraFragment.getMediaRecorder().stop();
-                cameraFragment.getMediaRecorder().reset();
-                mChronometer.stop();
-
-                Intent mediaStoreUpdateIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                mediaStoreUpdateIntent.setData(Uri.fromFile(new File(cameraFragment.getCamera().getmVideoFileName())));
-                sendBroadcast(mediaStoreUpdateIntent);
-
-                cameraFragment.getCamera().closeCamera(cameraFragment.getCameraDevice());
-                cameraFragment.stopBackGroundThread();
+                stopRecording();
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
             }
@@ -78,7 +75,10 @@ public class DrivingActivity extends AppCompatActivity {
             @Override
             public void onChronometerTick(Chronometer chronometer) {
                 if(mChronometer.getText().toString().equalsIgnoreCase(sizeOfFile)) {
-                    Toast.makeText(DrivingActivity.this, "05", Toast.LENGTH_SHORT).show();
+                    cameraFragment.setIsFirstTime(true);
+                    stopRecording();
+                    Intent intent = new Intent(getApplicationContext(), DrivingActivity.class);
+                    startActivity(intent);
                 }
             }
         });
@@ -103,6 +103,16 @@ public class DrivingActivity extends AppCompatActivity {
     }
 
     public static void setSizeOfFiles(String size) {
-        sizeOfFile = size + ":00";
+        sizeOfFile = size + ":01";
     }
+
+    private void stopRecording() {
+        cameraFragment.setIsFirstTime(true);
+        cameraFragment.getMediaRecorder().stop();
+        cameraFragment.getMediaRecorder().reset();
+        cameraFragment.getCamera().closeCamera(cameraFragment.getCameraDevice());
+        cameraFragment.stopBackGroundThread();
+        mChronometer.stop();
+    }
+
 }

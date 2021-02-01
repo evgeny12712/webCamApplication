@@ -15,6 +15,8 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 
 import com.example.webcamapplication.R;
 
+import MainWindow.MainActivity;
+
 public class SoundDialog extends AppCompatDialogFragment {
     private Switch soundSwitch;
     private TextView soundOn;
@@ -36,7 +38,7 @@ public class SoundDialog extends AppCompatDialogFragment {
             }
         });
 
-        builder.setView(view).setMessage("Would you like to have sound on your video clips while driving?")
+        builder.setView(view).setMessage("Would you like to have sound on your video clips?")
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -46,9 +48,9 @@ public class SoundDialog extends AppCompatDialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if(soundSwitch.isChecked())
-                    Toast.makeText(getContext(), "Sound : ON", Toast.LENGTH_SHORT).show();
+                    MainActivity.getSharedPreferencesEditor().putBoolean("isSound", true).commit();
                 else
-                    Toast.makeText(getContext(), "Sound : Off", Toast.LENGTH_SHORT).show();
+                    MainActivity.getSharedPreferencesEditor().putBoolean("isSound", false).commit();
                 }
         });
 

@@ -1,6 +1,9 @@
 package MainWindow;
 
 import android.Manifest;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -15,10 +18,12 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.webcamapplication.R;
 
+import CameraAndSupport.CameraClass;
 import Driving.DrivingActivity;
 import Gallery.GalleryActivity;
 import Gallery.Items;
@@ -33,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         private ImageButton startBtn;
         private ImageButton galleryBtn;
         private ImageButton settingsBtn;
+        private Context context;
         public static String[] fileTypes;
         private static SharedPreferences sharedPreferences;
         private static SharedPreferences.Editor sharedPreferencesEditor;
@@ -43,11 +49,12 @@ public class MainActivity extends AppCompatActivity {
             setContentView(R.layout.activity_main);
             fileTypes = getResources().getStringArray(R.array.fileTypes);
 
-        sharedPreferences = getSharedPreferences("settings", MODE_PRIVATE);
-        sharedPreferencesEditor = sharedPreferences.edit();
+            sharedPreferences = getSharedPreferences("settings", MODE_PRIVATE);
+            sharedPreferencesEditor = sharedPreferences.edit();
 
+            context = getApplicationContext();
 
-        loadFiles(getExternalFilesDir(Environment.DIRECTORY_MOVIES), fileTypes[0], getApplicationContext());
+            loadFiles(getExternalFilesDir(Environment.DIRECTORY_MOVIES), fileTypes[0], getApplicationContext());
             loadFiles(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileTypes[1], getApplicationContext());
             loadFiles(getExternalFilesDir(Environment.DIRECTORY_PICTURES), fileTypes[2], getApplicationContext());
 
@@ -105,7 +112,8 @@ public class MainActivity extends AppCompatActivity {
             }
             //initialize settings
             Items.setMaxTempFiles(sharedPreferences.getInt("numOfFiles", 12));
-            DrivingActivity.setSizeOfFiles(sharedPreferences.getString("sizeOfFiles", "01"));
+            DrivingActivity.setSizeOfFiles(sharedPreferences.getString("sizeOfFiles", "0"));
+            CameraClass.setIsSoundEnabled(sharedPreferences.getBoolean("isSound", true));
         }
 
         @Override
