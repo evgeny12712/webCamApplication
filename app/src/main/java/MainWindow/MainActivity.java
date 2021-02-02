@@ -114,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
             Items.setMaxTempFiles(sharedPreferences.getInt("numOfFiles", 12));
             DrivingActivity.setSizeOfFiles(sharedPreferences.getString("sizeOfFiles", "0"));
             CameraClass.setIsSoundEnabled(sharedPreferences.getBoolean("isSound", true));
+            DrivingActivity.setIsDnd(sharedPreferences.getBoolean("isDnd", false));
         }
 
         @Override
