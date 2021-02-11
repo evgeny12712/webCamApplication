@@ -26,9 +26,11 @@ import com.example.webcamapplication.R;
 import CameraAndSupport.CameraClass;
 import Driving.DrivingActivity;
 import Gallery.GalleryActivity;
+import Gallery.Item;
 import Gallery.Items;
 
 import static Gallery.GalleryActivity.*;
+import static Gallery.Items.getTemporaryFiles;
 import static Gallery.Items.loadFiles;
 
 
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         public static String[] fileTypes;
         private static SharedPreferences sharedPreferences;
         private static SharedPreferences.Editor sharedPreferencesEditor;
+         int cOunter = 0;
 
     @Override
         protected void onCreate(Bundle savedInstanceState) {

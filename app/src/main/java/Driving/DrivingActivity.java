@@ -9,11 +9,13 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.SystemClock;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -23,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 
 import CameraAndSupport.CameraClass;
+import Gallery.Items;
 import MainWindow.MainActivity;
 import com.example.webcamapplication.R;
 
@@ -51,6 +54,7 @@ public class DrivingActivity extends AppCompatActivity {
 
         if(isDnd) {
             mNotificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE);
+            Toast.makeText(context, "Caution, do not disturb is active", Toast.LENGTH_LONG).show();
         }
 
         btnMinimize.setOnClickListener(new View.OnClickListener() {
@@ -66,6 +70,10 @@ public class DrivingActivity extends AppCompatActivity {
             public void onClick(View v) {
                 cameraFragment.setIsFirstTime(true);
                 stopRecording();
+                mNotificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);
+                if(cameraFragment.getCamera().getIsLandscape()) {
+                    boolean isSuccess = renameFile();
+                }
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
             }
@@ -76,12 +84,8 @@ public class DrivingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 cameraFragment.lockFocus();
-//                cameraFragment.galleryAddPic();
-                Toast.makeText(DrivingActivity.this, "PICTURE TAKEN!", Toast.LENGTH_SHORT).show();
             }
         });
-
-        Toast.makeText(this, "Size of file " + sizeOfFile, Toast.LENGTH_SHORT).show();
 
         mChronometer.setBase(SystemClock.elapsedRealtime());
         mChronometer.start();
@@ -102,12 +106,15 @@ public class DrivingActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if(cameraFragment.getCamera().getIsLandscape()) {
+            boolean isSuccess = renameFile();
+        }
         if(isDnd) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 mNotificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);
             }
-
         }
+
     }
 
     //setting the application fullscreen
@@ -149,4 +156,13 @@ public class DrivingActivity extends AppCompatActivity {
         mChronometer.stop();
     }
 
+    private boolean renameFile() {
+        String fileName = cameraFragment.getCamera().getFileName();
+        fileName = fileName.substring(fileName.lastIndexOf("/")+1, fileName.length());
+        File directory = cameraFragment.getMovieFolder();
+        File from = new File(directory, fileName);
+        File to = new File(directory, "L" + fileName);
+        Log.d("fileName", fileName);
+        return from.renameTo(to);
+    }
 }

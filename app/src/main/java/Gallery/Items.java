@@ -177,19 +177,23 @@ public class Items {
     }
 
     public static void deleteOldestItem() {
+        File oldestFile = getOldestFile(temporaryFiles);
+        if (oldestFile != null) {
+            oldestFile.delete();
+            temporaryFiles.remove(getItemByFile(temporaryFiles, oldestFile));
+        }
+    }
+
+    public static File getOldestFile(List<Item> items) {
         long oldestDate = Long.MAX_VALUE;
         File oldestFile = null;
-        for (Item item : temporaryFiles) {
+        for (Item item : items) {
             if (item.getFile().lastModified() < oldestDate) {
                 oldestDate = item.getFile().lastModified();
                 oldestFile = item.getFile();
             }
         }
-
-        if (oldestFile != null) {
-            oldestFile.delete();
-            temporaryFiles.remove(getItemByFile(temporaryFiles, oldestFile));
-        }
+        return oldestFile;
     }
 
 }

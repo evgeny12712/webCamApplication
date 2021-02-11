@@ -2,6 +2,7 @@ package Gallery.Gallery.TemporaryFiles;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
+import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -51,7 +53,12 @@ public class GalleryTemporaryFilesFragment extends Fragment  {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_gallery_temporary_files, container, false);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.list);
-        mLayoutManager = new GridLayoutManager(getActivity(), 3);
+        if (Configuration.ORIENTATION_LANDSCAPE == getResources().getConfiguration().orientation) {
+            mLayoutManager = new GridLayoutManager(getActivity(), 4);
+        }
+        else {
+            mLayoutManager = new GridLayoutManager(getActivity(), 3);
+        }
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new MyTemporaryFilesRecyclerViewAdapter(getContext(), parentActivity);
         mRecyclerView.setAdapter(mAdapter);

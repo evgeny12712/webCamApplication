@@ -8,11 +8,13 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
@@ -25,6 +27,7 @@ import Gallery.GalleryActivity;
 import Gallery.Item;
 import Gallery.Items;
 import static Gallery.GalleryActivity.fileTypes;
+import static Gallery.Items.getImages;
 
 public class ImageDisplayActivity extends AppCompatActivity {
     private static final String TAG = "imageDisplayActivity";
@@ -34,12 +37,15 @@ public class ImageDisplayActivity extends AppCompatActivity {
     private ImageButton backBtn;
     private Button btnDelete;
     private Button btnShare;
+    private Button btnRotate;
     private TextView textViewDate;
     private TextView textViewTime;
     private String date;
     private String time;
     private Uri imageUri;
     private Context context;
+    private Float x1,x2;
+    final int[] rotate = {90, 180, 270, 360};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +55,7 @@ public class ImageDisplayActivity extends AppCompatActivity {
         backBtn = (ImageButton) findViewById(R.id.back_btn);
         btnShare = (Button) findViewById(R.id.btn_share);
         btnDelete = (Button) findViewById(R.id.btn_delete);
+        btnRotate = (Button) findViewById(R.id.btn_rotate);
         textViewDate = (TextView) findViewById(R.id.date_recorded_text);
         textViewTime = (TextView) findViewById(R.id.time_recorded_text);
         context = this;
@@ -88,6 +95,19 @@ public class ImageDisplayActivity extends AppCompatActivity {
                         context, fileTypes[2]);
             }
         });
+
+        btnRotate.setOnClickListener(new View.OnClickListener() {
+            int i = 0;
+
+            @Override
+            public void onClick(View v) {
+                imageView.setRotation(rotate[i++]);
+                if(rotate.length == i) {
+                    i = 0;
+                }
+            }
+        });
+
     }
 
     @Override
@@ -118,5 +138,39 @@ public class ImageDisplayActivity extends AppCompatActivity {
         Intent intent = new Intent(context, GalleryActivity.class);
         intent.putExtra("fragment", fileTypes[2]);
         context.startActivity(intent);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        int index = Items.getImages().indexOf(Items.getItemByFile(Items.getImages(), imageFile));
+        switch(event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                    {
+                        x1 = event.getX();
+                        break;
+                    }
+                    case MotionEvent.ACTION_UP:
+                    {
+                        x2 = event.getX();
+                        if(x1 > x2) {
+                            if(index < Items.getImages().size()-1) {
+                                Intent intent = new Intent(context, ImageDisplayActivity.class);
+                                intent.putExtra(fileTypes[2], getImages().get(index+1).getFile().getPath());
+                                context.startActivity(intent);
+                            }
+                            return true;
+                        }
+                        if(x1 < x2) {
+                            if(index > 0) {
+                                Intent intent = new Intent(context, ImageDisplayActivity.class);
+                                intent.putExtra(fileTypes[2], getImages().get(index-1).getFile().getPath());
+                                context.startActivity(intent);
+                            }
+                            return true;
+                        }
+                        break;
+                    }
+                }
+        return false;
     }
 }

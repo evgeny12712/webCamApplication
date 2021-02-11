@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.Log;
 
+import androidx.annotation.LongDef;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -11,7 +13,8 @@ public class Item {
     private Uri uri;
     private String date;
     private File file;
-    String fileType;
+    private String fileType;
+    private boolean isLandscape;
 
     public Item(File file, String fileType) {
         this.file = file;
@@ -33,5 +36,12 @@ public class Item {
     }
     public void setUri(Uri uri) {
         this.uri = uri;
+    }
+    public boolean getIsLandscape() {
+        String isLorV = file.getPath().substring(file.getPath().lastIndexOf("/")+1, file.getPath().lastIndexOf("/")+2);
+        if(isLorV.equals("L")) {
+            return true;
+        }
+        return false;
     }
 }

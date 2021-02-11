@@ -82,8 +82,8 @@ public class SettingsActivity extends AppCompatActivity {
                 sizeOfFilesDialog.show(getSupportFragmentManager(), "Fragmentation size dialog");
                 break;
             case "notifications":
-                NotificationsDialog notificationsDialog = new NotificationsDialog();
-                notificationsDialog.show(getSupportFragmentManager(), "Notifications Dialog");
+                DoNotDisturbDialog doNotDisturbDialog = new DoNotDisturbDialog();
+                doNotDisturbDialog.show(getSupportFragmentManager(), "Notifications Dialog");
                 break;
             case "sound":
                 SoundDialog soundDialog = new SoundDialog();

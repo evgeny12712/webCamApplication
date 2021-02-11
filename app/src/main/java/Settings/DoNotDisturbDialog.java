@@ -22,7 +22,7 @@ import com.example.webcamapplication.R;
 import Driving.DrivingActivity;
 import MainWindow.MainActivity;
 
-public class NotificationsDialog extends AppCompatDialogFragment {
+public class DoNotDisturbDialog extends AppCompatDialogFragment {
     private Switch notificationsSwitch;
     private TextView notificationsOn;
     private TextView notificationsOff;
@@ -44,7 +44,7 @@ public class NotificationsDialog extends AppCompatDialogFragment {
             }
         });
 
-        builder.setView(view).setMessage("Would you like to get notifications from other applications while driving?")
+        builder.setView(view).setMessage("Would you like to active \"do not disturb\" mode while driving?")
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -56,10 +56,12 @@ public class NotificationsDialog extends AppCompatDialogFragment {
                 if(notificationsSwitch.isChecked()) {
                     MainActivity.getSharedPreferencesEditor().putBoolean("isDnd", true).commit();
                     interruptionFilter = NotificationManager.INTERRUPTION_FILTER_NONE;
+                    Toast.makeText(getContext(), "Do not disturb mode is ACTIVE!", Toast.LENGTH_SHORT).show();
                 }
                 else {
                     interruptionFilter = NotificationManager.INTERRUPTION_FILTER_ALL;
                     MainActivity.getSharedPreferencesEditor().putBoolean("isDnd", false).commit();
+                    Toast.makeText(getContext(), "\"Do not disturb\" mode is currently inactive", Toast.LENGTH_SHORT).show();
                 }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

@@ -2,6 +2,7 @@ package Gallery.SavedFiles;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -54,7 +55,12 @@ public class GallerySavedFilesFragment extends Fragment  {
         View view = inflater.inflate(R.layout.fragment_gallery_saved_files, container, false);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.list);
-        mLayoutManager = new GridLayoutManager(getActivity(), 3);
+        if (Configuration.ORIENTATION_LANDSCAPE == getResources().getConfiguration().orientation) {
+            mLayoutManager = new GridLayoutManager(getActivity(), 4);
+        }
+        else {
+            mLayoutManager = new GridLayoutManager(getActivity(), 3);
+        }
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new MySavedFilesRecyclerViewAdapter(getContext(), parentActivity);
         mRecyclerView.setAdapter(mAdapter);

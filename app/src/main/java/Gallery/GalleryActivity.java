@@ -25,7 +25,6 @@ public class GalleryActivity extends AppCompatActivity {
     private Button btnPictures;
     private Button btnHome;
     private Button btnVideos;
-    private Resources res;
     private Toolbar toolbar;
     private Toolbar selectionToolBar;
     private Fragment temporaryFiles;
@@ -53,10 +52,6 @@ public class GalleryActivity extends AppCompatActivity {
         selectionToolBar = (Toolbar) findViewById(R.id.toolbar_temporary_selection);
         fileTypes = getResources().getStringArray(R.array.fileTypes);
         setSupportActionBar(toolbar);
-
-//        loadFiles(getExternalFilesDir(Environment.DIRECTORY_MOVIES), fileTypes[0], getApplicationContext());
-//        loadFiles(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileTypes[1], getApplicationContext());
-//        loadFiles(getExternalFilesDir(Environment.DIRECTORY_PICTURES), fileTypes[2], getApplicationContext());
 
         if(!getIncomingIntent()) {
             getSupportFragmentManager().beginTransaction()
@@ -105,6 +100,14 @@ public class GalleryActivity extends AppCompatActivity {
 
     }
 
+    //Make back button on navigation bar go back to the gallery and not to the last file played
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(GalleryActivity.this, MainActivity.class);
+        intent.putExtra("fragment", fileTypes[1]);
+        GalleryActivity.this.startActivity(intent);
+    }
 
     public void setButtonPressed(String buttonName) {
         switch (buttonName) {

@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -45,9 +46,13 @@ public class  CameraRecordingFragment extends Fragment {
     //states for image capture
     private static final int STATE_PREVIEW = 0;
     private static final int STATE_WAIT_LOCK = 1;
+
+    //to check if its the first time that we coming into "onCreateView" state
     private static boolean isFirstTime;
+
     private int mCaptureState = STATE_PREVIEW;
 
+    //the surface on which we show the camera preview
     private TextureView textureView;
     private TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -150,6 +155,9 @@ public class  CameraRecordingFragment extends Fragment {
 
     private View v;
 
+    // detects if the video was taken on landscape mode
+    private Boolean isLandscape;
+
     //----LIFE CYCLE----//
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -160,6 +168,8 @@ public class  CameraRecordingFragment extends Fragment {
         movieFolder = getContext().getExternalFilesDir(Environment.DIRECTORY_MOVIES);
         imageFolder = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         isFirstTime = true;
+        isLandscape = getActivity().getWindowManager().getDefaultDisplay().getRotation() == Surface.ROTATION_90
+            || getActivity().getWindowManager().getDefaultDisplay().getRotation() == Surface.ROTATION_270;
     }
 
     @Override
@@ -208,10 +218,18 @@ public class  CameraRecordingFragment extends Fragment {
         if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             deviceOrientation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
             textureView = Functions.transformImage(textureView.getHeight(), textureView.getWidth(), deviceOrientation, camera.getPreviewSize(), textureView);
+            //Log.d("Landscape", "Width : " + textureView.getWidth() +  " Height : " + textureView.getHeight());
+            camera.setupCamera(textureView.getWidth(), textureView.getHeight(), deviceOrientation, cameraManager);
+            isLandscape = true;
         }
         else if(newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             deviceOrientation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
             textureView = Functions.transformImage(textureView.getHeight(), textureView.getWidth(), deviceOrientation, camera.getPreviewSize(), textureView);
+            //Log.d("Portrait", "Width : " + textureView.getWidth() +  " Height : " + textureView.getHeight());
+
+            camera.setupCamera(textureView.getWidth(), textureView.getHeight(), deviceOrientation, cameraManager);
+
+            isLandscape = false;
         }
     }
 
@@ -229,9 +247,11 @@ public class  CameraRecordingFragment extends Fragment {
     protected CameraDevice getCameraDevice() {
         return cameraDevice;
     }
-    public static File getMovieFolder() {
-        return movieFolder;
+    protected Boolean getIsLandscape() {
+        return isLandscape;
     }
+    protected File getMovieFolder() { return movieFolder; }
+    protected File getImageFolder() { return imageFolder; }
 
     protected void setMediaRecorder(MediaRecorder mediaRecorder) {
         mMediaRecorder = mediaRecorder;
@@ -240,6 +260,7 @@ public class  CameraRecordingFragment extends Fragment {
 
     //connecting to the camera, getting the camera service, asking for permission
     protected void connectCamera() {
+        /* checking for permissions and opening camera*/
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) ==
@@ -377,7 +398,7 @@ public class  CameraRecordingFragment extends Fragment {
                         }
                     };
             mRecordCaptureSession.capture(mCaptureRequestBuilder.build(), stillCaptureCallback, null);
-            Toast.makeText(this.getActivity().getApplicationContext(), "CAPTURED", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this.getActivity().getApplicationContext(), "IMAGE TAKEN!", Toast.LENGTH_SHORT).show();
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }

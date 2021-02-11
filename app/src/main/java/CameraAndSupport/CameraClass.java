@@ -63,6 +63,7 @@ public class CameraClass extends AppCompatActivity {
     private static File mImageFolder; //file path
     private String mImageFileName; // file name
 
+    private boolean isLandscape;
 
     private CameraCharacteristics cameraCharacteristics;
     //surface orientations to real world numbers
@@ -90,6 +91,10 @@ public class CameraClass extends AppCompatActivity {
     public ImageReader getmImageReader() {
         return mImageReader;
     }
+    public boolean getIsLandscape() {
+        return isLandscape;
+    }
+    public String getFileName() { return mVideoFileName; }
     private static class CompareSizeByArea implements Comparator<Size> {
         //class to compare different resolutions by the preview
         @Override
@@ -113,17 +118,19 @@ public class CameraClass extends AppCompatActivity {
                 StreamConfigurationMap map = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                 // getting the rotation of the sensor
                 mTotalRotation = sensorToDeviceRotation(cameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION), deviceOrientation);
-                Log.d(TAG, mTotalRotation + "total rotation");
-                boolean swapRotation = mTotalRotation == 90 || mTotalRotation == 270; //check is the phone is landscape mode
+                isLandscape = mTotalRotation == 180 || mTotalRotation == 270 || mTotalRotation == 0; //check is the phone is landscape mode
                 int rotatedWidth = width;
                 int rotatedHeight = height;
                 // if the phone is landscape so switch between height and width
-                if (swapRotation) {
+                if (isLandscape) {
                     rotatedWidth = height;
                     rotatedHeight = width;
                 }
+                Log.d("PreviewSize", "Width : " + rotatedWidth +  " Height : " + rotatedHeight);
+
                 // setup the preview size
                 mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class), rotatedWidth, rotatedHeight);
+
                 mImageSize = chooseOptimalSize(map.getOutputSizes(ImageFormat.JPEG), rotatedWidth, rotatedHeight);
                 mImageReader = ImageReader.newInstance(mImageSize.getWidth(), mImageSize.getHeight(), ImageFormat.JPEG, 1);
                 mCameraId = cameraId;
@@ -181,12 +188,15 @@ public class CameraClass extends AppCompatActivity {
     }
 
     public File createVideoFileName() throws IOException {
+        File videoFile;
         //creating the time string
         String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         //creating the file name
         String prepend = "VIDEO_" + timestamp + "_";
         //creating the actual file
-        File videoFile = File.createTempFile(prepend, ".mp4", mVideoFolder);
+
+        videoFile = File.createTempFile(prepend, ".mp4", mVideoFolder);
+
         //setting the file inside the folder that we created on "createVideoFolder" func
         mVideoFileName = videoFile.getAbsolutePath();
         //if we reached the max files that we can save so delete the oldest file

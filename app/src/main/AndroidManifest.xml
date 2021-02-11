@@ -25,7 +25,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="Settings.NotificationsDialog" />
+        <activity android:name="Settings.DoNotDisturbDialog" />
         <activity android:name="Settings.sizeOfFilesDialog" />
         <activity android:name="Settings.HowToStartDialog" />
         <activity android:name="Settings.SoundDialog" />
@@ -35,7 +35,7 @@
         <activity android:name="Gallery.GalleryActivity" />
         <activity android:name="Gallery.Pictures.ImageDisplayActivity"/>
         <activity android:name="Gallery.Gallery.TemporaryFiles.TemporaryVideoDisplayActivity"
-            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"/>
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|layoutDirection" />
         <activity
             android:name="Driving.DrivingActivity"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden" />
