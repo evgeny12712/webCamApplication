@@ -177,7 +177,7 @@ public class TemporaryVideoDisplayActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(context, TemporaryVideoDisplayActivity.class);
                 //checking if we are not currently watching the last item
-                if(itemPosition < mediaSources.size()) {
+                if(itemPosition+1 <  mediaSources.size()) {
                     itemPosition++;
                 }
                 intent.putExtra(fileTypes[0], itemPosition);

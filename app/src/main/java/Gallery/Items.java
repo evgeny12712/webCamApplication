@@ -8,7 +8,6 @@ import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.CancellationSignal;
 import android.os.Environment;
-import android.util.Log;
 import android.util.Size;
 import android.widget.Toast;
 
@@ -124,7 +123,6 @@ public class Items {
 
         switch (fileType) {
             case "temporary videos":
-                Log.d(TAG, item.getFile().getPath());
                 item.getFile().delete();
                 temporaryFiles.remove(item);
                 break;
@@ -158,9 +156,6 @@ public class Items {
 
     public static Item getItemByFile(List<Item> items, File file) {
         for (Item item : items) {
-            Log.d(TAG, item.getFile().getPath());
-            Log.d(TAG, file.getPath());
-
             if (item.getFile().equals(file)) {
                 return item;
             }

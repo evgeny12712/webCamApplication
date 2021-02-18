@@ -1,8 +1,6 @@
 package MainWindow;
 
 import android.Manifest;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,15 +8,12 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.webcamapplication.R;
@@ -26,11 +21,8 @@ import com.example.webcamapplication.R;
 import CameraAndSupport.CameraClass;
 import Driving.DrivingActivity;
 import Gallery.GalleryActivity;
-import Gallery.Item;
 import Gallery.Items;
 
-import static Gallery.GalleryActivity.*;
-import static Gallery.Items.getTemporaryFiles;
 import static Gallery.Items.loadFiles;
 
 
@@ -44,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
         public static String[] fileTypes;
         private static SharedPreferences sharedPreferences;
         private static SharedPreferences.Editor sharedPreferencesEditor;
-         int cOunter = 0;
 
     @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -120,12 +111,6 @@ public class MainActivity extends AppCompatActivity {
             DrivingActivity.setIsDnd(sharedPreferences.getBoolean("isDnd", false));
         }
 
-        @Override
-        protected void onPause() {
-//            camera.closeCamera(cameraMainPreviewFragment.getCameraDevice());
-//            stopBackGroundThread();
-            super.onPause();
-        }
 
         public void onWindowFocusChanged(boolean hasFocus) {
             super.onWindowFocusChanged(hasFocus);

@@ -156,7 +156,7 @@ public class SavedVideoDisplayActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(context, SavedVideoDisplayActivity.class);
                 //checking if we are not currently watching the last item
-                if(itemPosition < GallerySavedFilesFragment.mediaSources.size()) {
+                if(itemPosition+1 < GallerySavedFilesFragment.mediaSources.size()) {
                     itemPosition++;
                 }
                 intent.putExtra(fileTypes[1], itemPosition);

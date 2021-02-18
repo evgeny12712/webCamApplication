@@ -158,6 +158,11 @@ public class ImageDisplayActivity extends AppCompatActivity {
                                 intent.putExtra(fileTypes[2], getImages().get(index+1).getFile().getPath());
                                 context.startActivity(intent);
                             }
+                            else {
+                                Intent intent = new Intent(context, ImageDisplayActivity.class);
+                                intent.putExtra(fileTypes[2], getImages().get(index).getFile().getPath());
+                                context.startActivity(intent);
+                            }
                             return true;
                         }
                         if(x1 < x2) {

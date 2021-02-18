@@ -1,7 +1,10 @@
 package Driving;
 
 import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.SurfaceTexture;
@@ -28,6 +31,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -155,8 +160,11 @@ public class  CameraRecordingFragment extends Fragment {
 
     private View v;
 
+
     // detects if the video was taken on landscape mode
     private Boolean isLandscape;
+
+    NotificationManagerCompat notificationManager;
 
     //----LIFE CYCLE----//
     @Override
@@ -170,6 +178,10 @@ public class  CameraRecordingFragment extends Fragment {
         isFirstTime = true;
         isLandscape = getActivity().getWindowManager().getDefaultDisplay().getRotation() == Surface.ROTATION_90
             || getActivity().getWindowManager().getDefaultDisplay().getRotation() == Surface.ROTATION_270;
+        notificationManager = NotificationManagerCompat.from(getActivity());
+        if(getActivity().getIntent().hasExtra("isFirstTime")) {
+            isFirstTime = false;
+        }
     }
 
     @Override
@@ -207,6 +219,11 @@ public class  CameraRecordingFragment extends Fragment {
 
         // Inflate the layout for this fragment
         return v;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.P)
@@ -247,16 +264,7 @@ public class  CameraRecordingFragment extends Fragment {
     protected CameraDevice getCameraDevice() {
         return cameraDevice;
     }
-    protected Boolean getIsLandscape() {
-        return isLandscape;
-    }
     protected File getMovieFolder() { return movieFolder; }
-    protected File getImageFolder() { return imageFolder; }
-
-    protected void setMediaRecorder(MediaRecorder mediaRecorder) {
-        mMediaRecorder = mediaRecorder;
-    }
-
 
     //connecting to the camera, getting the camera service, asking for permission
     protected void connectCamera() {
@@ -358,7 +366,6 @@ public class  CameraRecordingFragment extends Fragment {
         }
     }
 
-
     //----BACKGROUND THREAD----//
     protected void startBackgroundThread() {
         backgroundHandlerThread = new HandlerThread("DrivingActivity");
@@ -376,7 +383,6 @@ public class  CameraRecordingFragment extends Fragment {
             e.printStackTrace();
         }
     }
-
 
     //----IMAGE TAKING----//
     protected void startStillCaptureRequest() {
@@ -414,4 +420,16 @@ public class  CameraRecordingFragment extends Fragment {
         }
     }
 
+    public void createNotificationChannel() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            CharSequence name = "notChannel";
+            String description = "Channel for notifications";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel("webCam", name, importance);
+            channel.setDescription(description);
+
+            NotificationManager notificationManager = getActivity().getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
 }
