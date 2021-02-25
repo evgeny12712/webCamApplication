@@ -31,9 +31,9 @@ public class DoNotDisturbDialog extends AppCompatDialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
-
         View view = inflater.inflate(R.layout.activity_notifications_dialog, null);
         notificationsSwitch = (Switch)view.findViewById(R.id.notificationsSwitch);
+        notificationsSwitch.setChecked(DrivingActivity.getIsDnd());
         notificationsOn = (TextView)view.findViewById(R.id.on);
         notificationsOff = (TextView)view.findViewById(R.id.off);
         ischecked(notificationsSwitch);

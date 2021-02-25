@@ -13,6 +13,8 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 
 import com.example.webcamapplication.R;
 
+import Driving.DrivingActivity;
+import Gallery.Items;
 import MainWindow.MainActivity;
 
 public class sizeOfFilesDialog extends AppCompatDialogFragment {
@@ -58,6 +60,7 @@ public class sizeOfFilesDialog extends AppCompatDialogFragment {
                 }
         });
         editTextResetFreq = (EditText)view.findViewById(R.id.frequencyEditText);
+        editTextResetFreq.setHint("" + DrivingActivity.getIntSizeOfFile());
         return builder.create();
     }
 }

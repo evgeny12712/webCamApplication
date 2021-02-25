@@ -17,11 +17,13 @@ import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.media.ImageReader;
 import android.media.MediaRecorder;
+import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
@@ -29,22 +31,24 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-
 import CameraAndSupport.CameraClass;
 import CameraAndSupport.Functions;
+
 import com.example.webcamapplication.R;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-public class  CameraRecordingFragment extends Fragment {
+public class CameraRecordingFragment extends Fragment implements Runnable {
     private static final int REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION_RESULT = 1;
     private static final int REQUEST_CAMERA_PERMISSION_RESULT = 0;
 
@@ -94,7 +98,9 @@ public class  CameraRecordingFragment extends Fragment {
         @Override
         public void onOpened(@NonNull CameraDevice camera) {
             cameraDevice = camera;
+            //making the surface for recording
             startRecord();
+            //starting recording
             mMediaRecorder.start();
         }
 
@@ -104,7 +110,7 @@ public class  CameraRecordingFragment extends Fragment {
             cameraDevice = null;
         }
 
-        public void onError( CameraDevice camera, int error) {
+        public void onError(CameraDevice camera, int error) {
             camera.close();
             cameraDevice = null;
         }
@@ -131,20 +137,21 @@ public class  CameraRecordingFragment extends Fragment {
     private CameraCaptureSession.CaptureCallback mRecordCaptureCallback = new
             CameraCaptureSession.CaptureCallback() {
                 private void process(CaptureResult captureResult) {
-                    switch(mCaptureState){
+                    switch (mCaptureState) {
                         case STATE_PREVIEW:
                             // Do nothing
                             break;
                         case STATE_WAIT_LOCK:
                             mCaptureState = STATE_PREVIEW;
                             Integer afState = captureResult.get(CaptureResult.CONTROL_AF_STATE);
-                            if(afState == CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED ||
+                            if (afState == CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED ||
                                     afState == CaptureRequest.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED) {
                                 startStillCaptureRequest();
                             }
                             break;
                     }
                 }
+
                 @Override
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
                     super.onCaptureCompleted(session, request, result);
@@ -160,11 +167,14 @@ public class  CameraRecordingFragment extends Fragment {
 
     private View v;
 
+    private Thread thread;
+
 
     // detects if the video was taken on landscape mode
     private Boolean isLandscape;
 
     NotificationManagerCompat notificationManager;
+    private static final String TAG = "CameraRecordingFragment";
 
     //----LIFE CYCLE----//
     @Override
@@ -177,11 +187,12 @@ public class  CameraRecordingFragment extends Fragment {
         imageFolder = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         isFirstTime = true;
         isLandscape = getActivity().getWindowManager().getDefaultDisplay().getRotation() == Surface.ROTATION_90
-            || getActivity().getWindowManager().getDefaultDisplay().getRotation() == Surface.ROTATION_270;
+                || getActivity().getWindowManager().getDefaultDisplay().getRotation() == Surface.ROTATION_270;
         notificationManager = NotificationManagerCompat.from(getActivity());
-        if(getActivity().getIntent().hasExtra("isFirstTime")) {
+        if (getActivity().getIntent().hasExtra("isFirstTime")) {
             isFirstTime = false;
         }
+        thread = new Thread(this);
     }
 
     @Override
@@ -221,25 +232,19 @@ public class  CameraRecordingFragment extends Fragment {
         return v;
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
-
     @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
         // check the orientation of the screen
-        if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             deviceOrientation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
             textureView = Functions.transformImage(textureView.getHeight(), textureView.getWidth(), deviceOrientation, camera.getPreviewSize(), textureView);
             //Log.d("Landscape", "Width : " + textureView.getWidth() +  " Height : " + textureView.getHeight());
             camera.setupCamera(textureView.getWidth(), textureView.getHeight(), deviceOrientation, cameraManager);
             isLandscape = true;
-        }
-        else if(newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             deviceOrientation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
             textureView = Functions.transformImage(textureView.getHeight(), textureView.getWidth(), deviceOrientation, camera.getPreviewSize(), textureView);
             //Log.d("Portrait", "Width : " + textureView.getWidth() +  " Height : " + textureView.getHeight());
@@ -250,21 +255,42 @@ public class  CameraRecordingFragment extends Fragment {
         }
     }
 
+
     public void setIsFirstTime(boolean isFirstTime) {
         this.isFirstTime = isFirstTime;
     }
 
     //----GETTERS----//
     protected MediaRecorder getMediaRecorder() {
-        return mMediaRecorder;
+        return this.mMediaRecorder;
     }
+
     protected CameraClass getCamera() {
         return camera;
     }
+
     protected CameraDevice getCameraDevice() {
         return cameraDevice;
     }
-    protected File getMovieFolder() { return movieFolder; }
+
+    protected File getMovieFolder() {
+        return movieFolder;
+    }
+
+    protected void stopMediaRecorder() {
+        mMediaRecorder.stop();
+        mMediaRecorder.reset();    // set state to idle
+        mMediaRecorder.release();
+        mMediaRecorder = null;
+    }
+
+    protected void startMediaRecorder() {
+        mMediaRecorder = new MediaRecorder();
+        mMediaRecorder = camera.setupMediaRecorder();
+        mMediaRecorder.start();
+
+    }
+
 
     //connecting to the camera, getting the camera service, asking for permission
     protected void connectCamera() {
@@ -355,6 +381,8 @@ public class  CameraRecordingFragment extends Fragment {
 
                         }
                     }, null);
+
+
         } catch (CameraAccessException e) {
             e.printStackTrace();
         } catch (IllegalStateException e) {
@@ -430,6 +458,18 @@ public class  CameraRecordingFragment extends Fragment {
 
             NotificationManager notificationManager = getActivity().getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    @Override
+    public void run() {
+        for (int i = 0; i < 10; i++) {
+            try {
+                Thread.sleep(1000);
+                Log.d(TAG, "" + i);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

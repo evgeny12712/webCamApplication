@@ -48,6 +48,7 @@ public class numOfFilesDialog extends AppCompatDialogFragment {
                 }
             });
             editTextResetFreq = (EditText)view.findViewById(R.id.frequencyEditText);
+            editTextResetFreq.setHint("" + Items.getMaxTempFiles());
             return builder.create();
         }
 

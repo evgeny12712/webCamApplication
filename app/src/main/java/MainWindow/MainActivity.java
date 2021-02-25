@@ -29,9 +29,7 @@ import static Gallery.Items.loadFiles;
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class MainActivity extends AppCompatActivity {
 //        private CameraMainPreviewFragment cameraMainPreviewFragment;
-        private ImageButton startBtn;
-        private ImageButton galleryBtn;
-        private ImageButton settingsBtn;
+        private ImageButton startBtn, galleryBtn, settingsBtn;
         private Context context;
         public static String[] fileTypes;
         private static SharedPreferences sharedPreferences;
@@ -52,18 +50,19 @@ public class MainActivity extends AppCompatActivity {
             loadFiles(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileTypes[1], getApplicationContext());
             loadFiles(getExternalFilesDir(Environment.DIRECTORY_PICTURES), fileTypes[2], getApplicationContext());
 
+            DrivingActivity.setupNotificationManager(getApplicationContext());
 //            cameraMainPreviewFragment = (CameraMainPreviewFragment) getSupportFragmentManager().findFragmentById(R.id.cameraPreviewFragment);
             startBtn = (ImageButton) findViewById(R.id.btnStart);
             startBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-                            && ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-                            && ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED ) {
+                            && ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                         Intent intent = new Intent(getApplicationContext(), DrivingActivity.class);
                         startActivity(intent);
+                        finish();
                     } else {
-                        Toast.makeText(MainActivity.this, "You can't start recording without giving permission to use camera!",
+                        Toast.makeText(MainActivity.this, "You can't start recording without giving permission to use camera or to write to external storage!",
                                 Toast.LENGTH_LONG).show();
                     }
                 }
@@ -99,20 +98,24 @@ public class MainActivity extends AppCompatActivity {
                 sharedPreferencesEditor.putBoolean("firstRun", false).commit();
                 //setting up the default settings
                 sharedPreferencesEditor.putInt("howToStart", 0);
+
+
                 sharedPreferencesEditor.putInt("numOfFiles", 12);
-                sharedPreferencesEditor.putInt("sizeOfFiles", 5);
-                sharedPreferencesEditor.putBoolean("notificationsWhileDriving", true);
-                sharedPreferencesEditor.putBoolean("soundWhileDriving", true);
+                sharedPreferencesEditor.putString("sizeOfFiles", "5");
+                sharedPreferencesEditor.putBoolean("isSound", true);
+                sharedPreferencesEditor.putBoolean("isDnd", false);
             }
             //initialize settings
             Items.setMaxTempFiles(sharedPreferences.getInt("numOfFiles", 12));
-            DrivingActivity.setSizeOfFiles(sharedPreferences.getString("sizeOfFiles", "0"));
+            DrivingActivity.setSizeOfFiles(sharedPreferences.getString("sizeOfFiles", "5"));
             CameraClass.setIsSoundEnabled(sharedPreferences.getBoolean("isSound", true));
             DrivingActivity.setIsDnd(sharedPreferences.getBoolean("isDnd", false));
         }
 
 
-        public void onWindowFocusChanged(boolean hasFocus) {
+
+
+    public void onWindowFocusChanged(boolean hasFocus) {
             super.onWindowFocusChanged(hasFocus);
             View decorView = getWindow().getDecorView();
             if(hasFocus) {

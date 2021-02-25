@@ -195,6 +195,7 @@ public class CameraMainFragment extends Fragment {
                 if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
                         && ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
                             && ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED ) {
+
                     cameraManager.openCamera(camera.getCameraId(), cameraDeviceStateCallBack, backgroundHandler); //open the connection to the camera
                 } else {
                     //check if the user denied permission earlier, if he did so send him a toast
@@ -202,7 +203,7 @@ public class CameraMainFragment extends Fragment {
                         Toast.makeText(getActivity().getApplicationContext(), "video app required access to camera", Toast.LENGTH_SHORT).show();
                     }
                     if (shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)) {
-                        Toast.makeText(getActivity().getApplicationContext(), "app needs to be able to record audio", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity().getApplicationContext(), "app will not be able to record audio", Toast.LENGTH_SHORT).show();
                     }
                     if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                         Toast.makeText(getActivity().getApplicationContext(), "app needs to be able to save videos", Toast.LENGTH_SHORT).show();
@@ -235,7 +236,8 @@ public class CameraMainFragment extends Fragment {
             }
             if (grantResults[2] != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(getContext(), "Application need to be able to record audio", Toast.LENGTH_SHORT).show();
-                shouldOpen = false;
+                CameraClass.setIsSoundEnabled(false);
+                shouldOpen = true;
             }
             if(shouldOpen) {
                 try {

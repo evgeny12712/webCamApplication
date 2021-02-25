@@ -95,6 +95,9 @@ public class CameraClass extends AppCompatActivity {
         return isLandscape;
     }
     public String getFileName() { return mVideoFileName; }
+    public static boolean getIsSound() {
+        return isSoundEnabled;
+    }
     private static class CompareSizeByArea implements Comparator<Size> {
         //class to compare different resolutions by the preview
         @Override
@@ -140,7 +143,6 @@ public class CameraClass extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
 
     public void closeCamera(CameraDevice cameraDevice) {
         if(cameraDevice != null) {
@@ -255,18 +257,22 @@ public class CameraClass extends AppCompatActivity {
         }
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         mMediaRecorder.setOutputFile(mVideoFileName);
+        Log.d(TAG, "setupMediaRecorder: " + mVideoFileName);
         mMediaRecorder.setVideoEncodingBitRate(3000000);
         mMediaRecorder.setVideoFrameRate(16);
         mMediaRecorder.setVideoSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+        //mMediaRecorder.setMaxDuration(10*1000);
         if(isSoundEnabled) {
             mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
         }
         mMediaRecorder.setOrientationHint(cameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION));
         try {
             mMediaRecorder.prepare();
+            Log.d(TAG, "prepared");
         } catch (IOException e) {
             e.printStackTrace();
+            Log.d(TAG, "not-prepared");
         }
         return mMediaRecorder;
     }
