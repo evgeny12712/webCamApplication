@@ -4,16 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
-import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +13,6 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,14 +29,13 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import java.io.File;
 import java.io.IOException;
 
-import Gallery.GalleryActivity;
-import Gallery.Items;
-import Gallery.Item;
-import MainWindow.MainActivity;
+import Gallery.General.GalleryActivity;
+import Gallery.General.Items;
+import Gallery.General.Item;
 
 import static Gallery.Gallery.TemporaryFiles.GalleryTemporaryFilesFragment.*;
-import static Gallery.GalleryActivity.*;
-import static Gallery.Items.*;
+import static Gallery.General.GalleryActivity.*;
+import static Gallery.General.Items.*;
 import static android.R.style.Theme_Black_NoTitleBar_Fullscreen;
 
 public class TemporaryVideoDisplayActivity extends AppCompatActivity {

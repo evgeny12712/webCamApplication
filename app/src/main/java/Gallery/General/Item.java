@@ -1,13 +1,8 @@
-package Gallery;
+package Gallery.General;
 
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.util.Log;
-
-import androidx.annotation.LongDef;
 
 import java.io.File;
-import java.io.IOException;
 
 public class Item {
     private Uri uri;

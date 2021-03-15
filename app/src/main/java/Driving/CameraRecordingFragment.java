@@ -41,12 +41,17 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import CameraAndSupport.CameraClass;
 import CameraAndSupport.Functions;
+import Gallery.General.Item;
+import Gallery.General.Items;
+import MainWindow.MainActivity;
 
 import com.example.webcamapplication.R;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+
+import static Gallery.General.Items.loadFiles;
 
 public class CameraRecordingFragment extends Fragment implements Runnable {
     private static final int REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION_RESULT = 1;
@@ -144,8 +149,10 @@ public class CameraRecordingFragment extends Fragment implements Runnable {
                         case STATE_WAIT_LOCK:
                             mCaptureState = STATE_PREVIEW;
                             Integer afState = captureResult.get(CaptureResult.CONTROL_AF_STATE);
+                            Log.d(TAG, "process: " + afState);
                             if (afState == CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED ||
                                     afState == CaptureRequest.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED) {
+                                Log.d(TAG, "startStillCaptureRequest: JUST_B4_CAPTURE");
                                 startStillCaptureRequest();
                             }
                             break;
@@ -180,18 +187,18 @@ public class CameraRecordingFragment extends Fragment implements Runnable {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        isFirstTime = true;
+        if (getActivity().getIntent().hasExtra("isFirstTime")) {
+            isFirstTime = getActivity().getIntent().getBooleanExtra("isFirstTime", true);
+        }
         mMediaRecorder = new MediaRecorder();
         cameraManager = (CameraManager) getActivity().getSystemService(Context.CAMERA_SERVICE);
         camera = new CameraClass();
         movieFolder = getContext().getExternalFilesDir(Environment.DIRECTORY_MOVIES);
         imageFolder = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        isFirstTime = true;
         isLandscape = getActivity().getWindowManager().getDefaultDisplay().getRotation() == Surface.ROTATION_90
                 || getActivity().getWindowManager().getDefaultDisplay().getRotation() == Surface.ROTATION_270;
         notificationManager = NotificationManagerCompat.from(getActivity());
-        if (getActivity().getIntent().hasExtra("isFirstTime")) {
-            isFirstTime = false;
-        }
         thread = new Thread(this);
     }
 
@@ -199,6 +206,7 @@ public class CameraRecordingFragment extends Fragment implements Runnable {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_recording_camera, container, false);
+        Toast.makeText(getActivity().getApplicationContext(), "isFirstTime  " + isFirstTime, Toast.LENGTH_LONG).show();
         if (isFirstTime == true) {
             startBackgroundThread();
             textureView = (TextureView) v.findViewById(R.id.textureView);
@@ -230,6 +238,13 @@ public class CameraRecordingFragment extends Fragment implements Runnable {
 
         // Inflate the layout for this fragment
         return v;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: \"CameraRecordingFragment : DESTROYED!\"");
+        stopBackGroundThread();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.P)
@@ -277,20 +292,22 @@ public class CameraRecordingFragment extends Fragment implements Runnable {
         return movieFolder;
     }
 
-    protected void stopMediaRecorder() {
+    protected void stopMediaRecorder(boolean isFromOnDestroy) {
         mMediaRecorder.stop();
         mMediaRecorder.reset();    // set state to idle
         mMediaRecorder.release();
         mMediaRecorder = null;
+        if(isFromOnDestroy == false) {
+            loadFiles(getContext().getExternalFilesDir(Environment.DIRECTORY_MOVIES), MainActivity.fileTypes[0], getContext());
+            Log.d(TAG, " cameraFragment : temporaryFilesSize : " + Items.getTemporaryFiles().size());
+        }
     }
 
     protected void startMediaRecorder() {
         mMediaRecorder = new MediaRecorder();
         mMediaRecorder = camera.setupMediaRecorder();
         mMediaRecorder.start();
-
     }
-
 
     //connecting to the camera, getting the camera service, asking for permission
     protected void connectCamera() {
@@ -300,25 +317,23 @@ public class CameraRecordingFragment extends Fragment implements Runnable {
                 if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) ==
                         PackageManager.PERMISSION_GRANTED &&
                         ContextCompat.checkSelfPermission(getContext(), Manifest.permission.RECORD_AUDIO) ==
-                        PackageManager.PERMISSION_GRANTED &&
+                                PackageManager.PERMISSION_GRANTED &&
                         ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
-                        PackageManager.PERMISSION_GRANTED) {
+                                PackageManager.PERMISSION_GRANTED) {
                     cameraManager.openCamera(camera.getCameraId(), cameraDeviceStateCallBack, backgroundHandler); //open the connection to the camera
-                }
-                else
-                {
+                } else {
                     //check if we should show a request for permission
-                    if(shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
+                    if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
                         Toast.makeText(getContext(), "video app required access to camera", Toast.LENGTH_SHORT).show();
                     }
-                    if(shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)) {
+                    if (shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)) {
                         Toast.makeText(getContext(), "video app required access to record audio", Toast.LENGTH_SHORT).show();
                     }
-                    if(shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                         Toast.makeText(getContext(), "video app needs to be able to write to storage", Toast.LENGTH_SHORT).show();
                     }
                     // asking for the permission
-                    requestPermissions(new String[] {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE,
                             Manifest.permission.RECORD_AUDIO,
                     }, REQUEST_CAMERA_PERMISSION_RESULT);
                 }
@@ -334,14 +349,14 @@ public class CameraRecordingFragment extends Fragment implements Runnable {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permission, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permission, grantResults);
-        if(requestCode == REQUEST_CAMERA_PERMISSION_RESULT) {
-            if(grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+        if (requestCode == REQUEST_CAMERA_PERMISSION_RESULT) {
+            if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(getContext(), "Application will not run without camera permission", Toast.LENGTH_SHORT).show();
             }
-            if(grantResults[1] != PackageManager.PERMISSION_GRANTED) {
+            if (grantResults[1] != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(getContext(), "Application will not have audio on record", Toast.LENGTH_SHORT).show();
             }
-            if(grantResults[2] != PackageManager.PERMISSION_GRANTED) {
+            if (grantResults[2] != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(getActivity().getApplicationContext(),
                         "Application will not run without being able to save to storage", Toast.LENGTH_SHORT).show();
             }
@@ -349,48 +364,47 @@ public class CameraRecordingFragment extends Fragment implements Runnable {
     }
 
     protected void startRecord() {
-        try {
-            //creating the surface on which we gonna display the preview while recording
-            SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
-            surfaceTexture.setDefaultBufferSize(camera.getPreviewSize().getWidth(), camera.getPreviewSize().getHeight());
-            Surface previewSurface = new Surface(surfaceTexture);
-            Surface recordSurface = mMediaRecorder.getSurface();
+        if (cameraDevice != null) {
+            try {
+                //creating the surface on which we gonna display the preview while recording
+                SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
+                surfaceTexture.setDefaultBufferSize(camera.getPreviewSize().getWidth(), camera.getPreviewSize().getHeight());
+                Surface previewSurface = new Surface(surfaceTexture);
+                Surface recordSurface = mMediaRecorder.getSurface();
+                mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+                //making preview
+                mCaptureRequestBuilder.addTarget(previewSurface);
+                //recording
+                mCaptureRequestBuilder.addTarget(recordSurface);
 
-            mCaptureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
-            //making preview
-            mCaptureRequestBuilder.addTarget(previewSurface);
-            //recording
-            mCaptureRequestBuilder.addTarget(recordSurface);
-
-            cameraDevice.createCaptureSession(Arrays.asList(previewSurface, recordSurface, mImageReader.getSurface()),
-                    new CameraCaptureSession.StateCallback() {
-                        @Override
-                        public void onConfigured(@NonNull CameraCaptureSession session) {
-                            mRecordCaptureSession = session;
-                            try {
-                                mRecordCaptureSession.setRepeatingRequest(mCaptureRequestBuilder.build(),
-                                        null, backgroundHandler);
-                                session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, null);
-                            } catch (CameraAccessException e) {
-                                e.printStackTrace();
+                cameraDevice.createCaptureSession(Arrays.asList(previewSurface, recordSurface, mImageReader.getSurface()),
+                        new CameraCaptureSession.StateCallback() {
+                            @Override
+                            public void onConfigured(@NonNull CameraCaptureSession session) {
+                                mRecordCaptureSession = session;
+                                try {
+                                    mRecordCaptureSession.setRepeatingRequest(mCaptureRequestBuilder.build(),
+                                            null, backgroundHandler);
+                                    session.setRepeatingRequest(mCaptureRequestBuilder.build(), null, null);
+                                } catch (CameraAccessException e) {
+                                    e.printStackTrace();
+                                }
                             }
-                        }
 
-                        @Override
-                        public void onConfigureFailed(@NonNull CameraCaptureSession session) {
+                            @Override
+                            public void onConfigureFailed(@NonNull CameraCaptureSession session) {
 
-                        }
-                    }, null);
-
-
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
-        } catch (IllegalStateException e) {
-            Toast.makeText(getContext(), "ILLEGAL STATE", Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            Toast.makeText(getContext(), "ILLEGAL ARGUMENT", Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
+                            }
+                        }, null);
+            } catch (CameraAccessException e) {
+                e.printStackTrace();
+            } catch (IllegalStateException e) {
+                Toast.makeText(getContext(), "ILLEGAL STATE", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            } catch (IllegalArgumentException e) {
+                Toast.makeText(getContext(), "ILLEGAL ARGUMENT", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
         }
     }
 
@@ -443,21 +457,9 @@ public class CameraRecordingFragment extends Fragment implements Runnable {
         mCaptureRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_START);
         try {
             mRecordCaptureSession.capture(mCaptureRequestBuilder.build(), mRecordCaptureCallback, backgroundHandler);
+            Log.d(TAG, "in-LOCK_FOCUS");
         } catch (CameraAccessException e) {
             e.printStackTrace();
-        }
-    }
-
-    public void createNotificationChannel() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            CharSequence name = "notChannel";
-            String description = "Channel for notifications";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel("webCam", name, importance);
-            channel.setDescription(description);
-
-            NotificationManager notificationManager = getActivity().getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
         }
     }
 

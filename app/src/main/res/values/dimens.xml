@@ -5,4 +5,7 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="text_margin">16dp</dimen>
     <dimen name="gallery_margin">3dp</dimen>
+    <dimen name="dialog_box_text_size">20dp</dimen>
+    <dimen name="dialog_box_margin">15dp</dimen>
+
 </resources>

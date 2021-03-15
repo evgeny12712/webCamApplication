@@ -1,12 +1,10 @@
 package Gallery.SavedFiles;
 
-import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +14,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -29,16 +26,12 @@ import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.ui.PlayerView;
 
 import java.io.File;
-import java.io.IOException;
 
-import Gallery.Gallery.TemporaryFiles.TemporaryVideoDisplayActivity;
-import Gallery.GalleryActivity;
-import Gallery.Items;
-import Gallery.Item;
+import Gallery.General.GalleryActivity;
+import Gallery.General.Items;
 
-import static Gallery.Gallery.TemporaryFiles.GalleryTemporaryFilesFragment.*;
-import static Gallery.GalleryActivity.*;
-import static Gallery.Items.*;
+import static Gallery.General.GalleryActivity.*;
+import static Gallery.General.Items.*;
 import static android.R.style.Theme_Black_NoTitleBar_Fullscreen;
 
 

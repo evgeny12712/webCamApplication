@@ -14,7 +14,6 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 import com.example.webcamapplication.R;
 
 import Driving.DrivingActivity;
-import Gallery.Items;
 import MainWindow.MainActivity;
 
 public class sizeOfFilesDialog extends AppCompatDialogFragment {

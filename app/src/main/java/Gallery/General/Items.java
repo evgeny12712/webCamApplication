@@ -1,15 +1,10 @@
-package Gallery;
+package Gallery.General;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.icu.util.LocaleData;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
-import android.os.CancellationSignal;
 import android.os.Environment;
-import android.util.Size;
-import android.widget.Toast;
+import android.util.Log;
 
 import androidx.core.content.FileProvider;
 
@@ -24,9 +19,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import Gallery.GalleryActivity;
+import MainWindow.MainActivity;
 
-import static Gallery.GalleryActivity.fileTypes;
+import static Gallery.General.GalleryActivity.fileTypes;
 
 public class Items {
     private static final List<Item> temporaryFiles = new ArrayList<>();
@@ -80,7 +75,7 @@ public class Items {
         return date + "," + time;
     }
 
-    private static void addItem(Item item, String filesType) {
+    public static void addItem(Item item, String filesType) {
         switch (filesType) {
             case "temporary videos":
                 if (!Items.getTemporaryFiles().contains(item)) {
@@ -116,6 +111,7 @@ public class Items {
                 }
             }
         }
+        loadFiles(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileTypes[1], context);
         deleteFile(itemSrc, context, fileTypes[0]);
     }
 
@@ -172,17 +168,18 @@ public class Items {
     }
 
     public static void deleteOldestItem() {
-        File oldestFile = getOldestFile(temporaryFiles);
+        File oldestFile = getOldestFile();
+        Log.d(TAG, "deleteOldestItem: path : " + oldestFile.getPath());
         if (oldestFile != null) {
             oldestFile.delete();
             temporaryFiles.remove(getItemByFile(temporaryFiles, oldestFile));
         }
     }
 
-    public static File getOldestFile(List<Item> items) {
+    public static File getOldestFile() {
         long oldestDate = Long.MAX_VALUE;
-        File oldestFile = null;
-        for (Item item : items) {
+        File oldestFile = temporaryFiles.get(0).getFile();
+        for (Item item : temporaryFiles) {
             if (item.getFile().lastModified() < oldestDate) {
                 oldestDate = item.getFile().lastModified();
                 oldestFile = item.getFile();

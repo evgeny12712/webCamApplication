@@ -191,14 +191,14 @@ public class CameraMainFragment extends Fragment {
         try {
             //if our version of android is later version of android then marshmallow so we have to ask for permission
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                // check if we already got permission (for earlier activations)
+                // check if we already got permission (for earlier activations)  IF GOT
                 if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
                         && ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
                             && ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED ) {
 
                     cameraManager.openCamera(camera.getCameraId(), cameraDeviceStateCallBack, backgroundHandler); //open the connection to the camera
                 } else {
-                    //check if the user denied permission earlier, if he did so send him a toast
+                    //check if the user denied permission earlier, if he did so send him a toast IF DENIED BEFORE
                     if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
                         Toast.makeText(getActivity().getApplicationContext(), "video app required access to camera", Toast.LENGTH_SHORT).show();
                     }
@@ -208,8 +208,8 @@ public class CameraMainFragment extends Fragment {
                     if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                         Toast.makeText(getActivity().getApplicationContext(), "app needs to be able to save videos", Toast.LENGTH_SHORT).show();
                     }
-
-                    requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.RECORD_AUDIO}, REQUEST_CAMERA_PERMISSION_RESULT);
+                    //ASK FOR PERMISSIONS
+                    requestPermissions(new String[] { Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.RECORD_AUDIO }, REQUEST_CAMERA_PERMISSION_RESULT);
                 }
             } //if our version of android is earlier version of android then marshmallow so we can just open camera
             else {

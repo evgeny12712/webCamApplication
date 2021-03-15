@@ -1,6 +1,5 @@
 package CameraAndSupport;
 
-import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
@@ -14,6 +13,7 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.media.MediaRecorder;
 import android.os.Build;
+import android.os.Environment;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -22,7 +22,6 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 //import Driving.DrivingActivity;
 //import com.example.webcamapplication.SettingsActivity;
@@ -39,7 +38,11 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import Gallery.Items;
+import Gallery.General.Item;
+import Gallery.General.Items;
+import MainWindow.MainActivity;
+
+import static Gallery.General.Items.loadFiles;
 
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -62,6 +65,7 @@ public class CameraClass extends AppCompatActivity {
     private String mVideoFileName; // file name
     private static File mImageFolder; //file path
     private String mImageFileName; // file name
+    private File mVideoFile; //video file
 
     private boolean isLandscape;
 
@@ -77,8 +81,6 @@ public class CameraClass extends AppCompatActivity {
     }
 
     private static boolean isSoundEnabled;
-
-
 
     public String getCameraId() {
         return mCameraId;
@@ -98,6 +100,7 @@ public class CameraClass extends AppCompatActivity {
     public static boolean getIsSound() {
         return isSoundEnabled;
     }
+    public File getmVideoFile() { return mVideoFile; }
     private static class CompareSizeByArea implements Comparator<Size> {
         //class to compare different resolutions by the preview
         @Override
@@ -201,9 +204,11 @@ public class CameraClass extends AppCompatActivity {
 
         //setting the file inside the folder that we created on "createVideoFolder" func
         mVideoFileName = videoFile.getAbsolutePath();
+        Log.d(TAG, "createVideoFileName: CREATED FILE!");
         //if we reached the max files that we can save so delete the oldest file
         if(mVideoFolder.listFiles().length > Items.getMaxTempFiles()) {
             Items.deleteOldestItem();
+            Log.d(TAG, "createVideoFileName: FILE DELETED!!");
         }
         return videoFile;
     }
@@ -238,7 +243,7 @@ public class CameraClass extends AppCompatActivity {
         if(requestCode == REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION_RESULT) {
             if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 try {
-                    createVideoFileName();
+                    mVideoFile = createVideoFileName();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

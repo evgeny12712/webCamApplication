@@ -7,64 +7,54 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.media.AudioManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.Looper;
-import android.os.SystemClock;
-import android.service.notification.NotificationListenerService;
-import android.service.notification.StatusBarNotification;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.Chronometer;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
-import android.provider.Settings;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.JobIntentService;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import androidx.fragment.app.FragmentTransaction;
 
-import CameraAndSupport.CameraClass;
-import Gallery.Items;
+import Gallery.General.Items;
 import MainWindow.MainActivity;
+
 import com.example.webcamapplication.R;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
+
+import static Gallery.General.Items.loadFiles;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class DrivingActivity extends AppCompatActivity {
     private static final String TAG = "DrivingActivity";
     private static final int GPS_PERMISSION_CODE = 0;
 
-    //notification constants
+    //regular notification
     private final String notTitle = "webCamApplication";
     private final String notText = "Your webCamApplication is recording!";
     private final String channelName = "webCamApplication channel";
-    private final String channelDesctiption = "channel for one notification";
+    private final String channelDescription = "channel for one notification";
     private final String CHANNEL_ID = "webC";
-    private final int notificationId = 1;
+    private final int regularNotId = 1;
 
+    //auto stop notification
+    private final int autoStopNotId = 2;
+    private final String autoStopNotText = "Static mode detected, application will stop soon!" ;
+    private boolean isFromAutoStopNotification;
+    private Long milisUntilAutoStopTimerDone;
+    private CountDownTimer autoStopCountDownTimer;
     //buttons
     private ImageButton btnMinimize, btnStop, btnPicture;
-
-    //speed TextView
-    private TextView speedTextView;
 
     private CameraRecordingFragment cameraFragment;
     private SpeedAndChronoFragment speedAndChronoFragment;
@@ -80,41 +70,37 @@ public class DrivingActivity extends AppCompatActivity {
     private static Context context;
 
     //on minimized notification
-    private NotificationCompat.Builder builder;
-    NotificationManagerCompat notificationCompatManager;
-
+    private NotificationCompat.Builder regularNotBuilder;
+    private NotificationCompat.Builder autoStopNotBuilder;
+    private NotificationManagerCompat notificationCompatManager;
+    private static boolean isOnBackground;
     //handler for auto stop and start recording.
-    Handler handler;
+    private Handler handler;
+
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driving);
+
         btnMinimize = (ImageButton) findViewById(R.id.btnMinimize);
         cameraFragment = (CameraRecordingFragment) getSupportFragmentManager().findFragmentById(R.id.cameraRecordingFragment);
         speedAndChronoFragment = (SpeedAndChronoFragment) getSupportFragmentManager().findFragmentById(R.id.speed_and_chronometer);
-
+        isOnBackground = false;
         context = getApplicationContext();
+        Toast.makeText(context, "DrivingActivity onCreate", Toast.LENGTH_SHORT).show();
+        //notifications
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notificationCompatManager = NotificationManagerCompat.from(this);
-        createNotificationChannel();
-        Intent intent = new Intent(this, DrivingActivity.class);
-        intent.putExtra("isFirstTime", false);
-        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0,
-                intent,PendingIntent.FLAG_UPDATE_CURRENT);
-
-        //the builder for the no minimized notification
-        builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_baseline_camera_alt_24)
-                .setColor(getResources().getColor(R.color.green))
-                .setColorized(true)
-                .setContentTitle(notTitle)
-                .setContentText(notText)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setAutoCancel(true);
+        createNotificationsChannel();
+        createNotifications();
+        if(getIntent().hasExtra("fromAutoStopIntent")) {
+            isFromAutoStopNotification = true;
+        }
+        else {
+            isFromAutoStopNotification = false;
+        }
 
         //checking if the app should start with do not disturb mode
         if (isDnd) {
@@ -146,11 +132,9 @@ public class DrivingActivity extends AppCompatActivity {
                 cameraFragment.lockFocus();
             }
         });
-        if(!getIntent().hasExtra("isFirstTime")) {
+        if(getIntent().getBooleanExtra("isFirstTime", true)) {
             speedAndChronoFragment.startChronoFromZero();
         }
-
-        Intent recreateIntent = new Intent(this, DrivingActivity.class);
 
         //setting up the timer for the current video file
         handler = new Handler();
@@ -164,15 +148,20 @@ public class DrivingActivity extends AppCompatActivity {
                         Toast.makeText(DrivingActivity.this, "inside2", Toast.LENGTH_SHORT).show();
 
                         handler.postDelayed(this, delay);
-                        cameraFragment.stopMediaRecorder();
-                        try {
-                            cameraFragment.getCamera().createVideoFileName();
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        if (handler != null && cameraFragment != null) {
+                            loadFiles(getExternalFilesDir(Environment.DIRECTORY_MOVIES), MainActivity.fileTypes[0], getApplicationContext());
+                            Log.d(TAG, "temporaryFilesSize : "  + Items.getTemporaryFiles().size());
+
+                            cameraFragment.stopMediaRecorder(false);
+                            try {
+                                cameraFragment.getCamera().createVideoFileName();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            cameraFragment.startMediaRecorder();
+                            cameraFragment.startRecord();
+                            resetChronometer();
                         }
-                        cameraFragment.startMediaRecorder();
-                        cameraFragment.startRecord();
-                        startRecording();
                     }
                 }
             }, delay);
@@ -180,7 +169,6 @@ public class DrivingActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             //check if we already got permission
             if(checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                initLocation();
             }
             else {
                 //check if we want to explain to the user why we need this permission
@@ -192,21 +180,39 @@ public class DrivingActivity extends AppCompatActivity {
                 requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, GPS_PERMISSION_CODE);
             }
         }
-
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        notificationCompatManager.notify(notificationId, builder.build());
+        isOnBackground = true;
+        notificationCompatManager.notify(regularNotId, regularNotBuilder.build());
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        notificationCompatManager.cancel(notificationId);
-        Log.d(TAG, "onRestart: ");
-        Toast.makeText(context, "onRestart", Toast.LENGTH_SHORT).show();
+        if(getIntent().hasExtra("isFirstTime")) {
+            Log.d(TAG, "onRestart: hasEXTRA");
+            boolean isItFirstTIme = getIntent().getBooleanExtra("isFirstTime", true);
+            if(isItFirstTIme) {
+                Log.d(TAG, "onRestart: isFIRSTITME!!!!");
+            }
+        }
+        Toast.makeText(context, "DrivingActivity : onRestart", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+//        if(isFromAutoStopNotification) {
+//            Long timerLeft = milisUntilAutoStopTimerDone;
+//            isFromAutoStopNotification = false;
+//            speedAndChronoFragment.openAutoStopDialog();
+//            Log.d(TAG, "IN_isFromAutoStopNotification" + speedAndChronoFragment.getIsAutoStopDialogOn());
+//
+//        }
+        isOnBackground = false;
     }
 
     @Override
@@ -217,9 +223,10 @@ public class DrivingActivity extends AppCompatActivity {
             boolean isSuccess = renameFile();
         }
         cameraFragment.setIsFirstTime(true);
-        cameraFragment.stopMediaRecorder();
+        cameraFragment.stopMediaRecorder(true);
         //deleting the notification when we stop recording
-        notificationCompatManager.cancel(notificationId);
+        notificationCompatManager.cancel(regularNotId);
+        //notificationCompatManager.cancelAll();
         handler = null;
         cameraFragment = null;
         //if we were on "do not disturb" mode while driving so we need to cancel it now
@@ -228,17 +235,40 @@ public class DrivingActivity extends AppCompatActivity {
                 mNotificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);
             }
         }
-        Toast.makeText(context, "Destroyed", Toast.LENGTH_SHORT).show();
+        if(autoStopCountDownTimer != null) {
+            autoStopCountDownTimer.cancel();
+            autoStopCountDownTimer = null;
+        }
+        Toast.makeText(context, "DrivingActivity Destroyed", Toast.LENGTH_SHORT).show();
     }
 
+
+    //GETTERS
     public static int getIntSizeOfFile() {
         return intSizeOfFile;
     }
-
     public static boolean getIsDnd() {
         return isDnd;
     }
+    public static boolean getIsOnBackground() { return isOnBackground; }
+    public static NotificationManager getmNotificationManager() {
+        return mNotificationManager;
+    }
+    public CountDownTimer getAutoStopCountDownTimer() {
+        return autoStopCountDownTimer;
+    }
+    //SETTERS
+    public static void setSizeOfFiles(String size) {
+        sizeOfFile = size + ":01";
+        intSizeOfFile = Integer.parseInt(size);
+    }
+    public static void setIsDnd(Boolean is_dnd) {
+        isDnd = is_dnd;
+    }
 
+    public static void setupNotificationManager(Context context) {
+        mNotificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+    }
 
     //setting the application fullscreen
     @Override
@@ -253,42 +283,17 @@ public class DrivingActivity extends AppCompatActivity {
         }
     }
 
+
     @Override
     public void onBackPressed() {
         this.moveTaskToBack(true);
     }
 
-    public static NotificationManager getmNotificationManager() {
-        return mNotificationManager;
-    }
-
-    public static void setupNotificationManager(Context context) {
-        mNotificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-    }
-
-    public static void setSizeOfFiles(String size) {
-        sizeOfFile = size + ":01";
-        intSizeOfFile = Integer.parseInt(size);
-    }
-
-    public static void setIsDnd(Boolean is_dnd) {
-        isDnd = is_dnd;
-    }
-
-//    private void stopRecording() {
-//        cameraFragment.setIsFirstTime(true);
-//        cameraFragment.getMediaRecorder().stop();
-//        cameraFragment.getMediaRecorder().reset();
-//        cameraFragment.getMediaRecorder().release();
-//        cameraFragment.getCamera().closeCamera(cameraFragment.getCameraDevice());
-//        cameraFragment.stopBackGroundThread();
-//        mChronometer.stop();
-//    }
-
-    private void startRecording() {
+    private void resetChronometer() {
         speedAndChronoFragment.startChronoFromZero();
     }
 
+    // rename file to detect if shooted landscape
     private boolean renameFile() {
         String fileName = cameraFragment.getCamera().getFileName();
         fileName = fileName.substring(fileName.lastIndexOf("/") + 1, fileName.length());
@@ -299,24 +304,97 @@ public class DrivingActivity extends AppCompatActivity {
         return from.renameTo(to);
     }
 
-    public void createNotificationChannel() {
+    //////////////////////////////////////Notifications//////////////////////////////////////
+    public void createNotificationsChannel() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             CharSequence name = channelName;
-            String description = channelDesctiption;
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            String description = channelDescription;
+            int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
+            channel.setShowBadge(true);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            channel.setVibrationPattern(new long[]{300, 300, 300});
             // Registering the channel to the service
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
     }
 
+    private void createNotifications() {
+        ////////////////////////////REGULAR NOTIFICATION////////////////////////////
+        //Intent for the regular notification onClick
+        Intent intent = new Intent(this, DrivingActivity.class);
+        intent.putExtra("isFirstTime", false);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), regularNotId,
+                intent,PendingIntent.FLAG_UPDATE_CURRENT);
+
+        //The builder for the minimized notification
+        regularNotBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_baseline_camera_alt_24)
+                .setColor(getResources().getColor(R.color.green))
+                .setContentTitle(notTitle)
+                .setContentText(notText)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .setOngoing(true)
+                .setNotificationSilent()
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+
+        ////////////////////////////AUTO-STOP NOTIFICATION////////////////////////////
+        Intent autoStopIntent = new Intent(this, DrivingActivity.class);
+        autoStopIntent.putExtra("fromAutoStopIntent", "fromAutoStopIntent");
+        autoStopIntent.putExtra("isFirstTime", false);
+        autoStopIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent autoStopPendingIntent = PendingIntent.getActivity(this,
+                autoStopNotId, autoStopIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        // Builder for auto stop driving notification
+        autoStopNotBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_baseline_camera_alt_24)
+                .setColor(getResources().getColor(R.color.green))
+                .setContentTitle(notTitle)
+                .setContentText(autoStopNotText)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setAutoCancel(true) // closing the notification automatically when tapping it
+                .setOngoing(true) // do'es not let the user close the notification with swap
+                .setOnlyAlertOnce(true) // alerting sound only one time
+                .setContentIntent(autoStopPendingIntent) // action on click
+                .setStyle(new NotificationCompat.BigTextStyle().bigText("Static mode detected, if you won't start driving soon so the application will stop recording!")); // adding big text
+    }
+
+    public void startAutoStopNotification() {
+        notificationCompatManager.cancel(regularNotId);
+        mNotificationManager.notify(autoStopNotId, autoStopNotBuilder.build());
+        startAutoStopNotificationTimer();
+    }
+
+    //Start the timer for auto stop dialog open.
+    private void startAutoStopNotificationTimer() {
+        autoStopCountDownTimer = new CountDownTimer(10000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                //Update timer every tick
+                milisUntilAutoStopTimerDone = millisUntilFinished;
+                Log.d(TAG, "onTick: " + millisUntilFinished);
+            }
+
+            // When timer finish we need to open our dialog.
+            @Override
+            public void onFinish() {
+                autoStopCountDownTimer.cancel();
+                autoStopCountDownTimer = null;
+                mNotificationManager.cancel(autoStopNotId);
+                finish();
+            }
+        }.start();
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if(requestCode == GPS_PERMISSION_CODE) {
             if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                initLocation();
             } else {
                 Toast.makeText(context, "Permission was not granted", Toast.LENGTH_SHORT).show();
                 speedAndChronoFragment.getSpeedTextView().setVisibility(View.GONE);
@@ -326,7 +404,19 @@ public class DrivingActivity extends AppCompatActivity {
         }
     }
 
-    public void initLocation() {
-        //speedDetector = new SpeedDetector();
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if(intent.hasExtra("fromAutoStopIntent")) {
+            if(autoStopCountDownTimer != null) {
+                Log.d(TAG, "onNewIntent: autoStopCountDownTimer != null");
+                autoStopCountDownTimer.cancel();
+                autoStopCountDownTimer = null;
+            }
+                Long timerLeft = milisUntilAutoStopTimerDone;
+                isFromAutoStopNotification = false;
+                speedAndChronoFragment.openAutoStopDialog(milisUntilAutoStopTimerDone);
+                Log.d(TAG, "IN_isFromAutoStopNotification" + speedAndChronoFragment.getIsAutoStopDialogOn());
+        }
     }
 }

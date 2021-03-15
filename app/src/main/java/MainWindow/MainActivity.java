@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -20,22 +21,23 @@ import com.example.webcamapplication.R;
 
 import CameraAndSupport.CameraClass;
 import Driving.DrivingActivity;
-import Gallery.GalleryActivity;
-import Gallery.Items;
+import Gallery.General.GalleryActivity;
+import Gallery.General.Items;
 
-import static Gallery.Items.loadFiles;
+import static Gallery.General.Items.loadFiles;
 
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class MainActivity extends AppCompatActivity {
 //        private CameraMainPreviewFragment cameraMainPreviewFragment;
+        public static final String TAG = "MainActivity";
         private ImageButton startBtn, galleryBtn, settingsBtn;
         private Context context;
         public static String[] fileTypes;
         private static SharedPreferences sharedPreferences;
         private static SharedPreferences.Editor sharedPreferencesEditor;
 
-    @Override
+        @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_main);
@@ -49,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
             loadFiles(getExternalFilesDir(Environment.DIRECTORY_MOVIES), fileTypes[0], getApplicationContext());
             loadFiles(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileTypes[1], getApplicationContext());
             loadFiles(getExternalFilesDir(Environment.DIRECTORY_PICTURES), fileTypes[2], getApplicationContext());
+            Log.d(TAG, "temporaryFilesSize : "  + Items.getTemporaryFiles().size());
 
             DrivingActivity.setupNotificationManager(getApplicationContext());
 //            cameraMainPreviewFragment = (CameraMainPreviewFragment) getSupportFragmentManager().findFragmentById(R.id.cameraPreviewFragment);

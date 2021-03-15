@@ -21,20 +21,20 @@ import com.example.webcamapplication.R;
 import java.io.File;
 import java.util.List;
 
-import Gallery.Items;
+import Gallery.General.Items;
 
-import static Gallery.GalleryActivity.fileTypes;
-import static Gallery.Items.getFilesFromItems;
-import static Gallery.SelectedGalleryAdapter.clearSelection;
-import static Gallery.SelectedGalleryAdapter.deleteSelectedItems;
-import static Gallery.SelectedGalleryAdapter.getAllItems;
-import static Gallery.SelectedGalleryAdapter.getSelectedItemCount;
-import static Gallery.SelectedGalleryAdapter.getSelectedItems;
-import static Gallery.SelectedGalleryAdapter.initSelection;
-import static Gallery.SelectedGalleryAdapter.isSelected;
-import static Gallery.SelectedGalleryAdapter.shareSelectedItems;
-import static Gallery.SelectedGalleryAdapter.toggleOffSelection;
-import static Gallery.SelectedGalleryAdapter.toggleSelection;
+import static Gallery.General.GalleryActivity.fileTypes;
+import static Gallery.General.Items.getFilesFromItems;
+import static Gallery.General.SelectedGalleryAdapter.clearSelection;
+import static Gallery.General.SelectedGalleryAdapter.deleteSelectedItems;
+import static Gallery.General.SelectedGalleryAdapter.getAllItems;
+import static Gallery.General.SelectedGalleryAdapter.getSelectedItemCount;
+import static Gallery.General.SelectedGalleryAdapter.getSelectedItems;
+import static Gallery.General.SelectedGalleryAdapter.initSelection;
+import static Gallery.General.SelectedGalleryAdapter.isSelected;
+import static Gallery.General.SelectedGalleryAdapter.shareSelectedItems;
+import static Gallery.General.SelectedGalleryAdapter.toggleOffSelection;
+import static Gallery.General.SelectedGalleryAdapter.toggleSelection;
 
 public class MySavedFilesRecyclerViewAdapter extends RecyclerView.Adapter<MySavedFilesRecyclerViewAdapter.ViewHolder> {
 

@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 
 import com.example.webcamapplication.R;
 
-import Gallery.Items;
+import Gallery.General.Items;
 import MainWindow.MainActivity;
 
 public class numOfFilesDialog extends AppCompatDialogFragment {

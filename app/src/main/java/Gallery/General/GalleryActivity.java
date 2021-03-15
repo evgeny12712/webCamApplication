@@ -1,9 +1,7 @@
-package Gallery;
+package Gallery.General;
 
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 
@@ -16,8 +14,6 @@ import Gallery.Pictures.GalleryPicturesFragment;
 import Gallery.SavedFiles.GallerySavedFilesFragment;
 import MainWindow.MainActivity;
 import com.example.webcamapplication.R;
-
-import static Gallery.Items.*;
 
 public class GalleryActivity extends AppCompatActivity {
     private static final String TAG = "GalleryActivity";

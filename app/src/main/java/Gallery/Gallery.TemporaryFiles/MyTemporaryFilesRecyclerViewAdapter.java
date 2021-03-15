@@ -23,11 +23,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import Gallery.Items;
+import Gallery.General.Items;
 
-import static Gallery.GalleryActivity.*;
-import static Gallery.Items.getFilesFromItems;
-import static Gallery.SelectedGalleryAdapter.*;
+import static Gallery.General.GalleryActivity.*;
+import static Gallery.General.Items.getFilesFromItems;
+import static Gallery.General.SelectedGalleryAdapter.*;
 
 public class MyTemporaryFilesRecyclerViewAdapter extends RecyclerView.Adapter<MyTemporaryFilesRecyclerViewAdapter.ViewHolder> {
 
